@@ -4,7 +4,7 @@
 #
 Name     : blender
 Version  : 2.78
-Release  : 1
+Release  : 2
 URL      : http://download.blender.org/source/blender-2.78c.tar.gz
 Source0  : http://download.blender.org/source/blender-2.78c.tar.gz
 Summary  : No detailed summary available
@@ -99,6 +99,7 @@ export FCFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto -fno-se
 export FFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto -fno-semantic-interposition "
 export CXXFLAGS="$CXXFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto -fno-semantic-interposition "
 cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_SHARED_LIBS:BOOL=ON -DLIB_INSTALL_DIR:PATH=/usr/lib64 -DCMAKE_AR=/usr/bin/gcc-ar -DLIB_SUFFIX=64 -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_RANLIB=/usr/bin/gcc-ranlib -DWITH_INSTALL_PORTABLE=OFF -DWITH_BUILDINFO=OFF -DPYTHON_VERSION=3.6 -DWITH_CYCLES=OFF
+export LD_LIBRARY_PATH=/builddir/build/BUILD/blender-2.78c/clr-build/lib/
 make VERBOSE=1  %{?_smp_mflags}
 popd
 
@@ -107,6 +108,8 @@ export SOURCE_DATE_EPOCH=1501366361
 rm -rf %{buildroot}
 pushd clr-build
 %make_install
+mkdir -p %{buildroot}/usr/lib64
+cp lib/* %{buildroot}/usr/lib64/
 popd
 
 %files
@@ -116,6 +119,7 @@ popd
 %defattr(-,root,root,-)
 /usr/bin/blender
 /usr/bin/blender-thumbnailer.py
+/usr/lib64/*
 
 %files data
 %defattr(-,root,root,-)
