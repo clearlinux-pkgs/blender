@@ -4,13 +4,14 @@
 #
 Name     : blender
 Version  : 2.78
-Release  : 2
+Release  : 3
 URL      : http://download.blender.org/source/blender-2.78c.tar.gz
 Source0  : http://download.blender.org/source/blender-2.78c.tar.gz
 Summary  : No detailed summary available
 Group    : Development/Tools
 License  : Apache-2.0 BSD-2-Clause BSD-3-Clause GPL-2.0 GPL-3.0 Zlib
 Requires: blender-bin
+Requires: blender-lib
 Requires: blender-data
 Requires: blender-doc
 BuildRequires : blender
@@ -69,6 +70,7 @@ data components for the blender package.
 %package dev
 Summary: dev components for the blender package.
 Group: Development
+Requires: blender-lib
 Requires: blender-bin
 Requires: blender-data
 Provides: blender-devel
@@ -85,6 +87,15 @@ Group: Documentation
 doc components for the blender package.
 
 
+%package lib
+Summary: lib components for the blender package.
+Group: Libraries
+Requires: blender-data
+
+%description lib
+lib components for the blender package.
+
+
 %prep
 %setup -q -n blender-2.78c
 %patch1 -p1
@@ -94,7 +105,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1501373618
+export SOURCE_DATE_EPOCH=1501377823
 mkdir clr-build
 pushd clr-build
 export AR=gcc-ar
@@ -107,16 +118,56 @@ export CXXFLAGS="$CXXFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto -fno
 cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_SHARED_LIBS:BOOL=ON -DLIB_INSTALL_DIR:PATH=/usr/lib64 -DCMAKE_AR=/usr/bin/gcc-ar -DLIB_SUFFIX=64 -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_RANLIB=/usr/bin/gcc-ranlib -DWITH_INSTALL_PORTABLE=OFF -DWITH_BUILDINFO=OFF -DPYTHON_VERSION=3.6 -DWITH_CYCLES=OFF
 make VERBOSE=1  %{?_smp_mflags}
 popd
+mkdir clr-build-avx2
+pushd clr-build-avx2
+export AR=gcc-ar
+export RANLIB=gcc-ranlib
+export NM=gcc-nm
+export CFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto -fno-semantic-interposition "
+export FCFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto -fno-semantic-interposition "
+export FFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto -fno-semantic-interposition "
+export CXXFLAGS="$CXXFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto -fno-semantic-interposition "
+export CFLAGS="$CFLAGS -march=haswell"
+export CXXFLAGS="$CXXFLAGS -march=haswell"
+cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_SHARED_LIBS:BOOL=ON -DLIB_INSTALL_DIR:PATH=/usr/lib/haswell -DCMAKE_AR=/usr/bin/gcc-ar -DCMAKE_RANLIB=/usr/bin/gcc-ranlib -DWITH_INSTALL_PORTABLE=OFF -DWITH_BUILDINFO=OFF -DPYTHON_VERSION=3.6 -DWITH_CYCLES=OFF
+make VERBOSE=1  %{?_smp_mflags}  || :
+popd
+mkdir clr-build-avx512
+pushd clr-build-avx512
+export AR=gcc-ar
+export RANLIB=gcc-ranlib
+export NM=gcc-nm
+export CFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto -fno-semantic-interposition "
+export FCFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto -fno-semantic-interposition "
+export FFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto -fno-semantic-interposition "
+export CXXFLAGS="$CXXFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto -fno-semantic-interposition "
+export CFLAGS="$CFLAGS -march=skylake-avx512"
+export CXXFLAGS="$CXXFLAGS -march=skylake-avx512"
+cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_SHARED_LIBS:BOOL=ON -DLIB_INSTALL_DIR:PATH=/usr/lib/haswell/avx512_1 -DCMAKE_AR=/usr/bin/gcc-ar -DCMAKE_RANLIB=/usr/bin/gcc-ranlib -DWITH_INSTALL_PORTABLE=OFF -DWITH_BUILDINFO=OFF -DPYTHON_VERSION=3.6 -DWITH_CYCLES=OFF
+make VERBOSE=1  %{?_smp_mflags}  || :
+popd
 
 %install
-export SOURCE_DATE_EPOCH=1501373618
+export SOURCE_DATE_EPOCH=1501377823
 rm -rf %{buildroot}
+mkdir -p %{buildroot}/usr/lib64/haswell/avx512_1
+pushd clr-build-avx2
+%make_install  || :
+mv %{buildroot}/usr/lib64/*so* %{buildroot}/usr/lib64/haswell/ || :
+popd
+pushd clr-build-avx512
+%make_install  || :
+mv %{buildroot}/usr/lib64/*so* %{buildroot}/usr/lib64/haswell/avx512_1/ || :
+popd
+rm -f %{buildroot}/usr/bin/*
 pushd clr-build
 %make_install
 popd
 ## make_install_append content
-mkdir -p %{buildroot}/usr/lib64
+mkdir -p %{buildroot}/usr/lib64/haswell/avx512_1
 cp clr-build/lib/* %{buildroot}/usr/lib64/
+cp clr-build-avx2/lib/* %{buildroot}/usr/lib64/haswell
+cp clr-build-avx512/lib/* %{buildroot}/usr/lib64/haswell/avx512_1
 ## make_install_append end
 
 %files
@@ -5010,6 +5061,16 @@ cp clr-build/lib/* %{buildroot}/usr/lib64/
 
 %files dev
 %defattr(-,root,root,-)
+/usr/share/blender/2.78/python/include/python3.6m/pyconfig.h
+
+%files doc
+%defattr(-,root,root,-)
+%doc /usr/share/doc/blender/*
+
+%files lib
+%defattr(-,root,root,-)
+/usr/lib64/haswell/avx512_1/*
+/usr/lib64/haswell/*
 /usr/lib64/libbf_avi.so
 /usr/lib64/libbf_blenfont.so
 /usr/lib64/libbf_blenkernel.so
@@ -5123,8 +5184,3 @@ cp clr-build/lib/* %{buildroot}/usr/lib64/
 /usr/lib64/libge_rasterizer.so
 /usr/lib64/libge_scenegraph.so
 /usr/lib64/libge_videotex.so
-/usr/share/blender/2.78/python/include/python3.6m/pyconfig.h
-
-%files doc
-%defattr(-,root,root,-)
-%doc /usr/share/doc/blender/*
