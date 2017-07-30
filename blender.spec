@@ -13,8 +13,10 @@ License  : Apache-2.0 BSD-2-Clause BSD-3-Clause GPL-2.0 GPL-3.0 Zlib
 Requires: blender-bin
 Requires: blender-data
 Requires: blender-doc
+BuildRequires : blender
 BuildRequires : boost-dev
 BuildRequires : cmake
+BuildRequires : eigen-dev
 BuildRequires : fftw-dev
 BuildRequires : freeglut-dev
 BuildRequires : freetype-dev
@@ -31,7 +33,11 @@ BuildRequires : pkgconfig(x11)
 BuildRequires : pkgconfig(xi)
 BuildRequires : python-dev
 BuildRequires : python3-dev
+BuildRequires : requests
 BuildRequires : zlib-dev
+# Suppress stripping binaries
+%define __strip /bin/true
+%define debug_package %{nil}
 Patch1: build.patch
 
 %description
@@ -88,7 +94,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1501366361
+export SOURCE_DATE_EPOCH=1501373618
 mkdir clr-build
 pushd clr-build
 export AR=gcc-ar
@@ -99,18 +105,19 @@ export FCFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto -fno-se
 export FFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto -fno-semantic-interposition "
 export CXXFLAGS="$CXXFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto -fno-semantic-interposition "
 cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_SHARED_LIBS:BOOL=ON -DLIB_INSTALL_DIR:PATH=/usr/lib64 -DCMAKE_AR=/usr/bin/gcc-ar -DLIB_SUFFIX=64 -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_RANLIB=/usr/bin/gcc-ranlib -DWITH_INSTALL_PORTABLE=OFF -DWITH_BUILDINFO=OFF -DPYTHON_VERSION=3.6 -DWITH_CYCLES=OFF
-export LD_LIBRARY_PATH=/builddir/build/BUILD/blender-2.78c/clr-build/lib/
 make VERBOSE=1  %{?_smp_mflags}
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1501366361
+export SOURCE_DATE_EPOCH=1501373618
 rm -rf %{buildroot}
 pushd clr-build
 %make_install
-mkdir -p %{buildroot}/usr/lib64
-cp lib/* %{buildroot}/usr/lib64/
 popd
+## make_install_append content
+mkdir -p %{buildroot}/usr/lib64
+cp clr-build/lib/* %{buildroot}/usr/lib64/
+## make_install_append end
 
 %files
 %defattr(-,root,root,-)
@@ -119,7 +126,6 @@ popd
 %defattr(-,root,root,-)
 /usr/bin/blender
 /usr/bin/blender-thumbnailer.py
-/usr/lib64/*
 
 %files data
 %defattr(-,root,root,-)
@@ -1567,6 +1573,129 @@ popd
 /usr/share/blender/2.78/python/lib/python3.6/signal.py
 /usr/share/blender/2.78/python/lib/python3.6/signal.pyc
 /usr/share/blender/2.78/python/lib/python3.6/signal.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/__init__.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/__init__.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/__init__.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/big5freq.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/big5freq.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/big5freq.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/big5prober.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/big5prober.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/big5prober.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/chardistribution.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/chardistribution.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/chardistribution.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/charsetgroupprober.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/charsetgroupprober.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/charsetgroupprober.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/charsetprober.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/charsetprober.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/charsetprober.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/cli/__init__.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/cli/__init__.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/cli/__init__.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/cli/chardetect.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/cli/chardetect.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/cli/chardetect.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/codingstatemachine.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/codingstatemachine.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/codingstatemachine.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/compat.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/compat.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/compat.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/cp949prober.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/cp949prober.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/cp949prober.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/enums.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/enums.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/enums.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/escprober.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/escprober.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/escprober.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/escsm.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/escsm.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/escsm.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/eucjpprober.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/eucjpprober.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/eucjpprober.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/euckrfreq.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/euckrfreq.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/euckrfreq.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/euckrprober.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/euckrprober.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/euckrprober.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/euctwfreq.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/euctwfreq.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/euctwfreq.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/euctwprober.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/euctwprober.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/euctwprober.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/gb2312freq.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/gb2312freq.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/gb2312freq.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/gb2312prober.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/gb2312prober.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/gb2312prober.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/hebrewprober.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/hebrewprober.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/hebrewprober.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/jisfreq.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/jisfreq.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/jisfreq.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/jpcntx.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/jpcntx.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/jpcntx.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/langbulgarianmodel.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/langbulgarianmodel.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/langbulgarianmodel.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/langcyrillicmodel.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/langcyrillicmodel.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/langcyrillicmodel.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/langgreekmodel.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/langgreekmodel.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/langgreekmodel.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/langhebrewmodel.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/langhebrewmodel.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/langhebrewmodel.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/langhungarianmodel.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/langhungarianmodel.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/langhungarianmodel.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/langthaimodel.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/langthaimodel.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/langthaimodel.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/langturkishmodel.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/langturkishmodel.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/langturkishmodel.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/latin1prober.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/latin1prober.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/latin1prober.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/mbcharsetprober.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/mbcharsetprober.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/mbcharsetprober.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/mbcsgroupprober.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/mbcsgroupprober.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/mbcsgroupprober.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/mbcssm.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/mbcssm.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/mbcssm.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/sbcharsetprober.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/sbcharsetprober.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/sbcharsetprober.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/sbcsgroupprober.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/sbcsgroupprober.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/sbcsgroupprober.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/sjisprober.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/sjisprober.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/sjisprober.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/universaldetector.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/universaldetector.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/universaldetector.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/utf8prober.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/utf8prober.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/utf8prober.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/version.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/version.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/chardet/version.pyo
 /usr/share/blender/2.78/python/lib/python3.6/site-packages/numpy/__config__.py
 /usr/share/blender/2.78/python/lib/python3.6/site-packages/numpy/__config__.pyc
 /usr/share/blender/2.78/python/lib/python3.6/site-packages/numpy/__config__.pyo
@@ -2095,6 +2224,171 @@ popd
 /usr/share/blender/2.78/python/lib/python3.6/site-packages/numpy/version.py
 /usr/share/blender/2.78/python/lib/python3.6/site-packages/numpy/version.pyc
 /usr/share/blender/2.78/python/lib/python3.6/site-packages/numpy/version.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/__init__.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/__init__.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/__init__.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/__version__.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/__version__.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/__version__.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/_internal_utils.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/_internal_utils.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/_internal_utils.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/adapters.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/adapters.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/adapters.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/api.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/api.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/api.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/auth.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/auth.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/auth.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/certs.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/certs.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/certs.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/compat.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/compat.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/compat.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/cookies.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/cookies.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/cookies.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/exceptions.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/exceptions.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/exceptions.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/help.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/help.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/help.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/hooks.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/hooks.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/hooks.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/models.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/models.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/models.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/packages.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/packages.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/packages.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/sessions.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/sessions.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/sessions.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/status_codes.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/status_codes.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/status_codes.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/structures.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/structures.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/structures.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/utils.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/utils.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/requests/utils.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/six.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/six.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/six.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/__init__.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/__init__.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/__init__.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/_collections.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/_collections.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/_collections.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/connection.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/connection.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/connection.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/connectionpool.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/connectionpool.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/connectionpool.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/contrib/__init__.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/contrib/__init__.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/contrib/__init__.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/contrib/_securetransport/__init__.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/contrib/_securetransport/__init__.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/contrib/_securetransport/__init__.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/contrib/_securetransport/bindings.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/contrib/_securetransport/bindings.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/contrib/_securetransport/bindings.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/contrib/_securetransport/low_level.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/contrib/_securetransport/low_level.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/contrib/_securetransport/low_level.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/contrib/appengine.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/contrib/appengine.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/contrib/appengine.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/contrib/ntlmpool.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/contrib/ntlmpool.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/contrib/ntlmpool.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/contrib/pyopenssl.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/contrib/pyopenssl.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/contrib/pyopenssl.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/contrib/securetransport.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/contrib/securetransport.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/contrib/securetransport.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/contrib/socks.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/contrib/socks.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/contrib/socks.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/exceptions.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/exceptions.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/exceptions.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/fields.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/fields.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/fields.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/filepost.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/filepost.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/filepost.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/packages/__init__.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/packages/__init__.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/packages/__init__.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/packages/backports/__init__.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/packages/backports/__init__.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/packages/backports/__init__.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/packages/backports/makefile.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/packages/backports/makefile.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/packages/backports/makefile.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/packages/ordered_dict.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/packages/ordered_dict.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/packages/ordered_dict.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/packages/six.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/packages/six.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/packages/six.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/packages/ssl_match_hostname/__init__.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/packages/ssl_match_hostname/__init__.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/packages/ssl_match_hostname/__init__.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/packages/ssl_match_hostname/_implementation.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/packages/ssl_match_hostname/_implementation.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/packages/ssl_match_hostname/_implementation.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/poolmanager.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/poolmanager.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/poolmanager.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/request.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/request.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/request.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/response.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/response.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/response.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/util/__init__.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/util/__init__.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/util/__init__.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/util/connection.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/util/connection.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/util/connection.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/util/request.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/util/request.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/util/request.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/util/response.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/util/response.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/util/response.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/util/retry.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/util/retry.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/util/retry.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/util/selectors.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/util/selectors.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/util/selectors.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/util/ssl_.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/util/ssl_.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/util/ssl_.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/util/timeout.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/util/timeout.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/util/timeout.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/util/url.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/util/url.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/util/url.pyo
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/util/wait.py
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/util/wait.pyc
+/usr/share/blender/2.78/python/lib/python3.6/site-packages/urllib3/util/wait.pyo
 /usr/share/blender/2.78/python/lib/python3.6/site.py
 /usr/share/blender/2.78/python/lib/python3.6/smtpd.py
 /usr/share/blender/2.78/python/lib/python3.6/smtplib.py
@@ -4716,6 +5010,119 @@ popd
 
 %files dev
 %defattr(-,root,root,-)
+/usr/lib64/libbf_avi.so
+/usr/lib64/libbf_blenfont.so
+/usr/lib64/libbf_blenkernel.so
+/usr/lib64/libbf_blenlib.so
+/usr/lib64/libbf_blenloader.so
+/usr/lib64/libbf_blentranslation.so
+/usr/lib64/libbf_bmesh.so
+/usr/lib64/libbf_compositor.so
+/usr/lib64/libbf_depsgraph.so
+/usr/lib64/libbf_dna.so
+/usr/lib64/libbf_dna_blenlib.so
+/usr/lib64/libbf_editor_animation.so
+/usr/lib64/libbf_editor_armature.so
+/usr/lib64/libbf_editor_curve.so
+/usr/lib64/libbf_editor_datafiles.so
+/usr/lib64/libbf_editor_gpencil.so
+/usr/lib64/libbf_editor_interface.so
+/usr/lib64/libbf_editor_io.so
+/usr/lib64/libbf_editor_mask.so
+/usr/lib64/libbf_editor_mesh.so
+/usr/lib64/libbf_editor_metaball.so
+/usr/lib64/libbf_editor_object.so
+/usr/lib64/libbf_editor_physics.so
+/usr/lib64/libbf_editor_render.so
+/usr/lib64/libbf_editor_screen.so
+/usr/lib64/libbf_editor_sculpt_paint.so
+/usr/lib64/libbf_editor_sound.so
+/usr/lib64/libbf_editor_space_action.so
+/usr/lib64/libbf_editor_space_api.so
+/usr/lib64/libbf_editor_space_buttons.so
+/usr/lib64/libbf_editor_space_clip.so
+/usr/lib64/libbf_editor_space_console.so
+/usr/lib64/libbf_editor_space_file.so
+/usr/lib64/libbf_editor_space_graph.so
+/usr/lib64/libbf_editor_space_image.so
+/usr/lib64/libbf_editor_space_info.so
+/usr/lib64/libbf_editor_space_logic.so
+/usr/lib64/libbf_editor_space_nla.so
+/usr/lib64/libbf_editor_space_node.so
+/usr/lib64/libbf_editor_space_outliner.so
+/usr/lib64/libbf_editor_space_script.so
+/usr/lib64/libbf_editor_space_sequencer.so
+/usr/lib64/libbf_editor_space_text.so
+/usr/lib64/libbf_editor_space_time.so
+/usr/lib64/libbf_editor_space_userpref.so
+/usr/lib64/libbf_editor_space_view3d.so
+/usr/lib64/libbf_editor_transform.so
+/usr/lib64/libbf_editor_util.so
+/usr/lib64/libbf_editor_uvedit.so
+/usr/lib64/libbf_freestyle.so
+/usr/lib64/libbf_gpu.so
+/usr/lib64/libbf_ikplugin.so
+/usr/lib64/libbf_imbuf.so
+/usr/lib64/libbf_imbuf_cineon.so
+/usr/lib64/libbf_imbuf_dds.so
+/usr/lib64/libbf_intern_audaspace.so
+/usr/lib64/libbf_intern_decklink.so
+/usr/lib64/libbf_intern_dualcon.so
+/usr/lib64/libbf_intern_eigen.so
+/usr/lib64/libbf_intern_elbeem.so
+/usr/lib64/libbf_intern_ghost.so
+/usr/lib64/libbf_intern_glew_mx.so
+/usr/lib64/libbf_intern_guardedalloc.so
+/usr/lib64/libbf_intern_iksolver.so
+/usr/lib64/libbf_intern_itasc.so
+/usr/lib64/libbf_intern_libmv.so
+/usr/lib64/libbf_intern_locale.so
+/usr/lib64/libbf_intern_memutil.so
+/usr/lib64/libbf_intern_mikktspace.so
+/usr/lib64/libbf_intern_moto.so
+/usr/lib64/libbf_intern_opencolorio.so
+/usr/lib64/libbf_intern_rigidbody.so
+/usr/lib64/libbf_intern_smoke.so
+/usr/lib64/libbf_intern_string.so
+/usr/lib64/libbf_modifiers.so
+/usr/lib64/libbf_nodes.so
+/usr/lib64/libbf_physics.so
+/usr/lib64/libbf_python.so
+/usr/lib64/libbf_python_bmesh.so
+/usr/lib64/libbf_python_ext.so
+/usr/lib64/libbf_python_mathutils.so
+/usr/lib64/libbf_render.so
+/usr/lib64/libbf_rna.so
+/usr/lib64/libbf_windowmanager.so
+/usr/lib64/libextern_binreloc.so
+/usr/lib64/libextern_bullet.so
+/usr/lib64/libextern_carve.so
+/usr/lib64/libextern_ceres.so
+/usr/lib64/libextern_clew.so
+/usr/lib64/libextern_cuew.so
+/usr/lib64/libextern_curve_fit_nd.so
+/usr/lib64/libextern_gflags.so
+/usr/lib64/libextern_glog.so
+/usr/lib64/libextern_lzma.so
+/usr/lib64/libextern_minilzo.so
+/usr/lib64/libextern_rangetree.so
+/usr/lib64/libextern_recastnavigation.so
+/usr/lib64/libextern_wcwidth.so
+/usr/lib64/libextern_xdnd.so
+/usr/lib64/libge_blen_routines.so
+/usr/lib64/libge_converter.so
+/usr/lib64/libge_logic.so
+/usr/lib64/libge_logic_expressions.so
+/usr/lib64/libge_logic_ketsji.so
+/usr/lib64/libge_logic_loopbacknetwork.so
+/usr/lib64/libge_logic_network.so
+/usr/lib64/libge_logic_ngnetwork.so
+/usr/lib64/libge_oglrasterizer.so
+/usr/lib64/libge_phys_bullet.so
+/usr/lib64/libge_phys_dummy.so
+/usr/lib64/libge_rasterizer.so
+/usr/lib64/libge_scenegraph.so
+/usr/lib64/libge_videotex.so
 /usr/share/blender/2.78/python/include/python3.6m/pyconfig.h
 
 %files doc

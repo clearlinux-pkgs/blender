@@ -16,3 +16,5 @@ libsndfile-dev
 glu-dev
 freeglut-dev
 requests
+eigen-dev
+blender
