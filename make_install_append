@@ -1,0 +1,6 @@
+mkdir -p %{buildroot}/usr/lib64/haswell/avx512_1
+cp clr-build/lib/* %{buildroot}/usr/lib64/
+cp clr-build-avx2/lib/* %{buildroot}/usr/lib64/haswell
+cp clr-build-avx512/lib/* %{buildroot}/usr/lib64/haswell/avx512_1
+
+
