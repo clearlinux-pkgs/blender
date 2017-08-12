@@ -18,3 +18,5 @@ freeglut-dev
 requests
 eigen-dev
 blender
+oiio-dev
+openexr-dev
