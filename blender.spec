@@ -4,7 +4,7 @@
 #
 Name     : blender
 Version  : 2.78
-Release  : 9
+Release  : 10
 URL      : http://download.blender.org/source/blender-2.78c.tar.gz
 Source0  : http://download.blender.org/source/blender-2.78c.tar.gz
 Summary  : No detailed summary available
