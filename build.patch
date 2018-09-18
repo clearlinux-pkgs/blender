@@ -1,19 +1,11 @@
---- blender-2.78c/build_files/cmake/platform/platform_unix.cmake~	2017-02-24 14:09:19.000000000 +0000
-+++ blender-2.78c/build_files/cmake/platform/platform_unix.cmake	2017-07-29 21:39:25.054554701 +0000
-@@ -384,16 +384,6 @@
- if(CMAKE_COMPILER_IS_GNUCC)
- 	set(PLATFORM_CFLAGS "-pipe -fPIC -funsigned-char -fno-strict-aliasing")
+--- blender-2.79b/build_files/cmake/Modules/FindPythonLibsUnix.cmake~	2018-03-23 15:22:25.000000000 +0000
++++ blender-2.79b/build_files/cmake/Modules/FindPythonLibsUnix.cmake	2018-09-18 15:03:44.493537429 +0000
+@@ -38,7 +38,7 @@
+   SET(PYTHON_ROOT_DIR $ENV{PYTHON_ROOT_DIR})
+ ENDIF()
  
--	# use ld.gold linker if available, could make optional
--	execute_process(
--		COMMAND ${CMAKE_C_COMPILER} -fuse-ld=gold -Wl,--version
--		ERROR_QUIET OUTPUT_VARIABLE LD_VERSION)
--	if("${LD_VERSION}" MATCHES "GNU gold")
--		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fuse-ld=gold")
--		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fuse-ld=gold")
--	else()
--		message(STATUS "GNU gold linker isn't available, using the default system linker.")
--	endif()
- 	unset(LD_VERSION)
+-SET(PYTHON_VERSION 3.5 CACHE STRING "Python Version (major and minor only)")
++SET(PYTHON_VERSION 3.7 CACHE STRING "Python Version (major and minor only)")
+ MARK_AS_ADVANCED(PYTHON_VERSION)
  
- # CLang is the same as GCC for now.
+ 
