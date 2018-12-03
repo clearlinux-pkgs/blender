@@ -1,1 +1,13 @@
-build.patch
+blender-2.79-fix-case.patch
+blender-2.79-satisfy-clang.patch
+blender-2.79-Disable-broken-Big-Endian-Test.patch
+blender-2.79-Fix-renamed-buffer-constants.patch
+blender-2.79-work-around-to-use-class-name-as-id-name.patch
+blender-2.79-scripts.patch
+blender-2.79-thumbnailer.patch
+blender-2.79-unversioned-system-path.patch
+blender-2.79-manpages.patch
+blender-2.79-droid.patch
+blender-2.79-locale.patch
+blender-2.79-openvdb3-abi.patch
+blender-2.79-add-mime-file.patch

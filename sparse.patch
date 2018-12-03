@@ -1,0 +1,14 @@
+diff --git a/extern/Eigen3/Eigen/src/SparseCore/SparseBlock.h b/extern/Eigen3/Eigen/src/SparseCore/SparseBlock.h
+index 0c90bafbeab..22f1f697023 100644
+--- a/extern/Eigen3/Eigen/src/SparseCore/SparseBlock.h
++++ b/extern/Eigen3/Eigen/src/SparseCore/SparseBlock.h
+@@ -208,7 +208,7 @@ public:
+ 
+     inline BlockType& operator=(const BlockType& other)
+     {
+-      return operator=<BlockType>(other);
++      return operator=<BlockType&>(other);
+     }
+ 
+     inline const Scalar* valuePtr() const
+

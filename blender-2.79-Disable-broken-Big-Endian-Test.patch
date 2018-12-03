@@ -1,0 +1,37 @@
+From 57eda10561659ff332a0580ff2e92872727c9daf Mon Sep 17 00:00:00 2001
+From: Sean V Kelley <sean.v.kelley@linux.intel.com>
+Date: Tue, 20 Nov 2018 10:03:24 -0800
+Subject: [PATCH] Disable broken Big Endian Test
+
+Signed-off-by: Sean V Kelley <sean.v.kelley@linux.intel.com>
+---
+ CMakeLists.txt | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index eb8df075380..1874c7db00e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1007,13 +1007,13 @@ elseif(CMAKE_OSX_ARCHITECTURES MATCHES ppc OR CMAKE_OSX_ARCHITECTURES MATCHES pp
+ 	add_definitions(-D__BIG_ENDIAN__)
+ 
+ else()
+-	include(TestBigEndian)
+-	test_big_endian(_SYSTEM_BIG_ENDIAN)
+-	if(_SYSTEM_BIG_ENDIAN)
+-		add_definitions(-D__BIG_ENDIAN__)
+-	else()
++	#include(TestBigEndian)
++	#test_big_endian(_SYSTEM_BIG_ENDIAN)
++	#if(_SYSTEM_BIG_ENDIAN)
++	#	add_definitions(-D__BIG_ENDIAN__)
++	#else()
+ 		add_definitions(-D__LITTLE_ENDIAN__)
+-	endif()
++	#endif()
+ 	unset(_SYSTEM_BIG_ENDIAN)
+ endif()
+ if(WITH_IMAGE_OPENJPEG)
+-- 
+2.19.1
+

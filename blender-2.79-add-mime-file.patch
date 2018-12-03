@@ -1,0 +1,27 @@
+From 7e74e37f58ab739da0f5c32e141e2ab7827d531c Mon Sep 17 00:00:00 2001
+From: Sean V Kelley <sean.v.kelley@linux.intel.com>
+Date: Tue, 27 Nov 2018 17:32:09 -0800
+Subject: [PATCH] add mime file
+
+Signed-off-by: Sean V Kelley <sean.v.kelley@linux.intel.com>
+---
+ blender.xml | 7 +++++++
+ 1 file changed, 7 insertions(+)
+ create mode 100644 blender.xml
+
+diff --git a/blender.xml b/blender.xml
+new file mode 100644
+index 00000000000..7cee114c499
+--- /dev/null
++++ b/blender.xml
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
++    <mime-type type="application/x-blender">
++        <comment xml:lang="en">Blender Scene</comment>
++        <glob pattern="*.blend" />
++  </mime-type>
++</mime-info>
+-- 
+2.19.2
+

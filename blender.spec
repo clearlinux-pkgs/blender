@@ -5,43 +5,84 @@
 Name     : blender
 Version  : 2.79b
 Release  : 11
-URL      : http://download.blender.org/source/blender-2.79b.tar.gz
-Source0  : http://download.blender.org/source/blender-2.79b.tar.gz
+URL      : https://download.blender.org/source/blender-2.79b.tar.gz
+Source0  : https://download.blender.org/source/blender-2.79b.tar.gz
 Summary  : No detailed summary available
 Group    : Development/Tools
 License  : Apache-2.0 BSD-2-Clause BSD-3-Clause GPL-2.0 GPL-3.0 LGPL-2.1 OFL-1.0 Zlib
+Requires: blender-bin = %{version}-%{release}
+Requires: blender-data = %{version}-%{release}
+Requires: blender-license = %{version}-%{release}
+Requires: blender-locales = %{version}-%{release}
+Requires: blender-man = %{version}-%{release}
+Requires: OpenColorIO
+Requires: oiio
+Requires: yaml-cpp
+BuildRequires : OpenColorIO-dev
+BuildRequires : SDL2-dev
 BuildRequires : boost-dev
 BuildRequires : buildreq-cmake
-BuildRequires : buildreq-kde
 BuildRequires : cmake
+BuildRequires : desktop-file-utils
 BuildRequires : eigen-dev
-BuildRequires : fftw-dev
+BuildRequires : expat-dev
+BuildRequires : extra-cmake-modules pkgconfig(OpenEXR)
 BuildRequires : freeglut-dev
 BuildRequires : freetype-dev
 BuildRequires : git
 BuildRequires : glew-dev
 BuildRequires : glibc-dev
-BuildRequires : glu-dev
+BuildRequires : jemalloc
+BuildRequires : jemalloc-dev
 BuildRequires : libX11-dev libICE-dev libSM-dev libXau-dev libXcomposite-dev libXcursor-dev libXdamage-dev libXdmcp-dev libXext-dev libXfixes-dev libXft-dev libXi-dev libXinerama-dev libXi-dev libXmu-dev libXpm-dev libXrandr-dev libXrender-dev libXres-dev libXScrnSaver-dev libXt-dev libXtst-dev libXv-dev libXxf86misc-dev libXxf86vm-dev
 BuildRequires : libjpeg-turbo-dev
-BuildRequires : libsndfile-dev
+BuildRequires : libtool
+BuildRequires : libxml2-dev
+BuildRequires : libxml2-python
+BuildRequires : llvm
+BuildRequires : lzo-dev
 BuildRequires : mesa-dev
 BuildRequires : numpy
 BuildRequires : oiio-dev
 BuildRequires : openal-soft-dev
-BuildRequires : openblas
 BuildRequires : openexr-dev
+BuildRequires : openssl-dev
+BuildRequires : pcre-dev
 BuildRequires : pkg-config
-BuildRequires : pkgconfig(libpng)
+BuildRequires : pkgconfig(fftw3)
+BuildRequires : pkgconfig(freetype2)
+BuildRequires : pkgconfig(gl)
+BuildRequires : pkgconfig(glew)
+BuildRequires : pkgconfig(glu)
+BuildRequires : pkgconfig(lcms2)
+BuildRequires : pkgconfig(libxml-2.0)
+BuildRequires : pkgconfig(python3)
 BuildRequires : pkgconfig(x11)
+BuildRequires : pkgconfig(xfixes)
 BuildRequires : pkgconfig(xi)
+BuildRequires : pkgconfig(xrender)
+BuildRequires : pkgconfig(zlib)
+BuildRequires : pugixml-dev
 BuildRequires : python3
-BuildRequires : python3-core
 BuildRequires : python3-dev
 BuildRequires : requests
+BuildRequires : requests-python
+BuildRequires : tbb-dev
 BuildRequires : tiff-dev
 BuildRequires : zlib-dev
-Patch1: build.patch
+Patch1: blender-2.79-fix-case.patch
+Patch2: blender-2.79-satisfy-clang.patch
+Patch3: blender-2.79-Disable-broken-Big-Endian-Test.patch
+Patch4: blender-2.79-Fix-renamed-buffer-constants.patch
+Patch5: blender-2.79-work-around-to-use-class-name-as-id-name.patch
+Patch6: blender-2.79-scripts.patch
+Patch7: blender-2.79-thumbnailer.patch
+Patch8: blender-2.79-unversioned-system-path.patch
+Patch9: blender-2.79-manpages.patch
+Patch10: blender-2.79-droid.patch
+Patch11: blender-2.79-locale.patch
+Patch12: blender-2.79-openvdb3-abi.patch
+Patch13: blender-2.79-add-mime-file.patch
 
 %description
 Files:
@@ -52,83 +93,3032 @@ cineonlib.h, cineonlib.c: cineon specific library
 cineonfile.h: cineon file structure
 logImageCore.h, logImageCore.c: log image routines common to cineon amd dpx
 
+%package bin
+Summary: bin components for the blender package.
+Group: Binaries
+Requires: blender-data = %{version}-%{release}
+Requires: blender-license = %{version}-%{release}
+Requires: blender-man = %{version}-%{release}
+
+%description bin
+bin components for the blender package.
+
+
+%package data
+Summary: data components for the blender package.
+Group: Data
+
+%description data
+data components for the blender package.
+
+
+%package doc
+Summary: doc components for the blender package.
+Group: Documentation
+Requires: blender-man = %{version}-%{release}
+
+%description doc
+doc components for the blender package.
+
+
+%package extras
+Summary: extras components for the blender package.
+Group: Default
+
+%description extras
+extras components for the blender package.
+
+
+%package license
+Summary: license components for the blender package.
+Group: Default
+
+%description license
+license components for the blender package.
+
+
+%package locales
+Summary: locales components for the blender package.
+Group: Default
+
+%description locales
+locales components for the blender package.
+
+
+%package man
+Summary: man components for the blender package.
+Group: Default
+
+%description man
+man components for the blender package.
+
+
 %prep
 %setup -q -n blender-2.79b
 %patch1 -p1
+%patch2 -p1
+%patch3 -p1
+%patch4 -p1
+%patch5 -p1
+%patch6 -p1
+%patch7 -p1
+%patch8 -p1
+%patch9 -p1
+%patch10 -p1
+%patch11 -p1
+%patch12 -p1
+%patch13 -p1
 pushd ..
 cp -a blender-2.79b buildavx2
 popd
 
 %build
+## build_prepend content
+for i in `grep -rl "/usr/bin/env python3"`;do sed -i '1s/^#!.*/#!\/usr\/bin\/python3/' ${i} ;done
+## build_prepend end
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1537284689
-mkdir clr-build
+export SOURCE_DATE_EPOCH=1543857892
+mkdir -p clr-build
 pushd clr-build
-export AR=gcc-ar
-export RANLIB=gcc-ranlib
-export NM=gcc-nm
-export CFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
-export FCFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
-export FFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
-export CXXFLAGS="$CXXFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
-%cmake .. -DWITH_INSTALL_PORTABLE=OFF -DWITH_BUILDINFO=OFF -DPYTHON_VERSION=3.7 -DWITH_CYCLES=ON -DWITH_FFTW3=ON -DWITH_LINKER_GOLD=OFF
-make  %{?_smp_mflags}
+export CC=clang
+export CXX=clang++
+export LD=ld.gold
+unset LDFLAGS
+%cmake .. -DBUILD_SHARED_LIBS:BOOL=OFF \
+-DWITH_MEM_JEMALLOC:BOOL=ON \
+-DWITH_BUILDINFO:BOOL=ON \
+-DWITH_LLVM:BOOL=ON \
+-DWITH_DOC_MANPAGE:BOOL=ON \
+-DWITH_FFTW3:BOOL=ON \
+-DWITH_JACK:BOOL=OFF \
+-DWITH_JACK_DYNLOAD:BOOL=OFF \
+-DWITH_CODEC_SNDFILE:BOOL=OFF \
+-DWITH_IMAGE_OPENJPEG:BOOL=OFF \
+-DWITH_INPUT_NDOF:BOOL=ON \
+-DWITH_SYSTEM_OPENJPEG:BOOL=OFF \
+-DWITH_SYSTEM_EIGEN3:BOOL=ON \
+-DWITH_LIBMV_SCHUR_SPECIALIZATIONS:BOOL=ON \
+-DWITH_CODEC_FFMPEG:BOOL=OFF \
+-DWITH_OPENVDB:BOOL=OFF \
+-DWITH_OPENVDB_BLOSC:BOOL=OFF \
+-DWITH_OPENCOLLADA:BOOL=OFF \
+-DWITH_AUDASPACE:BOOL=ON \
+-DWITH_SYSTEM_AUDASPACE:BOOL=OFF \
+-DWITH_PYTHON:BOOL=ON \
+-DWITH_PYTHON_INSTALL:BOOL=OFF \
+-DWITH_PYTHON_INSTALL_REQUESTS:BOOL=OFF \
+-DWITH_PYTHON_SAFETY:BOOL=ON \
+-DWITH_GAMEENGINE:BOOL=ON \
+-DWITH_CYCLES:BOOL=ON \
+-DWITH_OPENIMAGEIO:BOOL=ON \
+-DWITH_OPENCOLORIO:BOOL=ON \
+-DWITH_PLAYER:BOOL=ON \
+-DWITH_INSTALL_PORTABLE:BOOL=OFF \
+-DWITH_SYSTEM_GLEW:BOOL=ON \
+-DWITH_SYSTEM_GLES:BOOL=ON \
+-DWITH_SDL:BOOL=ON \
+-DWITH_SDL_DYNLOAD:BOOL=ON \
+-DWITH_RAYOPTIMIZATION:BOOL=ON \
+-DWITH_MOD_OCEANSIM:BOOL=ON \
+-DCMAKE_VERBOSE_MAKEFILE=ON \
+-DCMAKE_INSTALL_PREFIX:PATH=%{_prefix} \
+-DCMAKE_EXE_LINKER_FLAGS:STRING="-pie" \
+-DPYTHON_VERSION=$(pkg-config python3 --modversion) \
+-DPYTHON_LIBPATH=%{_libexecdir} \
+-DPYTHON_LIBRARY=python$(pkg-config python3 --modversion)m \
+-DPYTHON_INCLUDE_DIRS=%{_includedir}/python$(pkg-config python3 --modversion)m \
+-DWITH_PYTHON_INSTALL_NUMPY=OFF \
+-DWITH_SYSTEM_LZO:BOOL=ON \
+-DWITH_LINKER_GOLD:BOOL=ON
+## make_prepend content
+pushd intern/libmv
+make -j1
 popd
-mkdir clr-build-avx2
+## make_prepend end
+make  %{?_smp_mflags} VERBOSE=1
+popd
+mkdir -p clr-build-avx2
 pushd clr-build-avx2
-export AR=gcc-ar
-export RANLIB=gcc-ranlib
-export NM=gcc-nm
-export CFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math -march=haswell "
-export FCFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math -march=haswell "
-export FFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math -march=haswell "
-export CXXFLAGS="$CXXFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math -march=haswell "
+## build_prepend content
+for i in `grep -rl "/usr/bin/env python3"`;do sed -i '1s/^#!.*/#!\/usr\/bin\/python3/' ${i} ;done
+## build_prepend end
+export CC=clang
+export CXX=clang++
+export LD=ld.gold
+unset LDFLAGS
+export CFLAGS="$CFLAGS -O3 -march=haswell "
+export FCFLAGS="$CFLAGS -O3 -march=haswell "
+export FFLAGS="$CFLAGS -O3 -march=haswell "
+export CXXFLAGS="$CXXFLAGS -O3 -march=haswell "
 export CFLAGS="$CFLAGS -march=haswell -m64"
 export CXXFLAGS="$CXXFLAGS -march=haswell -m64"
-%cmake .. -DWITH_INSTALL_PORTABLE=OFF -DWITH_BUILDINFO=OFF -DPYTHON_VERSION=3.7 -DWITH_CYCLES=ON -DWITH_FFTW3=ON -DWITH_LINKER_GOLD=OFF
-make VERBOSE=1  %{?_smp_mflags}  || :
+%cmake .. -DBUILD_SHARED_LIBS:BOOL=OFF \
+-DWITH_MEM_JEMALLOC:BOOL=ON \
+-DWITH_BUILDINFO:BOOL=ON \
+-DWITH_LLVM:BOOL=ON \
+-DWITH_DOC_MANPAGE:BOOL=ON \
+-DWITH_FFTW3:BOOL=ON \
+-DWITH_JACK:BOOL=OFF \
+-DWITH_JACK_DYNLOAD:BOOL=OFF \
+-DWITH_CODEC_SNDFILE:BOOL=OFF \
+-DWITH_IMAGE_OPENJPEG:BOOL=OFF \
+-DWITH_INPUT_NDOF:BOOL=ON \
+-DWITH_SYSTEM_OPENJPEG:BOOL=OFF \
+-DWITH_SYSTEM_EIGEN3:BOOL=ON \
+-DWITH_LIBMV_SCHUR_SPECIALIZATIONS:BOOL=ON \
+-DWITH_CODEC_FFMPEG:BOOL=OFF \
+-DWITH_OPENVDB:BOOL=OFF \
+-DWITH_OPENVDB_BLOSC:BOOL=OFF \
+-DWITH_OPENCOLLADA:BOOL=OFF \
+-DWITH_AUDASPACE:BOOL=ON \
+-DWITH_SYSTEM_AUDASPACE:BOOL=OFF \
+-DWITH_PYTHON:BOOL=ON \
+-DWITH_PYTHON_INSTALL:BOOL=OFF \
+-DWITH_PYTHON_INSTALL_REQUESTS:BOOL=OFF \
+-DWITH_PYTHON_SAFETY:BOOL=ON \
+-DWITH_GAMEENGINE:BOOL=ON \
+-DWITH_CYCLES:BOOL=ON \
+-DWITH_OPENIMAGEIO:BOOL=ON \
+-DWITH_OPENCOLORIO:BOOL=ON \
+-DWITH_PLAYER:BOOL=ON \
+-DWITH_INSTALL_PORTABLE:BOOL=OFF \
+-DWITH_SYSTEM_GLEW:BOOL=ON \
+-DWITH_SYSTEM_GLES:BOOL=ON \
+-DWITH_SDL:BOOL=ON \
+-DWITH_SDL_DYNLOAD:BOOL=ON \
+-DWITH_RAYOPTIMIZATION:BOOL=ON \
+-DWITH_MOD_OCEANSIM:BOOL=ON \
+-DCMAKE_VERBOSE_MAKEFILE=ON \
+-DCMAKE_INSTALL_PREFIX:PATH=%{_prefix} \
+-DCMAKE_EXE_LINKER_FLAGS:STRING="-pie" \
+-DPYTHON_VERSION=$(pkg-config python3 --modversion) \
+-DPYTHON_LIBPATH=%{_libexecdir} \
+-DPYTHON_LIBRARY=python$(pkg-config python3 --modversion)m \
+-DPYTHON_INCLUDE_DIRS=%{_includedir}/python$(pkg-config python3 --modversion)m \
+-DWITH_PYTHON_INSTALL_NUMPY=OFF \
+-DWITH_SYSTEM_LZO:BOOL=ON \
+-DWITH_LINKER_GOLD:BOOL=ON
+## make_prepend content
+pushd intern/libmv
+make -j1
+popd
+## make_prepend end
+make  %{?_smp_mflags} VERBOSE=1
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1537284689
+export SOURCE_DATE_EPOCH=1543857892
 rm -rf %{buildroot}
-mkdir -p %{buildroot}/usr/share/doc/blender
-cp COPYING %{buildroot}/usr/share/doc/blender/COPYING
-cp build_files/package_spec/debian/copyright %{buildroot}/usr/share/doc/blender/build_files_package_spec_debian_copyright
-cp extern/carve/LICENSE.GPL2 %{buildroot}/usr/share/doc/blender/extern_carve_LICENSE.GPL2
-cp extern/carve/LICENSE.GPL3 %{buildroot}/usr/share/doc/blender/extern_carve_LICENSE.GPL3
-cp extern/ceres/LICENSE %{buildroot}/usr/share/doc/blender/extern_ceres_LICENSE
-cp extern/cuew/LICENSE %{buildroot}/usr/share/doc/blender/extern_cuew_LICENSE
-cp extern/gflags/COPYING.txt %{buildroot}/usr/share/doc/blender/extern_gflags_COPYING.txt
-cp extern/glog/COPYING %{buildroot}/usr/share/doc/blender/extern_glog_COPYING
-cp extern/gmock/LICENSE %{buildroot}/usr/share/doc/blender/extern_gmock_LICENSE
-cp extern/gtest/LICENSE %{buildroot}/usr/share/doc/blender/extern_gtest_LICENSE
-cp extern/libopenjpeg/license.txt %{buildroot}/usr/share/doc/blender/extern_libopenjpeg_license.txt
-cp extern/lzo/minilzo/COPYING %{buildroot}/usr/share/doc/blender/extern_lzo_minilzo_COPYING
-cp extern/recastnavigation/License.txt %{buildroot}/usr/share/doc/blender/extern_recastnavigation_License.txt
-cp intern/audaspace/COPYING %{buildroot}/usr/share/doc/blender/intern_audaspace_COPYING
-cp intern/elbeem/COPYING %{buildroot}/usr/share/doc/blender/intern_elbeem_COPYING
-cp intern/elbeem/COPYING_trimesh2 %{buildroot}/usr/share/doc/blender/intern_elbeem_COPYING_trimesh2
-cp intern/smoke/intern/LICENSE.txt %{buildroot}/usr/share/doc/blender/intern_smoke_intern_LICENSE.txt
-cp release/datafiles/LICENSE-bfont.ttf.txt %{buildroot}/usr/share/doc/blender/release_datafiles_LICENSE-bfont.ttf.txt
-cp release/datafiles/LICENSE-bmonofont-i18n.ttf.txt %{buildroot}/usr/share/doc/blender/release_datafiles_LICENSE-bmonofont-i18n.ttf.txt
-cp release/datafiles/LICENSE-droidsans.ttf.txt %{buildroot}/usr/share/doc/blender/release_datafiles_LICENSE-droidsans.ttf.txt
-cp release/datafiles/matcaps/license.txt %{buildroot}/usr/share/doc/blender/release_datafiles_matcaps_license.txt
-cp release/text/copyright.txt %{buildroot}/usr/share/doc/blender/release_text_copyright.txt
+mkdir -p %{buildroot}/usr/share/package-licenses/blender
+cp COPYING %{buildroot}/usr/share/package-licenses/blender/COPYING
+cp build_files/package_spec/debian/copyright %{buildroot}/usr/share/package-licenses/blender/build_files_package_spec_debian_copyright
+cp extern/carve/LICENSE.GPL2 %{buildroot}/usr/share/package-licenses/blender/extern_carve_LICENSE.GPL2
+cp extern/carve/LICENSE.GPL3 %{buildroot}/usr/share/package-licenses/blender/extern_carve_LICENSE.GPL3
+cp extern/ceres/LICENSE %{buildroot}/usr/share/package-licenses/blender/extern_ceres_LICENSE
+cp extern/cuew/LICENSE %{buildroot}/usr/share/package-licenses/blender/extern_cuew_LICENSE
+cp extern/gflags/COPYING.txt %{buildroot}/usr/share/package-licenses/blender/extern_gflags_COPYING.txt
+cp extern/glog/COPYING %{buildroot}/usr/share/package-licenses/blender/extern_glog_COPYING
+cp extern/gmock/LICENSE %{buildroot}/usr/share/package-licenses/blender/extern_gmock_LICENSE
+cp extern/gtest/LICENSE %{buildroot}/usr/share/package-licenses/blender/extern_gtest_LICENSE
+cp extern/libopenjpeg/license.txt %{buildroot}/usr/share/package-licenses/blender/extern_libopenjpeg_license.txt
+cp extern/lzo/minilzo/COPYING %{buildroot}/usr/share/package-licenses/blender/extern_lzo_minilzo_COPYING
+cp extern/recastnavigation/License.txt %{buildroot}/usr/share/package-licenses/blender/extern_recastnavigation_License.txt
+cp intern/audaspace/COPYING %{buildroot}/usr/share/package-licenses/blender/intern_audaspace_COPYING
+cp intern/elbeem/COPYING %{buildroot}/usr/share/package-licenses/blender/intern_elbeem_COPYING
+cp intern/elbeem/COPYING_trimesh2 %{buildroot}/usr/share/package-licenses/blender/intern_elbeem_COPYING_trimesh2
+cp intern/smoke/intern/LICENSE.txt %{buildroot}/usr/share/package-licenses/blender/intern_smoke_intern_LICENSE.txt
+cp release/datafiles/LICENSE-bfont.ttf.txt %{buildroot}/usr/share/package-licenses/blender/release_datafiles_LICENSE-bfont.ttf.txt
+cp release/datafiles/LICENSE-bmonofont-i18n.ttf.txt %{buildroot}/usr/share/package-licenses/blender/release_datafiles_LICENSE-bmonofont-i18n.ttf.txt
+cp release/datafiles/LICENSE-droidsans.ttf.txt %{buildroot}/usr/share/package-licenses/blender/release_datafiles_LICENSE-droidsans.ttf.txt
+cp release/datafiles/matcaps/license.txt %{buildroot}/usr/share/package-licenses/blender/release_datafiles_matcaps_license.txt
+cp release/text/copyright.txt %{buildroot}/usr/share/package-licenses/blender/release_text_copyright.txt
 pushd clr-build-avx2
 %make_install_avx2  || :
 popd
 pushd clr-build
 %make_install
 popd
+%find_lang blender
 ## install_append content
-mkdir -p %{buildroot}/usr/lib64/haswell/avx512_1
-cp clr-build/lib/* %{buildroot}/usr/lib64/
-cp clr-build-avx2/lib/* %{buildroot}/usr/lib64/haswell
+find %{buildroot}%{_datadir}/%{name}/scripts -type f -exec sed -i -e 's/\r$//g' {} \;
+find %{buildroot} -name "*.py" -perm 0644 -print0 | \
+xargs -0r grep -l '#!' | xargs -d'\n' chmod -f 0755;
+rm -rf %{buildroot}%{_datadir}/%{name}/%{_version}/datafiles/fonts
+rm -f %{buildroot}%{_datadir}/%{name}/%{_version}/scripts/addons/.gitignore
+install -p -D -m 644 %{name}.xml %{buildroot}%{_datadir}/mime/packages/%{name}.xml
+desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
+%find_lang %{name}
+rm -fr %{buildroot}%{_datadir}/locale/languages
 ## install_append end
 
 %files
 %defattr(-,root,root,-)
+
+%files bin
+%defattr(-,root,root,-)
+/usr/bin/blender
+/usr/bin/blenderplayer
+/usr/bin/haswell/blender
+/usr/bin/haswell/blenderplayer
+
+%files data
+%defattr(-,root,root,-)
+%exclude /usr/share/blender/scripts/addons/add_advanced_objects_menu/__init__.py
+%exclude /usr/share/blender/scripts/addons/add_advanced_objects_menu/add_light_template.py
+%exclude /usr/share/blender/scripts/addons/add_advanced_objects_menu/add_mesh_aggregate.py
+%exclude /usr/share/blender/scripts/addons/add_advanced_objects_menu/arrange_on_curve.py
+%exclude /usr/share/blender/scripts/addons/add_advanced_objects_menu/circle_array.py
+%exclude /usr/share/blender/scripts/addons/add_advanced_objects_menu/copy2.py
+%exclude /usr/share/blender/scripts/addons/add_advanced_objects_menu/cubester.py
+%exclude /usr/share/blender/scripts/addons/add_advanced_objects_menu/make_struts.py
+%exclude /usr/share/blender/scripts/addons/add_advanced_objects_menu/mesh_easylattice.py
+%exclude /usr/share/blender/scripts/addons/add_advanced_objects_menu/object_add_chain.py
+%exclude /usr/share/blender/scripts/addons/add_advanced_objects_menu/oscurart_chain_maker.py
+%exclude /usr/share/blender/scripts/addons/add_advanced_objects_menu/pixelate_3d.py
+%exclude /usr/share/blender/scripts/addons/add_advanced_objects_menu/random_box_structure.py
+%exclude /usr/share/blender/scripts/addons/add_advanced_objects_menu/rope_alpha.py
+%exclude /usr/share/blender/scripts/addons/add_advanced_objects_menu/scene_objects_bi.py
+%exclude /usr/share/blender/scripts/addons/add_advanced_objects_menu/scene_objects_cycles.py
+%exclude /usr/share/blender/scripts/addons/add_advanced_objects_menu/scene_texture_render.py
+%exclude /usr/share/blender/scripts/addons/add_advanced_objects_menu/trilighting.py
+%exclude /usr/share/blender/scripts/addons/add_advanced_objects_panels/DelaunayVoronoi.py
+%exclude /usr/share/blender/scripts/addons/add_advanced_objects_panels/__init__.py
+%exclude /usr/share/blender/scripts/addons/add_advanced_objects_panels/delaunay_voronoi.py
+%exclude /usr/share/blender/scripts/addons/add_advanced_objects_panels/drop_to_ground.py
+%exclude /usr/share/blender/scripts/addons/add_advanced_objects_panels/object_laplace_lightning.py
+%exclude /usr/share/blender/scripts/addons/add_advanced_objects_panels/object_mangle_tools.py
+%exclude /usr/share/blender/scripts/addons/add_advanced_objects_panels/oscurart_constellation.py
+%exclude /usr/share/blender/scripts/addons/add_advanced_objects_panels/unfold_transition.py
+%exclude /usr/share/blender/scripts/addons/add_curve_extra_objects/__init__.py
+%exclude /usr/share/blender/scripts/addons/add_curve_extra_objects/add_curve_aceous_galore.py
+%exclude /usr/share/blender/scripts/addons/add_curve_extra_objects/add_curve_braid.py
+%exclude /usr/share/blender/scripts/addons/add_curve_extra_objects/add_curve_celtic_links.py
+%exclude /usr/share/blender/scripts/addons/add_curve_extra_objects/add_curve_curly.py
+%exclude /usr/share/blender/scripts/addons/add_curve_extra_objects/add_curve_simple.py
+%exclude /usr/share/blender/scripts/addons/add_curve_extra_objects/add_curve_spirals.py
+%exclude /usr/share/blender/scripts/addons/add_curve_extra_objects/add_curve_spirofit_bouncespline.py
+%exclude /usr/share/blender/scripts/addons/add_curve_extra_objects/add_curve_torus_knots.py
+%exclude /usr/share/blender/scripts/addons/add_curve_extra_objects/add_surface_plane_cone.py
+%exclude /usr/share/blender/scripts/addons/add_curve_extra_objects/beveltaper_curve.py
+%exclude /usr/share/blender/scripts/addons/add_curve_ivygen.py
+%exclude /usr/share/blender/scripts/addons/add_curve_sapling/__init__.py
+%exclude /usr/share/blender/scripts/addons/add_curve_sapling/presets/callistemon.py
+%exclude /usr/share/blender/scripts/addons/add_curve_sapling/presets/douglas_fir.py
+%exclude /usr/share/blender/scripts/addons/add_curve_sapling/presets/japanese_maple.py
+%exclude /usr/share/blender/scripts/addons/add_curve_sapling/presets/quaking_aspen.py
+%exclude /usr/share/blender/scripts/addons/add_curve_sapling/presets/small_maple.py
+%exclude /usr/share/blender/scripts/addons/add_curve_sapling/presets/small_pine.py
+%exclude /usr/share/blender/scripts/addons/add_curve_sapling/presets/weeping_willow.py
+%exclude /usr/share/blender/scripts/addons/add_curve_sapling/presets/white_birch.py
+%exclude /usr/share/blender/scripts/addons/add_curve_sapling/presets/willow.py
+%exclude /usr/share/blender/scripts/addons/add_curve_sapling/utils.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_BoltFactory/Boltfactory.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_BoltFactory/__init__.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_BoltFactory/createMesh.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_extra_objects/Blocks.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_extra_objects/Wallfactory.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_extra_objects/__init__.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_extra_objects/add_empty_as_parent.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_3d_function_surface.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_beam_builder.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_gears.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_gemstones.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_honeycomb.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_menger_sponge.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_pipe_joint.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_pyramid.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_round_brilliant.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_round_cube.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_solid.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_star.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_supertoroid.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_teapot.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_torusknot.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_triangles.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_twisted_torus.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_vertex.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_extra_objects/geodesic_domes/__init__.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_extra_objects/geodesic_domes/add_shape_geodesic.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_extra_objects/geodesic_domes/forms_271.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_extra_objects/geodesic_domes/geodesic_classes_271.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_extra_objects/geodesic_domes/third_domes_panel_271.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_extra_objects/geodesic_domes/vefm_271.py
+%exclude /usr/share/blender/scripts/addons/add_mesh_extra_objects/mesh_discombobulator.py
+%exclude /usr/share/blender/scripts/addons/animation_add_corrective_shape_key.py
+%exclude /usr/share/blender/scripts/addons/animation_animall.py
+%exclude /usr/share/blender/scripts/addons/ant_landscape/ErosionR.txt
+%exclude /usr/share/blender/scripts/addons/ant_landscape/__init__.py
+%exclude /usr/share/blender/scripts/addons/ant_landscape/add_mesh_ant_landscape.py
+%exclude /usr/share/blender/scripts/addons/ant_landscape/ant_functions.py
+%exclude /usr/share/blender/scripts/addons/ant_landscape/ant_noise.py
+%exclude /usr/share/blender/scripts/addons/ant_landscape/eroder.py
+%exclude /usr/share/blender/scripts/addons/ant_landscape/mesh_ant_displace.py
+%exclude /usr/share/blender/scripts/addons/ant_landscape/stats.py
+%exclude /usr/share/blender/scripts/addons/ant_landscape/test.py
+%exclude /usr/share/blender/scripts/addons/ant_landscape/utils.py
+%exclude /usr/share/blender/scripts/addons/archimesh/__init__.py
+%exclude /usr/share/blender/scripts/addons/archimesh/achm_books_maker.py
+%exclude /usr/share/blender/scripts/addons/archimesh/achm_column_maker.py
+%exclude /usr/share/blender/scripts/addons/archimesh/achm_curtain_maker.py
+%exclude /usr/share/blender/scripts/addons/archimesh/achm_door_maker.py
+%exclude /usr/share/blender/scripts/addons/archimesh/achm_gltools.py
+%exclude /usr/share/blender/scripts/addons/archimesh/achm_kitchen_maker.py
+%exclude /usr/share/blender/scripts/addons/archimesh/achm_lamp_maker.py
+%exclude /usr/share/blender/scripts/addons/archimesh/achm_main_panel.py
+%exclude /usr/share/blender/scripts/addons/archimesh/achm_roof_maker.py
+%exclude /usr/share/blender/scripts/addons/archimesh/achm_room_maker.py
+%exclude /usr/share/blender/scripts/addons/archimesh/achm_shelves_maker.py
+%exclude /usr/share/blender/scripts/addons/archimesh/achm_stairs_maker.py
+%exclude /usr/share/blender/scripts/addons/archimesh/achm_tools.py
+%exclude /usr/share/blender/scripts/addons/archimesh/achm_venetian_maker.py
+%exclude /usr/share/blender/scripts/addons/archimesh/achm_window_maker.py
+%exclude /usr/share/blender/scripts/addons/archimesh/achm_window_panel.py
+%exclude /usr/share/blender/scripts/addons/archimesh/images/fabric_diffuse.png
+%exclude /usr/share/blender/scripts/addons/archipack/__init__.py
+%exclude /usr/share/blender/scripts/addons/archipack/archipack_2d.py
+%exclude /usr/share/blender/scripts/addons/archipack/archipack_autoboolean.py
+%exclude /usr/share/blender/scripts/addons/archipack/archipack_cutter.py
+%exclude /usr/share/blender/scripts/addons/archipack/archipack_door.py
+%exclude /usr/share/blender/scripts/addons/archipack/archipack_fence.py
+%exclude /usr/share/blender/scripts/addons/archipack/archipack_floor.py
+%exclude /usr/share/blender/scripts/addons/archipack/archipack_gl.py
+%exclude /usr/share/blender/scripts/addons/archipack/archipack_handle.py
+%exclude /usr/share/blender/scripts/addons/archipack/archipack_keymaps.py
+%exclude /usr/share/blender/scripts/addons/archipack/archipack_manipulator.py
+%exclude /usr/share/blender/scripts/addons/archipack/archipack_material.py
+%exclude /usr/share/blender/scripts/addons/archipack/archipack_object.py
+%exclude /usr/share/blender/scripts/addons/archipack/archipack_preset.py
+%exclude /usr/share/blender/scripts/addons/archipack/archipack_progressbar.py
+%exclude /usr/share/blender/scripts/addons/archipack/archipack_reference_point.py
+%exclude /usr/share/blender/scripts/addons/archipack/archipack_rendering.py
+%exclude /usr/share/blender/scripts/addons/archipack/archipack_roof.py
+%exclude /usr/share/blender/scripts/addons/archipack/archipack_slab.py
+%exclude /usr/share/blender/scripts/addons/archipack/archipack_snap.py
+%exclude /usr/share/blender/scripts/addons/archipack/archipack_stair.py
+%exclude /usr/share/blender/scripts/addons/archipack/archipack_thumbs.py
+%exclude /usr/share/blender/scripts/addons/archipack/archipack_truss.py
+%exclude /usr/share/blender/scripts/addons/archipack/archipack_wall2.py
+%exclude /usr/share/blender/scripts/addons/archipack/archipack_window.py
+%exclude /usr/share/blender/scripts/addons/archipack/bmesh_utils.py
+%exclude /usr/share/blender/scripts/addons/archipack/icons/archipack.png
+%exclude /usr/share/blender/scripts/addons/archipack/icons/detect.png
+%exclude /usr/share/blender/scripts/addons/archipack/icons/door.png
+%exclude /usr/share/blender/scripts/addons/archipack/icons/fence.png
+%exclude /usr/share/blender/scripts/addons/archipack/icons/floor.png
+%exclude /usr/share/blender/scripts/addons/archipack/icons/polygons.png
+%exclude /usr/share/blender/scripts/addons/archipack/icons/roof.png
+%exclude /usr/share/blender/scripts/addons/archipack/icons/selection.png
+%exclude /usr/share/blender/scripts/addons/archipack/icons/slab.png
+%exclude /usr/share/blender/scripts/addons/archipack/icons/stair.png
+%exclude /usr/share/blender/scripts/addons/archipack/icons/truss.png
+%exclude /usr/share/blender/scripts/addons/archipack/icons/union.png
+%exclude /usr/share/blender/scripts/addons/archipack/icons/wall.png
+%exclude /usr/share/blender/scripts/addons/archipack/icons/window.png
+%exclude /usr/share/blender/scripts/addons/archipack/panel.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_door/160x200_dual.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_door/400x240_garage.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_door/80x200.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_fence/glass_panels.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_fence/inox_glass_concrete.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_fence/metal.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_fence/metal_glass.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_fence/wood.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_floor/boards_200x20.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_floor/herringbone_50x10.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_floor/herringbone_p_50x10.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_floor/hexagon_10.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_floor/hopscotch_30x30.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_floor/parquet_15x3.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_floor/stepping_stone_30x30.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_floor/tile_30x60.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_floor/windmill_30x30.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_materials/door.txt
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_materials/fence.txt
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_materials/floor.txt
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_materials/handle.txt
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_materials/roof.txt
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_materials/slab.txt
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_materials/stair.txt
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_materials/truss.txt
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_materials/wall2.txt
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_materials/window.txt
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_roof/braas_1.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_roof/braas_2.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_roof/eternit.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_roof/lauze.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_roof/metal.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_roof/ondule.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_roof/roman.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_roof/round.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_roof/square.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_stair/i_wood_over_concrete.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_stair/l_wood_over_concrete.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_stair/o_wood_over_concrete.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_stair/u_wood_over_concrete.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_window/120x110_flat_2.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_window/120x110_flat_2_elliptic.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_window/120x110_flat_2_oblique.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_window/120x110_flat_2_round.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_window/180x110_flat_3.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_window/180x210_flat_3.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_window/180x210_rail_2.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_window/240x210_rail_3.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_window/80x80_flat_1.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/archipack_window/80x80_flat_1_circle.py
+%exclude /usr/share/blender/scripts/addons/archipack/presets/missing.png
+%exclude /usr/share/blender/scripts/addons/blender_id/CHANGELOG.md
+%exclude /usr/share/blender/scripts/addons/blender_id/README.md
+%exclude /usr/share/blender/scripts/addons/blender_id/__init__.py
+%exclude /usr/share/blender/scripts/addons/blender_id/communication.py
+%exclude /usr/share/blender/scripts/addons/blender_id/profiles.py
+%exclude /usr/share/blender/scripts/addons/bone_selection_sets.py
+%exclude /usr/share/blender/scripts/addons/btrace/__init__.py
+%exclude /usr/share/blender/scripts/addons/btrace/bTrace.py
+%exclude /usr/share/blender/scripts/addons/btrace/bTrace_props.py
+%exclude /usr/share/blender/scripts/addons/camera_dolly_crane_rigs.py
+%exclude /usr/share/blender/scripts/addons/camera_turnaround.py
+%exclude /usr/share/blender/scripts/addons/curve_simplify.py
+%exclude /usr/share/blender/scripts/addons/cycles/__init__.py
+%exclude /usr/share/blender/scripts/addons/cycles/engine.py
+%exclude /usr/share/blender/scripts/addons/cycles/license/Apache_2.0.txt
+%exclude /usr/share/blender/scripts/addons/cycles/license/ILM.txt
+%exclude /usr/share/blender/scripts/addons/cycles/license/NVidia.txt
+%exclude /usr/share/blender/scripts/addons/cycles/license/OSL.txt
+%exclude /usr/share/blender/scripts/addons/cycles/license/Sobol.txt
+%exclude /usr/share/blender/scripts/addons/cycles/license/readme.txt
+%exclude /usr/share/blender/scripts/addons/cycles/osl.py
+%exclude /usr/share/blender/scripts/addons/cycles/presets.py
+%exclude /usr/share/blender/scripts/addons/cycles/properties.py
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/bvh/bvh.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/bvh/bvh_nodes.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/bvh/bvh_shadow_all.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/bvh/bvh_subsurface.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/bvh/bvh_traversal.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/bvh/bvh_types.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/bvh/bvh_volume.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/bvh/bvh_volume_all.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/bvh/qbvh_nodes.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/bvh/qbvh_shadow_all.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/bvh/qbvh_subsurface.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/bvh/qbvh_traversal.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/bvh/qbvh_volume.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/bvh/qbvh_volume_all.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/closure/alloc.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_ashikhmin_shirley.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_ashikhmin_velvet.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_diffuse.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_diffuse_ramp.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_hair.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_microfacet.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_microfacet_multi.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_microfacet_multi_impl.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_oren_nayar.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_phong_ramp.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_principled_diffuse.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_principled_sheen.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_reflection.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_refraction.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_toon.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_transparent.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_util.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/closure/bssrdf.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/closure/emissive.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/closure/volume.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/filter/filter.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/filter/filter_defines.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/filter/filter_features.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/filter/filter_features_sse.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/filter/filter_kernel.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/filter/filter_nlm_cpu.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/filter/filter_nlm_gpu.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/filter/filter_prefilter.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/filter/filter_reconstruction.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/filter/filter_transform.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/filter/filter_transform_gpu.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/filter/filter_transform_sse.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/geom/geom.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/geom/geom_attribute.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/geom/geom_curve.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/geom/geom_motion_curve.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/geom/geom_motion_triangle.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/geom/geom_motion_triangle_intersect.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/geom/geom_motion_triangle_shader.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/geom/geom_object.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/geom/geom_patch.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/geom/geom_primitive.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/geom/geom_subd_triangle.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/geom/geom_triangle.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/geom/geom_triangle_intersect.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/geom/geom_volume.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_accumulate.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_bake.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_camera.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_compat_cpu.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_compat_cuda.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_compat_opencl.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_debug.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_differential.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_emission.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_film.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_globals.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_image_opencl.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_jitter.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_light.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_math.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_montecarlo.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_passes.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_path.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_path_branched.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_path_common.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_path_state.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_path_subsurface.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_path_surface.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_path_volume.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_projection.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_queues.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_random.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_shader.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_shadow.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_subsurface.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_textures.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_types.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_volume.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernel_work_stealing.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernels/cuda/filter.cu
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernels/cuda/kernel.cu
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernels/cuda/kernel_config.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernels/cuda/kernel_split.cu
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/filter.cl
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel.cl
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_buffer_update.cl
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_data_init.cl
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_direct_lighting.cl
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_do_volume.cl
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_enqueue_inactive.cl
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_holdout_emission_blurring_pathtermination_ao.cl
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_indirect_background.cl
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_indirect_subsurface.cl
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_lamp_emission.cl
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_next_iteration_setup.cl
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_path_init.cl
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_queue_enqueue.cl
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_scene_intersect.cl
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_shader_eval.cl
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_shader_setup.cl
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_shader_sort.cl
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_shadow_blocked_ao.cl
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_shadow_blocked_dl.cl
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_split.cl
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_split_function.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_state_buffer_size.cl
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_subsurface_scatter.cl
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_branched.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_buffer_update.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_data_init.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_direct_lighting.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_do_volume.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_enqueue_inactive.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_holdout_emission_blurring_pathtermination_ao.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_indirect_background.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_indirect_subsurface.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_lamp_emission.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_next_iteration_setup.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_path_init.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_queue_enqueue.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_scene_intersect.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_shader_eval.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_shader_setup.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_shader_sort.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_shadow_blocked_ao.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_shadow_blocked_dl.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_split_common.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_split_data.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_split_data_types.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_subsurface_scatter.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_attribute.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_blackbody.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_brick.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_brightness.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_bump.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_camera.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_checker.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_closure.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_color_util.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_convert.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_displace.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_fresnel.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_gamma.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_geometry.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_gradient.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_hsv.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_image.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_invert.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_light_path.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_magic.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_mapping.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_math.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_math_util.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_mix.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_musgrave.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_noise.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_noisetex.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_normal.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_ramp.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_ramp_util.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_sepcomb_hsv.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_sepcomb_vector.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_sky.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_tex_coord.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_texture.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_types.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_value.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_vector_transform.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_voronoi.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_voxel.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_wave.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_wavelength.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_wireframe.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_atomic.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_color.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_half.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_hash.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_math.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_math_fast.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_math_float2.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_math_float3.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_math_float4.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_math_int2.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_math_int3.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_math_int4.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_math_intersect.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_math_matrix.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_static_assert.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_texture.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_transform.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_types.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_types_float2.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_types_float2_impl.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_types_float3.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_types_float3_impl.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_types_float4.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_types_float4_impl.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_types_int2.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_types_int2_impl.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_types_int3.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_types_int3_impl.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_types_int4.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_types_int4_impl.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_types_uchar2.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_types_uchar2_impl.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_types_uchar3.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_types_uchar3_impl.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_types_uchar4.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_types_uchar4_impl.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_types_uint2.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_types_uint2_impl.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_types_uint3.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_types_uint3_impl.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_types_uint4.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_types_uint4_impl.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_types_vector3.h
+%exclude /usr/share/blender/scripts/addons/cycles/source/util/util_types_vector3_impl.h
+%exclude /usr/share/blender/scripts/addons/cycles/ui.py
+%exclude /usr/share/blender/scripts/addons/cycles/version_update.py
+%exclude /usr/share/blender/scripts/addons/development_api_navigator.py
+%exclude /usr/share/blender/scripts/addons/development_edit_operator.py
+%exclude /usr/share/blender/scripts/addons/development_icon_get.py
+%exclude /usr/share/blender/scripts/addons/development_iskeyfree.py
+%exclude /usr/share/blender/scripts/addons/development_ui_classes.py
+%exclude /usr/share/blender/scripts/addons/game_engine_publishing.py
+%exclude /usr/share/blender/scripts/addons/game_engine_save_as_runtime.py
+%exclude /usr/share/blender/scripts/addons/io_anim_acclaim/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_anim_bvh/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_anim_bvh/export_bvh.py
+%exclude /usr/share/blender/scripts/addons/io_anim_bvh/import_bvh.py
+%exclude /usr/share/blender/scripts/addons/io_anim_c3d/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_anim_c3d/import_c3d.py
+%exclude /usr/share/blender/scripts/addons/io_anim_camera.py
+%exclude /usr/share/blender/scripts/addons/io_anim_nuke_chan/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_anim_nuke_chan/export_nuke_chan.py
+%exclude /usr/share/blender/scripts/addons/io_anim_nuke_chan/import_nuke_chan.py
+%exclude /usr/share/blender/scripts/addons/io_blend_utils/README.md
+%exclude /usr/share/blender/scripts/addons/io_blend_utils/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_blend_utils/bl_utils/pipe_non_blocking.py
+%exclude /usr/share/blender/scripts/addons/io_blend_utils/bl_utils/subprocess_helper.py
+%exclude /usr/share/blender/scripts/addons/io_blend_utils/blend/blendfile.py
+%exclude /usr/share/blender/scripts/addons/io_blend_utils/blend/blendfile_path_walker.py
+%exclude /usr/share/blender/scripts/addons/io_blend_utils/blender_bam-unpacked.whl/bam/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_blend_utils/blender_bam-unpacked.whl/bam/__main__.py
+%exclude /usr/share/blender/scripts/addons/io_blend_utils/blender_bam-unpacked.whl/bam/blend/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_blend_utils/blender_bam-unpacked.whl/bam/blend/blendfile.py
+%exclude /usr/share/blender/scripts/addons/io_blend_utils/blender_bam-unpacked.whl/bam/blend/blendfile_copy.py
+%exclude /usr/share/blender/scripts/addons/io_blend_utils/blender_bam-unpacked.whl/bam/blend/blendfile_pack.py
+%exclude /usr/share/blender/scripts/addons/io_blend_utils/blender_bam-unpacked.whl/bam/blend/blendfile_pack_restore.py
+%exclude /usr/share/blender/scripts/addons/io_blend_utils/blender_bam-unpacked.whl/bam/blend/blendfile_path_remap.py
+%exclude /usr/share/blender/scripts/addons/io_blend_utils/blender_bam-unpacked.whl/bam/blend/blendfile_path_walker.py
+%exclude /usr/share/blender/scripts/addons/io_blend_utils/blender_bam-unpacked.whl/bam/cli.py
+%exclude /usr/share/blender/scripts/addons/io_blend_utils/blender_bam-unpacked.whl/bam/pack.py
+%exclude /usr/share/blender/scripts/addons/io_blend_utils/blender_bam-unpacked.whl/bam/utils/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_blend_utils/blender_bam-unpacked.whl/bam/utils/system.py
+%exclude /usr/share/blender/scripts/addons/io_blend_utils/install_whl.py
+%exclude /usr/share/blender/scripts/addons/io_blend_utils/utils/system.py
+%exclude /usr/share/blender/scripts/addons/io_coat3D/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_coat3D/coat.py
+%exclude /usr/share/blender/scripts/addons/io_coat3D/tex.py
+%exclude /usr/share/blender/scripts/addons/io_convert_image_to_mesh_img/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_convert_image_to_mesh_img/mesh/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_convert_image_to_mesh_img/mesh/dtm.py
+%exclude /usr/share/blender/scripts/addons/io_convert_image_to_mesh_img/mesh/terrain.py
+%exclude /usr/share/blender/scripts/addons/io_convert_image_to_mesh_img/mesh/triangulate.py
+%exclude /usr/share/blender/scripts/addons/io_convert_image_to_mesh_img/pvl/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_convert_image_to_mesh_img/pvl/label.py
+%exclude /usr/share/blender/scripts/addons/io_convert_image_to_mesh_img/pvl/parse.py
+%exclude /usr/share/blender/scripts/addons/io_convert_image_to_mesh_img/pvl/patterns.py
+%exclude /usr/share/blender/scripts/addons/io_convert_image_to_mesh_img/ui/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_convert_image_to_mesh_img/ui/importer.py
+%exclude /usr/share/blender/scripts/addons/io_convert_image_to_mesh_img/ui/terrainpanel.py
+%exclude /usr/share/blender/scripts/addons/io_curve_svg/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_curve_svg/import_svg.py
+%exclude /usr/share/blender/scripts/addons/io_curve_svg/svg_colors.py
+%exclude /usr/share/blender/scripts/addons/io_export_after_effects.py
+%exclude /usr/share/blender/scripts/addons/io_export_dxf/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_export_dxf/draw_blenders/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_export_dxf/export_dxf.py
+%exclude /usr/share/blender/scripts/addons/io_export_dxf/model/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_export_dxf/model/dxfLibrary.py
+%exclude /usr/share/blender/scripts/addons/io_export_dxf/model/migiusModel.py
+%exclude /usr/share/blender/scripts/addons/io_export_dxf/model/model.py
+%exclude /usr/share/blender/scripts/addons/io_export_dxf/operator.py
+%exclude /usr/share/blender/scripts/addons/io_export_dxf/primitive_exporters/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_export_dxf/primitive_exporters/base_exporter.py
+%exclude /usr/share/blender/scripts/addons/io_export_dxf/primitive_exporters/camera_exporter.py
+%exclude /usr/share/blender/scripts/addons/io_export_dxf/primitive_exporters/curve_exporter.py
+%exclude /usr/share/blender/scripts/addons/io_export_dxf/primitive_exporters/empty_exporter.py
+%exclude /usr/share/blender/scripts/addons/io_export_dxf/primitive_exporters/insert_exporter.py
+%exclude /usr/share/blender/scripts/addons/io_export_dxf/primitive_exporters/lamp_exporter.py
+%exclude /usr/share/blender/scripts/addons/io_export_dxf/primitive_exporters/mesh_exporter.py
+%exclude /usr/share/blender/scripts/addons/io_export_dxf/primitive_exporters/text_exporter.py
+%exclude /usr/share/blender/scripts/addons/io_export_dxf/primitive_exporters/viewborder_exporter.py
+%exclude /usr/share/blender/scripts/addons/io_export_paper_model.py
+%exclude /usr/share/blender/scripts/addons/io_export_pc2.py
+%exclude /usr/share/blender/scripts/addons/io_export_unreal_psk_psa.py
+%exclude /usr/share/blender/scripts/addons/io_import_dxf/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/acdsdata.py
+%exclude /usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/blockssection.py
+%exclude /usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/codepage.py
+%exclude /usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/color.py
+%exclude /usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/const.py
+%exclude /usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/decode.py
+%exclude /usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/defaultchunk.py
+%exclude /usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/drawing.py
+%exclude /usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/dxfentities.py
+%exclude /usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/dxfobjects.py
+%exclude /usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/entitysection.py
+%exclude /usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/headersection.py
+%exclude /usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/juliandate.py
+%exclude /usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/layers.py
+%exclude /usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/linetypes.py
+%exclude /usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/sections.py
+%exclude /usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/styles.py
+%exclude /usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/tablessection.py
+%exclude /usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/tags.py
+%exclude /usr/share/blender/scripts/addons/io_import_dxf/dxfimport/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_import_dxf/dxfimport/convert.py
+%exclude /usr/share/blender/scripts/addons/io_import_dxf/dxfimport/do.py
+%exclude /usr/share/blender/scripts/addons/io_import_dxf/dxfimport/fake_entities.py
+%exclude /usr/share/blender/scripts/addons/io_import_dxf/dxfimport/groupsort.py
+%exclude /usr/share/blender/scripts/addons/io_import_dxf/dxfimport/is_.py
+%exclude /usr/share/blender/scripts/addons/io_import_dxf/dxfimport/line_merger.py
+%exclude /usr/share/blender/scripts/addons/io_import_dxf/transverse_mercator.py
+%exclude /usr/share/blender/scripts/addons/io_import_gimp_image_to_scene.py
+%exclude /usr/share/blender/scripts/addons/io_import_images_as_planes.py
+%exclude /usr/share/blender/scripts/addons/io_import_scene_lwo.py
+%exclude /usr/share/blender/scripts/addons/io_import_scene_unreal_psa_psk.py
+%exclude /usr/share/blender/scripts/addons/io_mesh_pdb/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_mesh_pdb/atom_info.dat
+%exclude /usr/share/blender/scripts/addons/io_mesh_pdb/export_pdb.py
+%exclude /usr/share/blender/scripts/addons/io_mesh_pdb/import_pdb.py
+%exclude /usr/share/blender/scripts/addons/io_mesh_ply/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_mesh_ply/export_ply.py
+%exclude /usr/share/blender/scripts/addons/io_mesh_ply/import_ply.py
+%exclude /usr/share/blender/scripts/addons/io_mesh_raw/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_mesh_raw/export_raw.py
+%exclude /usr/share/blender/scripts/addons/io_mesh_raw/import_raw.py
+%exclude /usr/share/blender/scripts/addons/io_mesh_stl/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_mesh_stl/blender_utils.py
+%exclude /usr/share/blender/scripts/addons/io_mesh_stl/stl_utils.py
+%exclude /usr/share/blender/scripts/addons/io_mesh_uv_layout/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_mesh_uv_layout/export_uv_eps.py
+%exclude /usr/share/blender/scripts/addons/io_mesh_uv_layout/export_uv_png.py
+%exclude /usr/share/blender/scripts/addons/io_mesh_uv_layout/export_uv_svg.py
+%exclude /usr/share/blender/scripts/addons/io_online_sketchfab/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_online_sketchfab/pack_for_export.py
+%exclude /usr/share/blender/scripts/addons/io_scene_3ds/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_scene_3ds/export_3ds.py
+%exclude /usr/share/blender/scripts/addons/io_scene_3ds/import_3ds.py
+%exclude /usr/share/blender/scripts/addons/io_scene_fbx/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_scene_fbx/data_types.py
+%exclude /usr/share/blender/scripts/addons/io_scene_fbx/encode_bin.py
+%exclude /usr/share/blender/scripts/addons/io_scene_fbx/export_fbx.py
+%exclude /usr/share/blender/scripts/addons/io_scene_fbx/export_fbx_bin.py
+%exclude /usr/share/blender/scripts/addons/io_scene_fbx/fbx2json.py
+%exclude /usr/share/blender/scripts/addons/io_scene_fbx/fbx_utils.py
+%exclude /usr/share/blender/scripts/addons/io_scene_fbx/import_fbx.py
+%exclude /usr/share/blender/scripts/addons/io_scene_fbx/json2fbx.py
+%exclude /usr/share/blender/scripts/addons/io_scene_fbx/parse_fbx.py
+%exclude /usr/share/blender/scripts/addons/io_scene_ms3d/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_scene_ms3d/ms3d_export.py
+%exclude /usr/share/blender/scripts/addons/io_scene_ms3d/ms3d_import.py
+%exclude /usr/share/blender/scripts/addons/io_scene_ms3d/ms3d_spec.py
+%exclude /usr/share/blender/scripts/addons/io_scene_ms3d/ms3d_strings.py
+%exclude /usr/share/blender/scripts/addons/io_scene_ms3d/ms3d_ui.py
+%exclude /usr/share/blender/scripts/addons/io_scene_ms3d/ms3d_utils.py
+%exclude /usr/share/blender/scripts/addons/io_scene_obj/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_scene_obj/export_obj.py
+%exclude /usr/share/blender/scripts/addons/io_scene_obj/import_obj.py
+%exclude /usr/share/blender/scripts/addons/io_scene_vrml2/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_scene_vrml2/export_vrml2.py
+%exclude /usr/share/blender/scripts/addons/io_scene_x/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_scene_x/export_x.py
+%exclude /usr/share/blender/scripts/addons/io_scene_x3d/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_scene_x3d/export_x3d.py
+%exclude /usr/share/blender/scripts/addons/io_scene_x3d/import_x3d.py
+%exclude /usr/share/blender/scripts/addons/io_sequencer_edl/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_sequencer_edl/import_edl.py
+%exclude /usr/share/blender/scripts/addons/io_sequencer_edl/parse_edl.py
+%exclude /usr/share/blender/scripts/addons/io_shape_mdd/__init__.py
+%exclude /usr/share/blender/scripts/addons/io_shape_mdd/export_mdd.py
+%exclude /usr/share/blender/scripts/addons/io_shape_mdd/import_mdd.py
+%exclude /usr/share/blender/scripts/addons/light_field_tools/__init__.py
+%exclude /usr/share/blender/scripts/addons/light_field_tools/light_field_tools.py
+%exclude /usr/share/blender/scripts/addons/lighting_dynamic_sky.py
+%exclude /usr/share/blender/scripts/addons/materials_library_vx/README.txt
+%exclude /usr/share/blender/scripts/addons/materials_library_vx/__init__.py
+%exclude /usr/share/blender/scripts/addons/materials_library_vx/blender_internal.blend
+%exclude /usr/share/blender/scripts/addons/materials_library_vx/categories.txt
+%exclude /usr/share/blender/scripts/addons/materials_library_vx/cycles_materials.blend
+%exclude /usr/share/blender/scripts/addons/materials_library_vx/cycles_templates.blend
+%exclude /usr/share/blender/scripts/addons/materials_utils/__init__.py
+%exclude /usr/share/blender/scripts/addons/materials_utils/material_converter.py
+%exclude /usr/share/blender/scripts/addons/materials_utils/materials_cycles_converter.py
+%exclude /usr/share/blender/scripts/addons/materials_utils/texture_rename.py
+%exclude /usr/share/blender/scripts/addons/materials_utils/warning_messages_utils.py
+%exclude /usr/share/blender/scripts/addons/measureit/__init__.py
+%exclude /usr/share/blender/scripts/addons/measureit/measureit_geometry.py
+%exclude /usr/share/blender/scripts/addons/measureit/measureit_main.py
+%exclude /usr/share/blender/scripts/addons/measureit/measureit_render.py
+%exclude /usr/share/blender/scripts/addons/mesh_auto_mirror.py
+%exclude /usr/share/blender/scripts/addons/mesh_bsurfaces.py
+%exclude /usr/share/blender/scripts/addons/mesh_carver.py
+%exclude /usr/share/blender/scripts/addons/mesh_custom_normals_tools.py
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/__init__.py
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/face_inset_fillet.py
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/icons/icons.py
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/icons/ngon.png
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/icons/triangle.png
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/mesh_check.py
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/mesh_cut_faces.py
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/mesh_edge_roundifier.py
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/mesh_edges_floor_plan.py
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/mesh_edges_length.py
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/mesh_edgetools.py
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/mesh_extrude_and_reshape.py
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/mesh_fastloop.py
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/mesh_filletplus.py
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/mesh_help.py
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/mesh_mextrude_plus.py
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/mesh_offset_edges.py
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/mesh_pen_tool.py
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/mesh_select_tools/__init__.py
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/mesh_select_tools/mesh_index_select.py
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/mesh_select_tools/mesh_info_select.py
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/mesh_select_tools/mesh_select_by_direction.py
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/mesh_select_tools/mesh_select_by_edge_length.py
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/mesh_select_tools/mesh_select_by_pi.py
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/mesh_select_tools/mesh_select_by_type.py
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/mesh_select_tools/mesh_select_connected_faces.py
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/mesh_select_tools/mesh_selection_topokit.py
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/mesh_vertex_chamfer.py
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/pkhg_faces.py
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/random_vertices.py
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/split_solidify.py
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/vertex_align.py
+%exclude /usr/share/blender/scripts/addons/mesh_extra_tools/vfe_specials.py
+%exclude /usr/share/blender/scripts/addons/mesh_f2.py
+%exclude /usr/share/blender/scripts/addons/mesh_inset/__init__.py
+%exclude /usr/share/blender/scripts/addons/mesh_inset/geom.py
+%exclude /usr/share/blender/scripts/addons/mesh_inset/model.py
+%exclude /usr/share/blender/scripts/addons/mesh_inset/offset.py
+%exclude /usr/share/blender/scripts/addons/mesh_inset/triquad.py
+%exclude /usr/share/blender/scripts/addons/mesh_looptools.py
+%exclude /usr/share/blender/scripts/addons/mesh_relax.py
+%exclude /usr/share/blender/scripts/addons/mesh_snap_utilities_line.py
+%exclude /usr/share/blender/scripts/addons/mesh_tiny_cad/BIX.py
+%exclude /usr/share/blender/scripts/addons/mesh_tiny_cad/CCEN.py
+%exclude /usr/share/blender/scripts/addons/mesh_tiny_cad/CFG.py
+%exclude /usr/share/blender/scripts/addons/mesh_tiny_cad/E2F.py
+%exclude /usr/share/blender/scripts/addons/mesh_tiny_cad/V2X.py
+%exclude /usr/share/blender/scripts/addons/mesh_tiny_cad/VTX.py
+%exclude /usr/share/blender/scripts/addons/mesh_tiny_cad/XALL.py
+%exclude /usr/share/blender/scripts/addons/mesh_tiny_cad/__init__.py
+%exclude /usr/share/blender/scripts/addons/mesh_tiny_cad/cad_module.py
+%exclude /usr/share/blender/scripts/addons/mesh_tiny_cad/icons/BIX.png
+%exclude /usr/share/blender/scripts/addons/mesh_tiny_cad/icons/CCEN.png
+%exclude /usr/share/blender/scripts/addons/mesh_tiny_cad/icons/E2F.png
+%exclude /usr/share/blender/scripts/addons/mesh_tiny_cad/icons/V2X.png
+%exclude /usr/share/blender/scripts/addons/mesh_tiny_cad/icons/VTX.png
+%exclude /usr/share/blender/scripts/addons/mesh_tiny_cad/icons/XALL.png
+%exclude /usr/share/blender/scripts/addons/mesh_tissue/README.md
+%exclude /usr/share/blender/scripts/addons/mesh_tissue/__init__.py
+%exclude /usr/share/blender/scripts/addons/mesh_tissue/colors_groups_exchanger.py
+%exclude /usr/share/blender/scripts/addons/mesh_tissue/dual_mesh.py
+%exclude /usr/share/blender/scripts/addons/mesh_tissue/lattice.py
+%exclude /usr/share/blender/scripts/addons/mesh_tissue/tessellate_numpy.py
+%exclude /usr/share/blender/scripts/addons/mesh_tissue/uv_to_mesh.py
+%exclude /usr/share/blender/scripts/addons/mocap/__init__.py
+%exclude /usr/share/blender/scripts/addons/mocap/mocap_constraints.py
+%exclude /usr/share/blender/scripts/addons/mocap/mocap_tools.py
+%exclude /usr/share/blender/scripts/addons/mocap/retarget.py
+%exclude /usr/share/blender/scripts/addons/modules/cycles_shader_compat.py
+%exclude /usr/share/blender/scripts/addons/modules/extensions_framework/__init__.py
+%exclude /usr/share/blender/scripts/addons/modules/extensions_framework/ui.py
+%exclude /usr/share/blender/scripts/addons/modules/extensions_framework/util.py
+%exclude /usr/share/blender/scripts/addons/modules/extensions_framework/validate.py
+%exclude /usr/share/blender/scripts/addons/modules/rna_manual_reference.py
+%exclude /usr/share/blender/scripts/addons/modules/selection_utils.py
+%exclude /usr/share/blender/scripts/addons/netrender/__init__.py
+%exclude /usr/share/blender/scripts/addons/netrender/baking.py
+%exclude /usr/share/blender/scripts/addons/netrender/balancing.py
+%exclude /usr/share/blender/scripts/addons/netrender/client.py
+%exclude /usr/share/blender/scripts/addons/netrender/css/images/themes-preview.gif
+%exclude /usr/share/blender/scripts/addons/netrender/css/images/themes.gif
+%exclude /usr/share/blender/scripts/addons/netrender/css/images/ui-bg_flat_30_cccccc_40x100.png
+%exclude /usr/share/blender/scripts/addons/netrender/css/images/ui-bg_flat_50_5c5c5c_40x100.png
+%exclude /usr/share/blender/scripts/addons/netrender/css/images/ui-bg_glass_20_555555_1x400.png
+%exclude /usr/share/blender/scripts/addons/netrender/css/images/ui-bg_glass_40_0078a3_1x400.png
+%exclude /usr/share/blender/scripts/addons/netrender/css/images/ui-bg_glass_40_ffc73d_1x400.png
+%exclude /usr/share/blender/scripts/addons/netrender/css/images/ui-bg_gloss-wave_25_333333_500x100.png
+%exclude /usr/share/blender/scripts/addons/netrender/css/images/ui-bg_highlight-soft_80_eeeeee_1x100.png
+%exclude /usr/share/blender/scripts/addons/netrender/css/images/ui-bg_inset-soft_25_000000_1x100.png
+%exclude /usr/share/blender/scripts/addons/netrender/css/images/ui-bg_inset-soft_30_f58400_1x100.png
+%exclude /usr/share/blender/scripts/addons/netrender/css/images/ui-icons_222222_256x240.png
+%exclude /usr/share/blender/scripts/addons/netrender/css/images/ui-icons_4b8e0b_256x240.png
+%exclude /usr/share/blender/scripts/addons/netrender/css/images/ui-icons_a83300_256x240.png
+%exclude /usr/share/blender/scripts/addons/netrender/css/images/ui-icons_cccccc_256x240.png
+%exclude /usr/share/blender/scripts/addons/netrender/css/images/ui-icons_ffffff_256x240.png
+%exclude /usr/share/blender/scripts/addons/netrender/css/jquery-ui.css
+%exclude /usr/share/blender/scripts/addons/netrender/css/jquery.themes.css
+%exclude /usr/share/blender/scripts/addons/netrender/js/jquery-ui.js
+%exclude /usr/share/blender/scripts/addons/netrender/js/jquery.js
+%exclude /usr/share/blender/scripts/addons/netrender/js/jquery.themes.js
+%exclude /usr/share/blender/scripts/addons/netrender/js/netrender-action.js
+%exclude /usr/share/blender/scripts/addons/netrender/js/netrender-widget.js
+%exclude /usr/share/blender/scripts/addons/netrender/js/netrender.js
+%exclude /usr/share/blender/scripts/addons/netrender/js/netrender_balance.js
+%exclude /usr/share/blender/scripts/addons/netrender/master.py
+%exclude /usr/share/blender/scripts/addons/netrender/master_html.py
+%exclude /usr/share/blender/scripts/addons/netrender/model.py
+%exclude /usr/share/blender/scripts/addons/netrender/netrender.css
+%exclude /usr/share/blender/scripts/addons/netrender/netrender.js
+%exclude /usr/share/blender/scripts/addons/netrender/newui.html
+%exclude /usr/share/blender/scripts/addons/netrender/operators.py
+%exclude /usr/share/blender/scripts/addons/netrender/repath.py
+%exclude /usr/share/blender/scripts/addons/netrender/slave.py
+%exclude /usr/share/blender/scripts/addons/netrender/thumbnail.py
+%exclude /usr/share/blender/scripts/addons/netrender/ui.py
+%exclude /usr/share/blender/scripts/addons/netrender/utils.py
+%exclude /usr/share/blender/scripts/addons/netrender/versioning.py
+%exclude /usr/share/blender/scripts/addons/node_wrangler.py
+%exclude /usr/share/blender/scripts/addons/object_animrenderbake.py
+%exclude /usr/share/blender/scripts/addons/object_boolean_tools.py
+%exclude /usr/share/blender/scripts/addons/object_cloud_gen.py
+%exclude /usr/share/blender/scripts/addons/object_edit_linked.py
+%exclude /usr/share/blender/scripts/addons/object_fracture/__init__.py
+%exclude /usr/share/blender/scripts/addons/object_fracture/data.blend
+%exclude /usr/share/blender/scripts/addons/object_fracture/fracture_ops.py
+%exclude /usr/share/blender/scripts/addons/object_fracture/fracture_setup.py
+%exclude /usr/share/blender/scripts/addons/object_fracture_cell/__init__.py
+%exclude /usr/share/blender/scripts/addons/object_fracture_cell/fracture_cell_calc.py
+%exclude /usr/share/blender/scripts/addons/object_fracture_cell/fracture_cell_setup.py
+%exclude /usr/share/blender/scripts/addons/object_fracture_crack/__init__.py
+%exclude /usr/share/blender/scripts/addons/object_fracture_crack/crack_it.py
+%exclude /usr/share/blender/scripts/addons/object_fracture_crack/materials/materials1.blend
+%exclude /usr/share/blender/scripts/addons/object_fracture_crack/operator.py
+%exclude /usr/share/blender/scripts/addons/object_grease_scatter.py
+%exclude /usr/share/blender/scripts/addons/object_print3d_utils/__init__.py
+%exclude /usr/share/blender/scripts/addons/object_print3d_utils/export.py
+%exclude /usr/share/blender/scripts/addons/object_print3d_utils/mesh_helpers.py
+%exclude /usr/share/blender/scripts/addons/object_print3d_utils/operators.py
+%exclude /usr/share/blender/scripts/addons/object_print3d_utils/readme.rst
+%exclude /usr/share/blender/scripts/addons/object_print3d_utils/report.py
+%exclude /usr/share/blender/scripts/addons/object_print3d_utils/todo.rst
+%exclude /usr/share/blender/scripts/addons/object_print3d_utils/ui.py
+%exclude /usr/share/blender/scripts/addons/object_skinify.py
+%exclude /usr/share/blender/scripts/addons/oscurart_tools/__init__.py
+%exclude /usr/share/blender/scripts/addons/oscurart_tools/oscurart_animation.py
+%exclude /usr/share/blender/scripts/addons/oscurart_tools/oscurart_files.py
+%exclude /usr/share/blender/scripts/addons/oscurart_tools/oscurart_meshes.py
+%exclude /usr/share/blender/scripts/addons/oscurart_tools/oscurart_objects.py
+%exclude /usr/share/blender/scripts/addons/oscurart_tools/oscurart_overrides.py
+%exclude /usr/share/blender/scripts/addons/oscurart_tools/oscurart_render.py
+%exclude /usr/share/blender/scripts/addons/oscurart_tools/oscurart_shapes.py
+%exclude /usr/share/blender/scripts/addons/paint_palette.py
+%exclude /usr/share/blender/scripts/addons/pie_menus_official/__init__.py
+%exclude /usr/share/blender/scripts/addons/pie_menus_official/pie_clip_marker_of.py
+%exclude /usr/share/blender/scripts/addons/pie_menus_official/pie_manipulator_of.py
+%exclude /usr/share/blender/scripts/addons/pie_menus_official/pie_object_modes_of.py
+%exclude /usr/share/blender/scripts/addons/pie_menus_official/pie_pivot_of.py
+%exclude /usr/share/blender/scripts/addons/pie_menus_official/pie_shade_of.py
+%exclude /usr/share/blender/scripts/addons/pie_menus_official/pie_snap_of.py
+%exclude /usr/share/blender/scripts/addons/pie_menus_official/pie_view_of.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/curve.torus_knot_plus/13x8_wicker_globe.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/curve.torus_knot_plus/7x6.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/curve.torus_knot_plus/9x9_color.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/curve.torus_knot_plus/braided_coil.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/curve.torus_knot_plus/flower_mesh_(2d).py
+%exclude /usr/share/blender/scripts/addons/presets/operator/curve.torus_knot_plus/slinky_knot.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/curve.torus_knot_plus/snowflake_(2d).py
+%exclude /usr/share/blender/scripts/addons/presets/operator/curve.torus_knot_plus/sun_cross_(2d).py
+%exclude /usr/share/blender/scripts/addons/presets/operator/curve.torus_knot_plus/tripple_dna.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/curve.torus_knot_plus/wicker_basket.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.bolt_add/default.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.bolt_add/m10.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.bolt_add/m12.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.bolt_add/m3.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.bolt_add/m4.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.bolt_add/m5.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.bolt_add/m6.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.bolt_add/m8.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.eroder/default.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.eroder/light_erosion.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.eroder/medium_erosion.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.eroder/strong_erosion.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.eroder/thermal_diffusion.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/abstract.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/another_noise.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/billow.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/canion.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/canions.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/cauliflower_hills.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/cliff.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/cristaline.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/default.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/default_large.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/dunes.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/flatstones.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/gully.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/lakes_1.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/lakes_2.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/large_terrain.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/mesa.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/mounds.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/mountain_1.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/mountain_2.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/planet.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/planet_noise.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/ridged.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/river.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/rock.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/slick_rock.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/tech_effect.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/techno_cell.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/vlnoise_turbulence.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/voronoi_hills.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/vulcano.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/yin_yang.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.primitive_round_cube_add/Capsule.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.primitive_round_cube_add/Clay_Bar.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.primitive_round_cube_add/Cube.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.primitive_round_cube_add/Grid_3D.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.primitive_round_cube_add/Octahedron.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.primitive_round_cube_add/Quadsphere.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.primitive_round_cube_add/Rounded_Cube.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/bonbon.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/boy.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/catalan.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/catenoid.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/clifford_torus.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/cochlea.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/cosinus.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/dini.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/enneper.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/helicoidal.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/helix.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/hexahedron.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/hyperhelicoidal.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/klein.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/moebius.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/pseudo_catenoid.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/pseudosphere.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/ridged_torus.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/shell.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/sine.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/snake.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/sterosphere.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/torus.py
+%exclude /usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/twisted_torus.py
+%exclude /usr/share/blender/scripts/addons/render_auto_tile_size.py
+%exclude /usr/share/blender/scripts/addons/render_clay.py
+%exclude /usr/share/blender/scripts/addons/render_copy_settings/__init__.py
+%exclude /usr/share/blender/scripts/addons/render_copy_settings/operator.py
+%exclude /usr/share/blender/scripts/addons/render_copy_settings/panel.py
+%exclude /usr/share/blender/scripts/addons/render_copy_settings/presets.py
+%exclude /usr/share/blender/scripts/addons/render_copy_settings/translations.py
+%exclude /usr/share/blender/scripts/addons/render_freestyle_svg.py
+%exclude /usr/share/blender/scripts/addons/render_povray/__init__.py
+%exclude /usr/share/blender/scripts/addons/render_povray/df3.py
+%exclude /usr/share/blender/scripts/addons/render_povray/nodes.py
+%exclude /usr/share/blender/scripts/addons/render_povray/primitives.py
+%exclude /usr/share/blender/scripts/addons/render_povray/render.py
+%exclude /usr/share/blender/scripts/addons/render_povray/shading.py
+%exclude /usr/share/blender/scripts/addons/render_povray/templates_pov/abyss.pov
+%exclude /usr/share/blender/scripts/addons/render_povray/templates_pov/biscuit.pov
+%exclude /usr/share/blender/scripts/addons/render_povray/templates_pov/bsp_Tango.pov
+%exclude /usr/share/blender/scripts/addons/render_povray/templates_pov/chess2.pov
+%exclude /usr/share/blender/scripts/addons/render_povray/templates_pov/cornell.pov
+%exclude /usr/share/blender/scripts/addons/render_povray/templates_pov/diffract.pov
+%exclude /usr/share/blender/scripts/addons/render_povray/templates_pov/diffuse_back.pov
+%exclude /usr/share/blender/scripts/addons/render_povray/templates_pov/float5.pov
+%exclude /usr/share/blender/scripts/addons/render_povray/templates_pov/gamma_showcase.pov
+%exclude /usr/share/blender/scripts/addons/render_povray/templates_pov/grenadine.pov
+%exclude /usr/share/blender/scripts/addons/render_povray/templates_pov/isocacti.pov
+%exclude /usr/share/blender/scripts/addons/render_povray/templates_pov/mediasky.pov
+%exclude /usr/share/blender/scripts/addons/render_povray/templates_pov/patio-radio.pov
+%exclude /usr/share/blender/scripts/addons/render_povray/templates_pov/subsurface.pov
+%exclude /usr/share/blender/scripts/addons/render_povray/templates_pov/wallstucco.pov
+%exclude /usr/share/blender/scripts/addons/render_povray/ui.py
+%exclude /usr/share/blender/scripts/addons/render_povray/update_files.py
+%exclude /usr/share/blender/scripts/addons/rigify/__init__.py
+%exclude /usr/share/blender/scripts/addons/rigify/generate.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/__init__.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/generate.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/metarig_menu.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/metarigs/__init__.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/metarigs/human.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/metarigs/pitchipoy_human.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rig_lists.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rig_ui_pitchipoy_template.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rig_ui_template.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/__init__.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/basic/__init__.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/basic/copy.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/basic/copy_chain.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/biped/__init__.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/biped/arm/__init__.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/biped/arm/deform.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/biped/arm/fk.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/biped/arm/ik.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/biped/leg/__init__.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/biped/leg/deform.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/biped/leg/fk.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/biped/leg/ik.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/biped/limb_common.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/finger.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/misc/__init__.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/misc/delta.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/neck_short.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/palm.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/__init__.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/limbs/__init__.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/limbs/arm.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/limbs/leg.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/limbs/limb_utils.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/limbs/paw.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/limbs/super_limb.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/limbs/ui.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/simple_tentacle.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/super_copy.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/super_face.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/super_finger.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/super_palm.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/super_torso_turbo.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/super_widgets.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/tentacle.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/rigs/spine.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/ui.py
+%exclude /usr/share/blender/scripts/addons/rigify/legacy/utils.py
+%exclude /usr/share/blender/scripts/addons/rigify/metarig_menu.py
+%exclude /usr/share/blender/scripts/addons/rigify/metarigs/Animals/__init__.py
+%exclude /usr/share/blender/scripts/addons/rigify/metarigs/Animals/bird.py
+%exclude /usr/share/blender/scripts/addons/rigify/metarigs/Animals/cat.py
+%exclude /usr/share/blender/scripts/addons/rigify/metarigs/Animals/horse.py
+%exclude /usr/share/blender/scripts/addons/rigify/metarigs/Animals/shark.py
+%exclude /usr/share/blender/scripts/addons/rigify/metarigs/Animals/wolf.py
+%exclude /usr/share/blender/scripts/addons/rigify/metarigs/Basic/basic_human.py
+%exclude /usr/share/blender/scripts/addons/rigify/metarigs/Basic/basic_quadruped.py
+%exclude /usr/share/blender/scripts/addons/rigify/metarigs/__init__.py
+%exclude /usr/share/blender/scripts/addons/rigify/metarigs/human.py
+%exclude /usr/share/blender/scripts/addons/rigify/rig_lists.py
+%exclude /usr/share/blender/scripts/addons/rigify/rig_ui_template.py
+%exclude /usr/share/blender/scripts/addons/rigify/rigs/__init__.py
+%exclude /usr/share/blender/scripts/addons/rigify/rigs/basic/__init__.py
+%exclude /usr/share/blender/scripts/addons/rigify/rigs/basic/copy_chain.py
+%exclude /usr/share/blender/scripts/addons/rigify/rigs/basic/super_copy.py
+%exclude /usr/share/blender/scripts/addons/rigify/rigs/experimental/__init__.py
+%exclude /usr/share/blender/scripts/addons/rigify/rigs/experimental/super_chain.py
+%exclude /usr/share/blender/scripts/addons/rigify/rigs/experimental/super_eye.py
+%exclude /usr/share/blender/scripts/addons/rigify/rigs/faces/__init__.py
+%exclude /usr/share/blender/scripts/addons/rigify/rigs/faces/super_face.py
+%exclude /usr/share/blender/scripts/addons/rigify/rigs/limbs/__init__.py
+%exclude /usr/share/blender/scripts/addons/rigify/rigs/limbs/arm.py
+%exclude /usr/share/blender/scripts/addons/rigify/rigs/limbs/leg.py
+%exclude /usr/share/blender/scripts/addons/rigify/rigs/limbs/limb_utils.py
+%exclude /usr/share/blender/scripts/addons/rigify/rigs/limbs/paw.py
+%exclude /usr/share/blender/scripts/addons/rigify/rigs/limbs/rear_paw.py
+%exclude /usr/share/blender/scripts/addons/rigify/rigs/limbs/simple_tentacle.py
+%exclude /usr/share/blender/scripts/addons/rigify/rigs/limbs/super_finger.py
+%exclude /usr/share/blender/scripts/addons/rigify/rigs/limbs/super_limb.py
+%exclude /usr/share/blender/scripts/addons/rigify/rigs/limbs/super_palm.py
+%exclude /usr/share/blender/scripts/addons/rigify/rigs/limbs/ui.py
+%exclude /usr/share/blender/scripts/addons/rigify/rigs/spines/__init__.py
+%exclude /usr/share/blender/scripts/addons/rigify/rigs/spines/super_spine.py
+%exclude /usr/share/blender/scripts/addons/rigify/rigs/utils.py
+%exclude /usr/share/blender/scripts/addons/rigify/rigs/widgets.py
+%exclude /usr/share/blender/scripts/addons/rigify/rot_mode.py
+%exclude /usr/share/blender/scripts/addons/rigify/ui.py
+%exclude /usr/share/blender/scripts/addons/rigify/utils.py
+%exclude /usr/share/blender/scripts/addons/sequencer_kinoraw_tools/__init__.py
+%exclude /usr/share/blender/scripts/addons/sequencer_kinoraw_tools/audio_tools.py
+%exclude /usr/share/blender/scripts/addons/sequencer_kinoraw_tools/datamosh.py
+%exclude /usr/share/blender/scripts/addons/sequencer_kinoraw_tools/eco.py
+%exclude /usr/share/blender/scripts/addons/sequencer_kinoraw_tools/exiftool.py
+%exclude /usr/share/blender/scripts/addons/sequencer_kinoraw_tools/functions.py
+%exclude /usr/share/blender/scripts/addons/sequencer_kinoraw_tools/jumptocut.py
+%exclude /usr/share/blender/scripts/addons/sequencer_kinoraw_tools/operators_extra_actions.py
+%exclude /usr/share/blender/scripts/addons/sequencer_kinoraw_tools/proxy_tools.py
+%exclude /usr/share/blender/scripts/addons/sequencer_kinoraw_tools/random_editor.py
+%exclude /usr/share/blender/scripts/addons/sequencer_kinoraw_tools/recursive_loader.py
+%exclude /usr/share/blender/scripts/addons/sequencer_kinoraw_tools/ui.py
+%exclude /usr/share/blender/scripts/addons/space_clip_editor_autotracker.py
+%exclude /usr/share/blender/scripts/addons/space_clip_editor_refine_solution.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_3d_navigation.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_brush_menus/__init__.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_brush_menus/brush_menu.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_brush_menus/brushes.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_brush_menus/curve_menu.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_brush_menus/dyntopo_menu.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_brush_menus/stroke_menu.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_brush_menus/symmetry_menu.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_brush_menus/texture_menu.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_brush_menus/utils_core.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_copy_attributes.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_display_tools/__init__.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_display_tools/display.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_display_tools/fast_navigate.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_display_tools/modifier_tools.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_display_tools/scene_vis.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_display_tools/select_tools.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_display_tools/selection_restrictor.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_display_tools/shading_menu.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_display_tools/useless_tools.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_math_vis/__init__.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_math_vis/draw.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_math_vis/utils.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_modifier_tools.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_pie_menus/__init__.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_align_menu.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_animation_menu.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_apply_transform_menu.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_cursor.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_delete_menu.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_editor_switch_menu.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_manipulator_menu.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_modes_menu.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_orientation_menu.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_origin.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_pivot_point_menu.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_proportional_menu.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_save_open_menu.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_sculpt_menu.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_select_menu.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_shading_menu.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_snap_menu.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_views_numpad_menu.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_spacebar_menu.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_stored_views/__init__.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_stored_views/core.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_stored_views/io.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_stored_views/operators.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_stored_views/properties.py
+%exclude /usr/share/blender/scripts/addons/space_view3d_stored_views/ui.py
+%exclude /usr/share/blender/scripts/addons/system_blend_info.py
+%exclude /usr/share/blender/scripts/addons/system_demo_mode/__init__.py
+%exclude /usr/share/blender/scripts/addons/system_demo_mode/config.py
+%exclude /usr/share/blender/scripts/addons/system_demo_mode/demo_mode.py
+%exclude /usr/share/blender/scripts/addons/system_property_chart.py
+%exclude /usr/share/blender/scripts/addons/ui_layer_manager.py
+%exclude /usr/share/blender/scripts/addons/ui_translate/__init__.py
+%exclude /usr/share/blender/scripts/addons/ui_translate/edit_translation.py
+%exclude /usr/share/blender/scripts/addons/ui_translate/settings.py
+%exclude /usr/share/blender/scripts/addons/ui_translate/update_addon.py
+%exclude /usr/share/blender/scripts/addons/ui_translate/update_svn.py
+%exclude /usr/share/blender/scripts/addons/ui_translate/update_ui.py
+%exclude /usr/share/blender/scripts/addons/uv_bake_texture_to_vcols.py
+%exclude /usr/share/blender/scripts/addons/uv_magic_uv/__init__.py
+%exclude /usr/share/blender/scripts/addons/uv_magic_uv/muv_common.py
+%exclude /usr/share/blender/scripts/addons/uv_magic_uv/muv_cpuv_ops.py
+%exclude /usr/share/blender/scripts/addons/uv_magic_uv/muv_cpuv_selseq_ops.py
+%exclude /usr/share/blender/scripts/addons/uv_magic_uv/muv_fliprot_ops.py
+%exclude /usr/share/blender/scripts/addons/uv_magic_uv/muv_menu.py
+%exclude /usr/share/blender/scripts/addons/uv_magic_uv/muv_mirroruv_ops.py
+%exclude /usr/share/blender/scripts/addons/uv_magic_uv/muv_mvuv_ops.py
+%exclude /usr/share/blender/scripts/addons/uv_magic_uv/muv_packuv_ops.py
+%exclude /usr/share/blender/scripts/addons/uv_magic_uv/muv_preferences.py
+%exclude /usr/share/blender/scripts/addons/uv_magic_uv/muv_preserve_uv_aspect.py
+%exclude /usr/share/blender/scripts/addons/uv_magic_uv/muv_props.py
+%exclude /usr/share/blender/scripts/addons/uv_magic_uv/muv_texlock_ops.py
+%exclude /usr/share/blender/scripts/addons/uv_magic_uv/muv_texproj_ops.py
+%exclude /usr/share/blender/scripts/addons/uv_magic_uv/muv_transuv_ops.py
+%exclude /usr/share/blender/scripts/addons/uv_magic_uv/muv_unwrapconst_ops.py
+%exclude /usr/share/blender/scripts/addons/uv_magic_uv/muv_uvbb_ops.py
+%exclude /usr/share/blender/scripts/addons/uv_magic_uv/muv_wsuv_ops.py
+%exclude /usr/share/blender/scripts/addons/uv_texture_atlas.py
+/usr/share/applications/blender.desktop
+/usr/share/blender/datafiles/colormanagement/config.ocio
+/usr/share/blender/datafiles/colormanagement/filmic/filmic_desat65cube.spi3d
+/usr/share/blender/datafiles/colormanagement/filmic/filmic_false_color.spi3d
+/usr/share/blender/datafiles/colormanagement/filmic/filmic_to_0-35_1-30.spi1d
+/usr/share/blender/datafiles/colormanagement/filmic/filmic_to_0-48_1-09.spi1d
+/usr/share/blender/datafiles/colormanagement/filmic/filmic_to_0-60_1-04.spi1d
+/usr/share/blender/datafiles/colormanagement/filmic/filmic_to_0-70_1-03.spi1d
+/usr/share/blender/datafiles/colormanagement/filmic/filmic_to_0-85_1-011.spi1d
+/usr/share/blender/datafiles/colormanagement/filmic/filmic_to_0.99_1-0075.spi1d
+/usr/share/blender/datafiles/colormanagement/filmic/filmic_to_1.20_1-00.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/aces_to_xyz.spimtx
+/usr/share/blender/datafiles/colormanagement/luts/adx_adx10_to_cdd.spimtx
+/usr/share/blender/datafiles/colormanagement/luts/adx_cdd_to_cid.spimtx
+/usr/share/blender/datafiles/colormanagement/luts/adx_cid_to_rle.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/adx_exp_to_aces.spimtx
+/usr/share/blender/datafiles/colormanagement/luts/colorworks_filmlg_to_p3.3dl
+/usr/share/blender/datafiles/colormanagement/luts/dci_xyz.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/agfa_advantix_100.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/agfa_advantix_200.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/agfa_advantix_400.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/agfa_agfachrome_ct_precisa_100.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/agfa_agfachrome_ct_precisa_200.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/agfa_agfachrome_rsx2_050.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/agfa_agfachrome_rsx2_100.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/agfa_agfachrome_rsx2_200.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/agfa_agfacolor_futura_100.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/agfa_agfacolor_futura_200.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/agfa_agfacolor_futura_400.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/agfa_agfacolor_futura_ii_100.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/agfa_agfacolor_futura_ii_200.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/agfa_agfacolor_futura_ii_400.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/agfa_agfacolor_hdc_100_plus.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/agfa_agfacolor_hdc_200_plus.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/agfa_agfacolor_hdc_400_plus.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/agfa_agfacolor_optima_ii_100.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/agfa_agfacolor_optima_ii_200.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/agfa_agfacolor_ultra_050.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/agfa_agfacolor_vista_100.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/agfa_agfacolor_vista_200.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/agfa_agfacolor_vista_400.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/agfa_agfacolor_vista_800.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/canon_optura_981111.slrr.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/canon_optura_981111.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/canon_optura_981113.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/canon_optura_981114.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/eastman_double_x_neg_12min.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/eastman_double_x_neg_4min.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/eastman_double_x_neg_5min.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/eastman_double_x_neg_6min.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/fujifilm_f-125.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/fujifilm_f-250.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/fujifilm_f-400.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/fujifilm_fci.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/fujifilm_fp2900z.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/kodak_dscs_3151.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/kodak_dscs_3152.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/kodak_dscs_3153.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/kodak_dscs_3154.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/kodak_dscs_3155.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/kodak_dscs_3156.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/kodak_ektachrome_100.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/kodak_ektachrome_100_plus.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/kodak_ektachrome_320t.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/kodak_ektachrome_400x.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/kodak_ektachrome_64.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/kodak_ektachrome_64t.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/kodak_ektachrome_e100s.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/kodak_gold_100.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/kodak_gold_200.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/kodak_kaf-2001.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/kodak_kaf-3000.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/kodak_kai-0311.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/kodak_kai-0372.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/kodak_kai-1010.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/kodak_kodachrome_200.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/kodak_kodachrome_25.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/kodak_kodachrome_64.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/kodak_max_zoom_800.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/kodak_portra_100t.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/kodak_portra_160nc.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/kodak_portra_160vc.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/kodak_portra_400nc.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/kodak_portra_400vc.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/film_response/kodak_portra_800.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/lg10.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/rec709.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/rec709_to_aces.spimtx
+/usr/share/blender/datafiles/colormanagement/luts/rrt_ut33_dcdm.spi3d
+/usr/share/blender/datafiles/colormanagement/luts/rrt_ut33_p3dci.spi3d
+/usr/share/blender/datafiles/colormanagement/luts/rrt_ut33_rec709.spi3d
+/usr/share/blender/datafiles/colormanagement/luts/rrt_ut33_sRGB.spi3d
+/usr/share/blender/datafiles/colormanagement/luts/spi_ocio_srgb_test.spi3d
+/usr/share/blender/datafiles/colormanagement/luts/srgb.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/srgb_inv.spi1d
+/usr/share/blender/datafiles/colormanagement/luts/srgb_to_xyz.spimtx
+/usr/share/blender/datafiles/colormanagement/luts/vd16.spi1d
+/usr/share/blender/scripts/blender-thumbnailer.py
+/usr/share/blender/scripts/freestyle/modules/freestyle/__init__.py
+/usr/share/blender/scripts/freestyle/modules/freestyle/chainingiterators.py
+/usr/share/blender/scripts/freestyle/modules/freestyle/functions.py
+/usr/share/blender/scripts/freestyle/modules/freestyle/predicates.py
+/usr/share/blender/scripts/freestyle/modules/freestyle/shaders.py
+/usr/share/blender/scripts/freestyle/modules/freestyle/types.py
+/usr/share/blender/scripts/freestyle/modules/freestyle/utils.py
+/usr/share/blender/scripts/freestyle/modules/parameter_editor.py
+/usr/share/blender/scripts/freestyle/styles/anisotropic_diffusion.py
+/usr/share/blender/scripts/freestyle/styles/apriori_and_causal_density.py
+/usr/share/blender/scripts/freestyle/styles/apriori_density.py
+/usr/share/blender/scripts/freestyle/styles/backbone_stretcher.py
+/usr/share/blender/scripts/freestyle/styles/blueprint_circles.py
+/usr/share/blender/scripts/freestyle/styles/blueprint_ellipses.py
+/usr/share/blender/scripts/freestyle/styles/blueprint_squares.py
+/usr/share/blender/scripts/freestyle/styles/cartoon.py
+/usr/share/blender/scripts/freestyle/styles/contour.py
+/usr/share/blender/scripts/freestyle/styles/curvature2d.py
+/usr/share/blender/scripts/freestyle/styles/external_contour.py
+/usr/share/blender/scripts/freestyle/styles/external_contour_sketchy.py
+/usr/share/blender/scripts/freestyle/styles/external_contour_smooth.py
+/usr/share/blender/scripts/freestyle/styles/haloing.py
+/usr/share/blender/scripts/freestyle/styles/ignore_small_occlusions.py
+/usr/share/blender/scripts/freestyle/styles/invisible_lines.py
+/usr/share/blender/scripts/freestyle/styles/japanese_bigbrush.py
+/usr/share/blender/scripts/freestyle/styles/long_anisotropically_dense.py
+/usr/share/blender/scripts/freestyle/styles/multiple_parameterization.py
+/usr/share/blender/scripts/freestyle/styles/nature.py
+/usr/share/blender/scripts/freestyle/styles/near_lines.py
+/usr/share/blender/scripts/freestyle/styles/occluded_by_specific_object.py
+/usr/share/blender/scripts/freestyle/styles/polygonalize.py
+/usr/share/blender/scripts/freestyle/styles/qi0.py
+/usr/share/blender/scripts/freestyle/styles/qi0_not_external_contour.py
+/usr/share/blender/scripts/freestyle/styles/qi1.py
+/usr/share/blender/scripts/freestyle/styles/qi2.py
+/usr/share/blender/scripts/freestyle/styles/sequentialsplit_sketchy.py
+/usr/share/blender/scripts/freestyle/styles/sketchy_multiple_parameterization.py
+/usr/share/blender/scripts/freestyle/styles/sketchy_topology_broken.py
+/usr/share/blender/scripts/freestyle/styles/sketchy_topology_preserved.py
+/usr/share/blender/scripts/freestyle/styles/split_at_highest_2d_curvatures.py
+/usr/share/blender/scripts/freestyle/styles/split_at_tvertices.py
+/usr/share/blender/scripts/freestyle/styles/suggestive.py
+/usr/share/blender/scripts/freestyle/styles/thickness_fof_depth_discontinuity.py
+/usr/share/blender/scripts/freestyle/styles/tipremover.py
+/usr/share/blender/scripts/freestyle/styles/tvertex_remover.py
+/usr/share/blender/scripts/freestyle/styles/uniformpruning_zsort.py
+/usr/share/blender/scripts/modules/addon_utils.py
+/usr/share/blender/scripts/modules/animsys_refactor.py
+/usr/share/blender/scripts/modules/bl_app_override/__init__.py
+/usr/share/blender/scripts/modules/bl_app_override/helpers.py
+/usr/share/blender/scripts/modules/bl_app_template_utils.py
+/usr/share/blender/scripts/modules/bl_i18n_utils/__init__.py
+/usr/share/blender/scripts/modules/bl_i18n_utils/bl_extract_messages.py
+/usr/share/blender/scripts/modules/bl_i18n_utils/merge_po.py
+/usr/share/blender/scripts/modules/bl_i18n_utils/settings.py
+/usr/share/blender/scripts/modules/bl_i18n_utils/settings_user.py
+/usr/share/blender/scripts/modules/bl_i18n_utils/utils.py
+/usr/share/blender/scripts/modules/bl_i18n_utils/utils_languages_menu.py
+/usr/share/blender/scripts/modules/bl_i18n_utils/utils_rtl.py
+/usr/share/blender/scripts/modules/bl_i18n_utils/utils_spell_check.py
+/usr/share/blender/scripts/modules/bl_previews_utils/bl_previews_render.py
+/usr/share/blender/scripts/modules/blend_render_info.py
+/usr/share/blender/scripts/modules/bpy/__init__.py
+/usr/share/blender/scripts/modules/bpy/ops.py
+/usr/share/blender/scripts/modules/bpy/path.py
+/usr/share/blender/scripts/modules/bpy/utils/__init__.py
+/usr/share/blender/scripts/modules/bpy/utils/previews.py
+/usr/share/blender/scripts/modules/bpy_extras/__init__.py
+/usr/share/blender/scripts/modules/bpy_extras/anim_utils.py
+/usr/share/blender/scripts/modules/bpy_extras/image_utils.py
+/usr/share/blender/scripts/modules/bpy_extras/io_utils.py
+/usr/share/blender/scripts/modules/bpy_extras/keyconfig_utils.py
+/usr/share/blender/scripts/modules/bpy_extras/mesh_utils.py
+/usr/share/blender/scripts/modules/bpy_extras/object_utils.py
+/usr/share/blender/scripts/modules/bpy_extras/view3d_utils.py
+/usr/share/blender/scripts/modules/bpy_restrict_state.py
+/usr/share/blender/scripts/modules/bpy_types.py
+/usr/share/blender/scripts/modules/bpyml.py
+/usr/share/blender/scripts/modules/bpyml_ui.py
+/usr/share/blender/scripts/modules/console/__init__.py
+/usr/share/blender/scripts/modules/console/complete_calltip.py
+/usr/share/blender/scripts/modules/console/complete_import.py
+/usr/share/blender/scripts/modules/console/complete_namespace.py
+/usr/share/blender/scripts/modules/console/intellisense.py
+/usr/share/blender/scripts/modules/console_python.py
+/usr/share/blender/scripts/modules/console_shell.py
+/usr/share/blender/scripts/modules/graphviz_export.py
+/usr/share/blender/scripts/modules/keyingsets_utils.py
+/usr/share/blender/scripts/modules/nodeitems_utils.py
+/usr/share/blender/scripts/modules/progress_report.py
+/usr/share/blender/scripts/modules/rna_info.py
+/usr/share/blender/scripts/modules/rna_keymap_ui.py
+/usr/share/blender/scripts/modules/rna_prop_ui.py
+/usr/share/blender/scripts/modules/rna_xml.py
+/usr/share/blender/scripts/modules/sys_info.py
+/usr/share/blender/scripts/presets/camera/1__colon__2.3_inch.py
+/usr/share/blender/scripts/presets/camera/1__colon__2.5_inch.py
+/usr/share/blender/scripts/presets/camera/2__colon__3_inch.py
+/usr/share/blender/scripts/presets/camera/4__colon__3_inch.py
+/usr/share/blender/scripts/presets/camera/Arri_Alexa.py
+/usr/share/blender/scripts/presets/camera/Blackmagic_Cinema_Camera.py
+/usr/share/blender/scripts/presets/camera/Blackmagic_Pocket_Cinema_Camera.py
+/usr/share/blender/scripts/presets/camera/Blackmagic_Production_Camera_4K.py
+/usr/share/blender/scripts/presets/camera/Blender.py
+/usr/share/blender/scripts/presets/camera/Canon_1100D.py
+/usr/share/blender/scripts/presets/camera/Canon_APS-C.py
+/usr/share/blender/scripts/presets/camera/Canon_APS-H.py
+/usr/share/blender/scripts/presets/camera/Canon_C300.py
+/usr/share/blender/scripts/presets/camera/Full_Frame_35mm_Camera.py
+/usr/share/blender/scripts/presets/camera/GoPro_Hero3_Black.py
+/usr/share/blender/scripts/presets/camera/GoPro_Hero3_Silver.py
+/usr/share/blender/scripts/presets/camera/GoPro_Hero3_White.py
+/usr/share/blender/scripts/presets/camera/Nexus_5.py
+/usr/share/blender/scripts/presets/camera/Nikon_D3100.py
+/usr/share/blender/scripts/presets/camera/Nikon_DX.py
+/usr/share/blender/scripts/presets/camera/Panasonic_AG-HVX200.py
+/usr/share/blender/scripts/presets/camera/Panasonic_LX2.py
+/usr/share/blender/scripts/presets/camera/Red_Epic.py
+/usr/share/blender/scripts/presets/camera/Red_One_2K.py
+/usr/share/blender/scripts/presets/camera/Red_One_3K.py
+/usr/share/blender/scripts/presets/camera/Red_One_4K.py
+/usr/share/blender/scripts/presets/camera/Samsung_Galaxy_S3.py
+/usr/share/blender/scripts/presets/camera/Samsung_Galaxy_S4.py
+/usr/share/blender/scripts/presets/camera/Sony_A55.py
+/usr/share/blender/scripts/presets/camera/Sony_EX1.py
+/usr/share/blender/scripts/presets/camera/Sony_F65.py
+/usr/share/blender/scripts/presets/camera/Super_16_Film.py
+/usr/share/blender/scripts/presets/camera/Super_35_Film.py
+/usr/share/blender/scripts/presets/camera/iPhone_4.py
+/usr/share/blender/scripts/presets/camera/iPhone_4S.py
+/usr/share/blender/scripts/presets/camera/iPhone_5.py
+/usr/share/blender/scripts/presets/cloth/cotton.py
+/usr/share/blender/scripts/presets/cloth/denim.py
+/usr/share/blender/scripts/presets/cloth/leather.py
+/usr/share/blender/scripts/presets/cloth/rubber.py
+/usr/share/blender/scripts/presets/cloth/silk.py
+/usr/share/blender/scripts/presets/cycles/integrator/direct_light.py
+/usr/share/blender/scripts/presets/cycles/integrator/full_global_illumination.py
+/usr/share/blender/scripts/presets/cycles/integrator/limited_global_illumination.py
+/usr/share/blender/scripts/presets/cycles/sampling/final.py
+/usr/share/blender/scripts/presets/cycles/sampling/preview.py
+/usr/share/blender/scripts/presets/ffmpeg/DVD_(note_colon__this_changes_render_resolution).py
+/usr/share/blender/scripts/presets/ffmpeg/h264_in_MP4.py
+/usr/share/blender/scripts/presets/ffmpeg/h264_in_Matroska.py
+/usr/share/blender/scripts/presets/ffmpeg/h264_in_Matroska_for_scrubbing.py
+/usr/share/blender/scripts/presets/ffmpeg/ogg_theora.py
+/usr/share/blender/scripts/presets/ffmpeg/xvid.py
+/usr/share/blender/scripts/presets/fluid/honey.py
+/usr/share/blender/scripts/presets/fluid/oil.py
+/usr/share/blender/scripts/presets/fluid/water.py
+/usr/share/blender/scripts/presets/framerate/23.98.py
+/usr/share/blender/scripts/presets/framerate/24.py
+/usr/share/blender/scripts/presets/framerate/25.py
+/usr/share/blender/scripts/presets/framerate/29.97.py
+/usr/share/blender/scripts/presets/framerate/30.py
+/usr/share/blender/scripts/presets/framerate/50.py
+/usr/share/blender/scripts/presets/framerate/59.94.py
+/usr/share/blender/scripts/presets/framerate/60.py
+/usr/share/blender/scripts/presets/framerate/Custom.py
+/usr/share/blender/scripts/presets/hair_dynamics/default.py
+/usr/share/blender/scripts/presets/interaction/3dsmax.py
+/usr/share/blender/scripts/presets/interaction/blender.py
+/usr/share/blender/scripts/presets/interaction/maya.py
+/usr/share/blender/scripts/presets/interface_theme/24x_blues.xml
+/usr/share/blender/scripts/presets/interface_theme/back_to_black.xml
+/usr/share/blender/scripts/presets/interface_theme/blender_24x.xml
+/usr/share/blender/scripts/presets/interface_theme/dark_blue_gradient.xml
+/usr/share/blender/scripts/presets/interface_theme/default++.xml
+/usr/share/blender/scripts/presets/interface_theme/elsyiun.xml
+/usr/share/blender/scripts/presets/interface_theme/flatty_light.xml
+/usr/share/blender/scripts/presets/interface_theme/graph.xml
+/usr/share/blender/scripts/presets/interface_theme/hexagon.xml
+/usr/share/blender/scripts/presets/interface_theme/modern_minimalist.xml
+/usr/share/blender/scripts/presets/interface_theme/north.xml
+/usr/share/blender/scripts/presets/interface_theme/rtheme.xml
+/usr/share/blender/scripts/presets/interface_theme/sandyslate.xml
+/usr/share/blender/scripts/presets/interface_theme/science_lab.xml
+/usr/share/blender/scripts/presets/interface_theme/softblend.xml
+/usr/share/blender/scripts/presets/interface_theme/true_blue_menu.xml
+/usr/share/blender/scripts/presets/keyconfig/3dsmax.py
+/usr/share/blender/scripts/presets/keyconfig/maya.py
+/usr/share/blender/scripts/presets/operator/wm.collada_export/sl_plus_open_sim_rigged.py
+/usr/share/blender/scripts/presets/operator/wm.collada_export/sl_plus_open_sim_static.py
+/usr/share/blender/scripts/presets/render/DVCPRO_HD_1080p.py
+/usr/share/blender/scripts/presets/render/DVCPRO_HD_720p.py
+/usr/share/blender/scripts/presets/render/HDTV_1080p.py
+/usr/share/blender/scripts/presets/render/HDTV_720p.py
+/usr/share/blender/scripts/presets/render/HDV_1080p.py
+/usr/share/blender/scripts/presets/render/HDV_NTSC_1080p.py
+/usr/share/blender/scripts/presets/render/HDV_PAL_1080p.py
+/usr/share/blender/scripts/presets/render/TV_NTSC_16_colon_9.py
+/usr/share/blender/scripts/presets/render/TV_NTSC_4_colon_3.py
+/usr/share/blender/scripts/presets/render/TV_PAL_16_colon_9.py
+/usr/share/blender/scripts/presets/render/TV_PAL_4_colon_3.py
+/usr/share/blender/scripts/presets/safe_areas/14_colon_9_in_16_colon_9.py
+/usr/share/blender/scripts/presets/safe_areas/16_colon_9.py
+/usr/share/blender/scripts/presets/safe_areas/4_colon_3_in_16_colon_9.py
+/usr/share/blender/scripts/presets/sss/apple.py
+/usr/share/blender/scripts/presets/sss/chicken.py
+/usr/share/blender/scripts/presets/sss/cream.py
+/usr/share/blender/scripts/presets/sss/ketchup.py
+/usr/share/blender/scripts/presets/sss/marble.py
+/usr/share/blender/scripts/presets/sss/potato.py
+/usr/share/blender/scripts/presets/sss/skim_milk.py
+/usr/share/blender/scripts/presets/sss/skin1.py
+/usr/share/blender/scripts/presets/sss/skin2.py
+/usr/share/blender/scripts/presets/sss/whole_milk.py
+/usr/share/blender/scripts/presets/sunsky/classic.py
+/usr/share/blender/scripts/presets/sunsky/desert.py
+/usr/share/blender/scripts/presets/sunsky/mountain.py
+/usr/share/blender/scripts/presets/tracking_camera/1__colon__2.3_inch.py
+/usr/share/blender/scripts/presets/tracking_camera/1__colon__2.5_inch.py
+/usr/share/blender/scripts/presets/tracking_camera/2__colon__3_inch.py
+/usr/share/blender/scripts/presets/tracking_camera/4__colon__3_inch.py
+/usr/share/blender/scripts/presets/tracking_camera/Arri_Alexa.py
+/usr/share/blender/scripts/presets/tracking_camera/Blackmagic_Cinema_Camera.py
+/usr/share/blender/scripts/presets/tracking_camera/Blackmagic_Pocket_Cinema_Camera.py
+/usr/share/blender/scripts/presets/tracking_camera/Blackmagic_Production_Camera_4K.py
+/usr/share/blender/scripts/presets/tracking_camera/Blender.py
+/usr/share/blender/scripts/presets/tracking_camera/Canon_1100D.py
+/usr/share/blender/scripts/presets/tracking_camera/Canon_APS-C.py
+/usr/share/blender/scripts/presets/tracking_camera/Canon_APS-H.py
+/usr/share/blender/scripts/presets/tracking_camera/Canon_C300.py
+/usr/share/blender/scripts/presets/tracking_camera/Full_Frame_35mm_Camera.py
+/usr/share/blender/scripts/presets/tracking_camera/GoPro_Hero3_Black.py
+/usr/share/blender/scripts/presets/tracking_camera/GoPro_Hero3_Silver.py
+/usr/share/blender/scripts/presets/tracking_camera/GoPro_Hero3_White.py
+/usr/share/blender/scripts/presets/tracking_camera/Nexus_5.py
+/usr/share/blender/scripts/presets/tracking_camera/Nikon_D3100.py
+/usr/share/blender/scripts/presets/tracking_camera/Nikon_DX.py
+/usr/share/blender/scripts/presets/tracking_camera/Panasonic_AG-HVX200.py
+/usr/share/blender/scripts/presets/tracking_camera/Panasonic_LX2.py
+/usr/share/blender/scripts/presets/tracking_camera/Red_Epic.py
+/usr/share/blender/scripts/presets/tracking_camera/Red_One_2K.py
+/usr/share/blender/scripts/presets/tracking_camera/Red_One_3K.py
+/usr/share/blender/scripts/presets/tracking_camera/Red_One_4K.py
+/usr/share/blender/scripts/presets/tracking_camera/Samsung_Galaxy_S3.py
+/usr/share/blender/scripts/presets/tracking_camera/Samsung_Galaxy_S4.py
+/usr/share/blender/scripts/presets/tracking_camera/Sony_A55.py
+/usr/share/blender/scripts/presets/tracking_camera/Sony_EX1.py
+/usr/share/blender/scripts/presets/tracking_camera/Sony_F65.py
+/usr/share/blender/scripts/presets/tracking_camera/Super_16.py
+/usr/share/blender/scripts/presets/tracking_camera/Super_35.py
+/usr/share/blender/scripts/presets/tracking_camera/iPhone_4.py
+/usr/share/blender/scripts/presets/tracking_camera/iPhone_4S.py
+/usr/share/blender/scripts/presets/tracking_camera/iPhone_5.py
+/usr/share/blender/scripts/presets/tracking_settings/blurry_footage.py
+/usr/share/blender/scripts/presets/tracking_settings/default.py
+/usr/share/blender/scripts/presets/tracking_settings/fast_motion.py
+/usr/share/blender/scripts/presets/tracking_settings/planar.py
+/usr/share/blender/scripts/presets/tracking_track_color/default.py
+/usr/share/blender/scripts/presets/tracking_track_color/far_plane.py
+/usr/share/blender/scripts/presets/tracking_track_color/near_plane.py
+/usr/share/blender/scripts/presets/tracking_track_color/object.py
+/usr/share/blender/scripts/presets/units_length/centimeters.py
+/usr/share/blender/scripts/presets/units_length/feet.py
+/usr/share/blender/scripts/presets/units_length/inches.py
+/usr/share/blender/scripts/presets/units_length/kilometers.py
+/usr/share/blender/scripts/presets/units_length/meters.py
+/usr/share/blender/scripts/presets/units_length/miles.py
+/usr/share/blender/scripts/presets/units_length/millimeters.py
+/usr/share/blender/scripts/startup/bl_operators/__init__.py
+/usr/share/blender/scripts/startup/bl_operators/add_mesh_torus.py
+/usr/share/blender/scripts/startup/bl_operators/anim.py
+/usr/share/blender/scripts/startup/bl_operators/bmesh/find_adjacent.py
+/usr/share/blender/scripts/startup/bl_operators/clip.py
+/usr/share/blender/scripts/startup/bl_operators/console.py
+/usr/share/blender/scripts/startup/bl_operators/file.py
+/usr/share/blender/scripts/startup/bl_operators/freestyle.py
+/usr/share/blender/scripts/startup/bl_operators/image.py
+/usr/share/blender/scripts/startup/bl_operators/mask.py
+/usr/share/blender/scripts/startup/bl_operators/mesh.py
+/usr/share/blender/scripts/startup/bl_operators/node.py
+/usr/share/blender/scripts/startup/bl_operators/object.py
+/usr/share/blender/scripts/startup/bl_operators/object_align.py
+/usr/share/blender/scripts/startup/bl_operators/object_quick_effects.py
+/usr/share/blender/scripts/startup/bl_operators/object_randomize_transform.py
+/usr/share/blender/scripts/startup/bl_operators/presets.py
+/usr/share/blender/scripts/startup/bl_operators/rigidbody.py
+/usr/share/blender/scripts/startup/bl_operators/screen_play_rendered_anim.py
+/usr/share/blender/scripts/startup/bl_operators/sequencer.py
+/usr/share/blender/scripts/startup/bl_operators/uvcalc_follow_active.py
+/usr/share/blender/scripts/startup/bl_operators/uvcalc_lightmap.py
+/usr/share/blender/scripts/startup/bl_operators/uvcalc_smart_project.py
+/usr/share/blender/scripts/startup/bl_operators/vertexpaint_dirt.py
+/usr/share/blender/scripts/startup/bl_operators/view3d.py
+/usr/share/blender/scripts/startup/bl_operators/wm.py
+/usr/share/blender/scripts/startup/bl_ui/__init__.py
+/usr/share/blender/scripts/startup/bl_ui/properties_animviz.py
+/usr/share/blender/scripts/startup/bl_ui/properties_constraint.py
+/usr/share/blender/scripts/startup/bl_ui/properties_data_armature.py
+/usr/share/blender/scripts/startup/bl_ui/properties_data_bone.py
+/usr/share/blender/scripts/startup/bl_ui/properties_data_camera.py
+/usr/share/blender/scripts/startup/bl_ui/properties_data_curve.py
+/usr/share/blender/scripts/startup/bl_ui/properties_data_empty.py
+/usr/share/blender/scripts/startup/bl_ui/properties_data_lamp.py
+/usr/share/blender/scripts/startup/bl_ui/properties_data_lattice.py
+/usr/share/blender/scripts/startup/bl_ui/properties_data_mesh.py
+/usr/share/blender/scripts/startup/bl_ui/properties_data_metaball.py
+/usr/share/blender/scripts/startup/bl_ui/properties_data_modifier.py
+/usr/share/blender/scripts/startup/bl_ui/properties_data_speaker.py
+/usr/share/blender/scripts/startup/bl_ui/properties_freestyle.py
+/usr/share/blender/scripts/startup/bl_ui/properties_game.py
+/usr/share/blender/scripts/startup/bl_ui/properties_grease_pencil_common.py
+/usr/share/blender/scripts/startup/bl_ui/properties_mask_common.py
+/usr/share/blender/scripts/startup/bl_ui/properties_material.py
+/usr/share/blender/scripts/startup/bl_ui/properties_object.py
+/usr/share/blender/scripts/startup/bl_ui/properties_paint_common.py
+/usr/share/blender/scripts/startup/bl_ui/properties_particle.py
+/usr/share/blender/scripts/startup/bl_ui/properties_physics_cloth.py
+/usr/share/blender/scripts/startup/bl_ui/properties_physics_common.py
+/usr/share/blender/scripts/startup/bl_ui/properties_physics_dynamicpaint.py
+/usr/share/blender/scripts/startup/bl_ui/properties_physics_field.py
+/usr/share/blender/scripts/startup/bl_ui/properties_physics_fluid.py
+/usr/share/blender/scripts/startup/bl_ui/properties_physics_rigidbody.py
+/usr/share/blender/scripts/startup/bl_ui/properties_physics_rigidbody_constraint.py
+/usr/share/blender/scripts/startup/bl_ui/properties_physics_smoke.py
+/usr/share/blender/scripts/startup/bl_ui/properties_physics_softbody.py
+/usr/share/blender/scripts/startup/bl_ui/properties_render.py
+/usr/share/blender/scripts/startup/bl_ui/properties_render_layer.py
+/usr/share/blender/scripts/startup/bl_ui/properties_scene.py
+/usr/share/blender/scripts/startup/bl_ui/properties_texture.py
+/usr/share/blender/scripts/startup/bl_ui/properties_world.py
+/usr/share/blender/scripts/startup/bl_ui/space_clip.py
+/usr/share/blender/scripts/startup/bl_ui/space_console.py
+/usr/share/blender/scripts/startup/bl_ui/space_dopesheet.py
+/usr/share/blender/scripts/startup/bl_ui/space_filebrowser.py
+/usr/share/blender/scripts/startup/bl_ui/space_graph.py
+/usr/share/blender/scripts/startup/bl_ui/space_image.py
+/usr/share/blender/scripts/startup/bl_ui/space_info.py
+/usr/share/blender/scripts/startup/bl_ui/space_logic.py
+/usr/share/blender/scripts/startup/bl_ui/space_nla.py
+/usr/share/blender/scripts/startup/bl_ui/space_node.py
+/usr/share/blender/scripts/startup/bl_ui/space_outliner.py
+/usr/share/blender/scripts/startup/bl_ui/space_properties.py
+/usr/share/blender/scripts/startup/bl_ui/space_sequencer.py
+/usr/share/blender/scripts/startup/bl_ui/space_text.py
+/usr/share/blender/scripts/startup/bl_ui/space_time.py
+/usr/share/blender/scripts/startup/bl_ui/space_userpref.py
+/usr/share/blender/scripts/startup/bl_ui/space_view3d.py
+/usr/share/blender/scripts/startup/bl_ui/space_view3d_toolbar.py
+/usr/share/blender/scripts/startup/keyingsets_builtins.py
+/usr/share/blender/scripts/startup/nodeitems_builtins.py
+/usr/share/blender/scripts/templates_osl/empty_shader.osl
+/usr/share/blender/scripts/templates_osl/fresnel_conductive.osl
+/usr/share/blender/scripts/templates_osl/gabor_noise.osl
+/usr/share/blender/scripts/templates_osl/lyapunov_texture.osl
+/usr/share/blender/scripts/templates_osl/noise.osl
+/usr/share/blender/scripts/templates_osl/ramp_closure.osl
+/usr/share/blender/scripts/templates_py/addon_add_object.py
+/usr/share/blender/scripts/templates_py/background_job.py
+/usr/share/blender/scripts/templates_py/batch_export.py
+/usr/share/blender/scripts/templates_py/bmesh_simple.py
+/usr/share/blender/scripts/templates_py/bmesh_simple_editmode.py
+/usr/share/blender/scripts/templates_py/builtin_keyingset.py
+/usr/share/blender/scripts/templates_py/custom_nodes.py
+/usr/share/blender/scripts/templates_py/driver_functions.py
+/usr/share/blender/scripts/templates_py/external_script_stub.py
+/usr/share/blender/scripts/templates_py/gamelogic.py
+/usr/share/blender/scripts/templates_py/gamelogic_module.py
+/usr/share/blender/scripts/templates_py/gamelogic_simple.py
+/usr/share/blender/scripts/templates_py/operator_file_export.py
+/usr/share/blender/scripts/templates_py/operator_file_import.py
+/usr/share/blender/scripts/templates_py/operator_mesh_add.py
+/usr/share/blender/scripts/templates_py/operator_mesh_uv.py
+/usr/share/blender/scripts/templates_py/operator_modal.py
+/usr/share/blender/scripts/templates_py/operator_modal_draw.py
+/usr/share/blender/scripts/templates_py/operator_modal_timer.py
+/usr/share/blender/scripts/templates_py/operator_modal_view3d.py
+/usr/share/blender/scripts/templates_py/operator_modal_view3d_raycast.py
+/usr/share/blender/scripts/templates_py/operator_node.py
+/usr/share/blender/scripts/templates_py/operator_simple.py
+/usr/share/blender/scripts/templates_py/ui_list.py
+/usr/share/blender/scripts/templates_py/ui_list_simple.py
+/usr/share/blender/scripts/templates_py/ui_menu.py
+/usr/share/blender/scripts/templates_py/ui_menu_simple.py
+/usr/share/blender/scripts/templates_py/ui_panel.py
+/usr/share/blender/scripts/templates_py/ui_panel_simple.py
+/usr/share/blender/scripts/templates_py/ui_pie_menu.py
+/usr/share/blender/scripts/templates_py/ui_previews_custom_icon.py
+/usr/share/blender/scripts/templates_py/ui_previews_dynamic_enum.py
+/usr/share/fonts/blender/bmonofont-i18n.ttf.gz
+/usr/share/fonts/blender/droidsans.ttf.gz
+/usr/share/icons/hicolor/16x16/apps/blender.png
+/usr/share/icons/hicolor/22x22/apps/blender.png
+/usr/share/icons/hicolor/24x24/apps/blender.png
+/usr/share/icons/hicolor/256x256/apps/blender.png
+/usr/share/icons/hicolor/32x32/apps/blender.png
+/usr/share/icons/hicolor/48x48/apps/blender.png
+/usr/share/icons/hicolor/scalable/apps/blender.svg
+/usr/share/mime-packages/blender.xml
+
+%files doc
+%defattr(0644,root,root,0755)
+%doc /usr/share/doc/blender/*
+
+%files extras
+%defattr(-,root,root,-)
+/usr/share/blender/scripts/addons/add_advanced_objects_menu/__init__.py
+/usr/share/blender/scripts/addons/add_advanced_objects_menu/add_light_template.py
+/usr/share/blender/scripts/addons/add_advanced_objects_menu/add_mesh_aggregate.py
+/usr/share/blender/scripts/addons/add_advanced_objects_menu/arrange_on_curve.py
+/usr/share/blender/scripts/addons/add_advanced_objects_menu/circle_array.py
+/usr/share/blender/scripts/addons/add_advanced_objects_menu/copy2.py
+/usr/share/blender/scripts/addons/add_advanced_objects_menu/cubester.py
+/usr/share/blender/scripts/addons/add_advanced_objects_menu/make_struts.py
+/usr/share/blender/scripts/addons/add_advanced_objects_menu/mesh_easylattice.py
+/usr/share/blender/scripts/addons/add_advanced_objects_menu/object_add_chain.py
+/usr/share/blender/scripts/addons/add_advanced_objects_menu/oscurart_chain_maker.py
+/usr/share/blender/scripts/addons/add_advanced_objects_menu/pixelate_3d.py
+/usr/share/blender/scripts/addons/add_advanced_objects_menu/random_box_structure.py
+/usr/share/blender/scripts/addons/add_advanced_objects_menu/rope_alpha.py
+/usr/share/blender/scripts/addons/add_advanced_objects_menu/scene_objects_bi.py
+/usr/share/blender/scripts/addons/add_advanced_objects_menu/scene_objects_cycles.py
+/usr/share/blender/scripts/addons/add_advanced_objects_menu/scene_texture_render.py
+/usr/share/blender/scripts/addons/add_advanced_objects_menu/trilighting.py
+/usr/share/blender/scripts/addons/add_advanced_objects_panels/DelaunayVoronoi.py
+/usr/share/blender/scripts/addons/add_advanced_objects_panels/__init__.py
+/usr/share/blender/scripts/addons/add_advanced_objects_panels/delaunay_voronoi.py
+/usr/share/blender/scripts/addons/add_advanced_objects_panels/drop_to_ground.py
+/usr/share/blender/scripts/addons/add_advanced_objects_panels/object_laplace_lightning.py
+/usr/share/blender/scripts/addons/add_advanced_objects_panels/object_mangle_tools.py
+/usr/share/blender/scripts/addons/add_advanced_objects_panels/oscurart_constellation.py
+/usr/share/blender/scripts/addons/add_advanced_objects_panels/unfold_transition.py
+/usr/share/blender/scripts/addons/add_curve_extra_objects/__init__.py
+/usr/share/blender/scripts/addons/add_curve_extra_objects/add_curve_aceous_galore.py
+/usr/share/blender/scripts/addons/add_curve_extra_objects/add_curve_braid.py
+/usr/share/blender/scripts/addons/add_curve_extra_objects/add_curve_celtic_links.py
+/usr/share/blender/scripts/addons/add_curve_extra_objects/add_curve_curly.py
+/usr/share/blender/scripts/addons/add_curve_extra_objects/add_curve_simple.py
+/usr/share/blender/scripts/addons/add_curve_extra_objects/add_curve_spirals.py
+/usr/share/blender/scripts/addons/add_curve_extra_objects/add_curve_spirofit_bouncespline.py
+/usr/share/blender/scripts/addons/add_curve_extra_objects/add_curve_torus_knots.py
+/usr/share/blender/scripts/addons/add_curve_extra_objects/add_surface_plane_cone.py
+/usr/share/blender/scripts/addons/add_curve_extra_objects/beveltaper_curve.py
+/usr/share/blender/scripts/addons/add_curve_ivygen.py
+/usr/share/blender/scripts/addons/add_curve_sapling/__init__.py
+/usr/share/blender/scripts/addons/add_curve_sapling/presets/callistemon.py
+/usr/share/blender/scripts/addons/add_curve_sapling/presets/douglas_fir.py
+/usr/share/blender/scripts/addons/add_curve_sapling/presets/japanese_maple.py
+/usr/share/blender/scripts/addons/add_curve_sapling/presets/quaking_aspen.py
+/usr/share/blender/scripts/addons/add_curve_sapling/presets/small_maple.py
+/usr/share/blender/scripts/addons/add_curve_sapling/presets/small_pine.py
+/usr/share/blender/scripts/addons/add_curve_sapling/presets/weeping_willow.py
+/usr/share/blender/scripts/addons/add_curve_sapling/presets/white_birch.py
+/usr/share/blender/scripts/addons/add_curve_sapling/presets/willow.py
+/usr/share/blender/scripts/addons/add_curve_sapling/utils.py
+/usr/share/blender/scripts/addons/add_mesh_BoltFactory/Boltfactory.py
+/usr/share/blender/scripts/addons/add_mesh_BoltFactory/__init__.py
+/usr/share/blender/scripts/addons/add_mesh_BoltFactory/createMesh.py
+/usr/share/blender/scripts/addons/add_mesh_extra_objects/Blocks.py
+/usr/share/blender/scripts/addons/add_mesh_extra_objects/Wallfactory.py
+/usr/share/blender/scripts/addons/add_mesh_extra_objects/__init__.py
+/usr/share/blender/scripts/addons/add_mesh_extra_objects/add_empty_as_parent.py
+/usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_3d_function_surface.py
+/usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_beam_builder.py
+/usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_gears.py
+/usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_gemstones.py
+/usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_honeycomb.py
+/usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_menger_sponge.py
+/usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_pipe_joint.py
+/usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_pyramid.py
+/usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_round_brilliant.py
+/usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_round_cube.py
+/usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_solid.py
+/usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_star.py
+/usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_supertoroid.py
+/usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_teapot.py
+/usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_torusknot.py
+/usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_triangles.py
+/usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_twisted_torus.py
+/usr/share/blender/scripts/addons/add_mesh_extra_objects/add_mesh_vertex.py
+/usr/share/blender/scripts/addons/add_mesh_extra_objects/geodesic_domes/__init__.py
+/usr/share/blender/scripts/addons/add_mesh_extra_objects/geodesic_domes/add_shape_geodesic.py
+/usr/share/blender/scripts/addons/add_mesh_extra_objects/geodesic_domes/forms_271.py
+/usr/share/blender/scripts/addons/add_mesh_extra_objects/geodesic_domes/geodesic_classes_271.py
+/usr/share/blender/scripts/addons/add_mesh_extra_objects/geodesic_domes/third_domes_panel_271.py
+/usr/share/blender/scripts/addons/add_mesh_extra_objects/geodesic_domes/vefm_271.py
+/usr/share/blender/scripts/addons/add_mesh_extra_objects/mesh_discombobulator.py
+/usr/share/blender/scripts/addons/animation_add_corrective_shape_key.py
+/usr/share/blender/scripts/addons/animation_animall.py
+/usr/share/blender/scripts/addons/ant_landscape/ErosionR.txt
+/usr/share/blender/scripts/addons/ant_landscape/__init__.py
+/usr/share/blender/scripts/addons/ant_landscape/add_mesh_ant_landscape.py
+/usr/share/blender/scripts/addons/ant_landscape/ant_functions.py
+/usr/share/blender/scripts/addons/ant_landscape/ant_noise.py
+/usr/share/blender/scripts/addons/ant_landscape/eroder.py
+/usr/share/blender/scripts/addons/ant_landscape/mesh_ant_displace.py
+/usr/share/blender/scripts/addons/ant_landscape/stats.py
+/usr/share/blender/scripts/addons/ant_landscape/test.py
+/usr/share/blender/scripts/addons/ant_landscape/utils.py
+/usr/share/blender/scripts/addons/archimesh/__init__.py
+/usr/share/blender/scripts/addons/archimesh/achm_books_maker.py
+/usr/share/blender/scripts/addons/archimesh/achm_column_maker.py
+/usr/share/blender/scripts/addons/archimesh/achm_curtain_maker.py
+/usr/share/blender/scripts/addons/archimesh/achm_door_maker.py
+/usr/share/blender/scripts/addons/archimesh/achm_gltools.py
+/usr/share/blender/scripts/addons/archimesh/achm_kitchen_maker.py
+/usr/share/blender/scripts/addons/archimesh/achm_lamp_maker.py
+/usr/share/blender/scripts/addons/archimesh/achm_main_panel.py
+/usr/share/blender/scripts/addons/archimesh/achm_roof_maker.py
+/usr/share/blender/scripts/addons/archimesh/achm_room_maker.py
+/usr/share/blender/scripts/addons/archimesh/achm_shelves_maker.py
+/usr/share/blender/scripts/addons/archimesh/achm_stairs_maker.py
+/usr/share/blender/scripts/addons/archimesh/achm_tools.py
+/usr/share/blender/scripts/addons/archimesh/achm_venetian_maker.py
+/usr/share/blender/scripts/addons/archimesh/achm_window_maker.py
+/usr/share/blender/scripts/addons/archimesh/achm_window_panel.py
+/usr/share/blender/scripts/addons/archimesh/images/fabric_diffuse.png
+/usr/share/blender/scripts/addons/archipack/__init__.py
+/usr/share/blender/scripts/addons/archipack/archipack_2d.py
+/usr/share/blender/scripts/addons/archipack/archipack_autoboolean.py
+/usr/share/blender/scripts/addons/archipack/archipack_cutter.py
+/usr/share/blender/scripts/addons/archipack/archipack_door.py
+/usr/share/blender/scripts/addons/archipack/archipack_fence.py
+/usr/share/blender/scripts/addons/archipack/archipack_floor.py
+/usr/share/blender/scripts/addons/archipack/archipack_gl.py
+/usr/share/blender/scripts/addons/archipack/archipack_handle.py
+/usr/share/blender/scripts/addons/archipack/archipack_keymaps.py
+/usr/share/blender/scripts/addons/archipack/archipack_manipulator.py
+/usr/share/blender/scripts/addons/archipack/archipack_material.py
+/usr/share/blender/scripts/addons/archipack/archipack_object.py
+/usr/share/blender/scripts/addons/archipack/archipack_preset.py
+/usr/share/blender/scripts/addons/archipack/archipack_progressbar.py
+/usr/share/blender/scripts/addons/archipack/archipack_reference_point.py
+/usr/share/blender/scripts/addons/archipack/archipack_rendering.py
+/usr/share/blender/scripts/addons/archipack/archipack_roof.py
+/usr/share/blender/scripts/addons/archipack/archipack_slab.py
+/usr/share/blender/scripts/addons/archipack/archipack_snap.py
+/usr/share/blender/scripts/addons/archipack/archipack_stair.py
+/usr/share/blender/scripts/addons/archipack/archipack_thumbs.py
+/usr/share/blender/scripts/addons/archipack/archipack_truss.py
+/usr/share/blender/scripts/addons/archipack/archipack_wall2.py
+/usr/share/blender/scripts/addons/archipack/archipack_window.py
+/usr/share/blender/scripts/addons/archipack/bmesh_utils.py
+/usr/share/blender/scripts/addons/archipack/icons/archipack.png
+/usr/share/blender/scripts/addons/archipack/icons/detect.png
+/usr/share/blender/scripts/addons/archipack/icons/door.png
+/usr/share/blender/scripts/addons/archipack/icons/fence.png
+/usr/share/blender/scripts/addons/archipack/icons/floor.png
+/usr/share/blender/scripts/addons/archipack/icons/polygons.png
+/usr/share/blender/scripts/addons/archipack/icons/roof.png
+/usr/share/blender/scripts/addons/archipack/icons/selection.png
+/usr/share/blender/scripts/addons/archipack/icons/slab.png
+/usr/share/blender/scripts/addons/archipack/icons/stair.png
+/usr/share/blender/scripts/addons/archipack/icons/truss.png
+/usr/share/blender/scripts/addons/archipack/icons/union.png
+/usr/share/blender/scripts/addons/archipack/icons/wall.png
+/usr/share/blender/scripts/addons/archipack/icons/window.png
+/usr/share/blender/scripts/addons/archipack/panel.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_door/160x200_dual.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_door/400x240_garage.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_door/80x200.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_fence/glass_panels.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_fence/inox_glass_concrete.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_fence/metal.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_fence/metal_glass.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_fence/wood.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_floor/boards_200x20.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_floor/herringbone_50x10.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_floor/herringbone_p_50x10.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_floor/hexagon_10.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_floor/hopscotch_30x30.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_floor/parquet_15x3.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_floor/stepping_stone_30x30.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_floor/tile_30x60.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_floor/windmill_30x30.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_materials/door.txt
+/usr/share/blender/scripts/addons/archipack/presets/archipack_materials/fence.txt
+/usr/share/blender/scripts/addons/archipack/presets/archipack_materials/floor.txt
+/usr/share/blender/scripts/addons/archipack/presets/archipack_materials/handle.txt
+/usr/share/blender/scripts/addons/archipack/presets/archipack_materials/roof.txt
+/usr/share/blender/scripts/addons/archipack/presets/archipack_materials/slab.txt
+/usr/share/blender/scripts/addons/archipack/presets/archipack_materials/stair.txt
+/usr/share/blender/scripts/addons/archipack/presets/archipack_materials/truss.txt
+/usr/share/blender/scripts/addons/archipack/presets/archipack_materials/wall2.txt
+/usr/share/blender/scripts/addons/archipack/presets/archipack_materials/window.txt
+/usr/share/blender/scripts/addons/archipack/presets/archipack_roof/braas_1.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_roof/braas_2.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_roof/eternit.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_roof/lauze.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_roof/metal.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_roof/ondule.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_roof/roman.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_roof/round.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_roof/square.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_stair/i_wood_over_concrete.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_stair/l_wood_over_concrete.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_stair/o_wood_over_concrete.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_stair/u_wood_over_concrete.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_window/120x110_flat_2.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_window/120x110_flat_2_elliptic.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_window/120x110_flat_2_oblique.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_window/120x110_flat_2_round.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_window/180x110_flat_3.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_window/180x210_flat_3.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_window/180x210_rail_2.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_window/240x210_rail_3.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_window/80x80_flat_1.py
+/usr/share/blender/scripts/addons/archipack/presets/archipack_window/80x80_flat_1_circle.py
+/usr/share/blender/scripts/addons/archipack/presets/missing.png
+/usr/share/blender/scripts/addons/blender_id/CHANGELOG.md
+/usr/share/blender/scripts/addons/blender_id/README.md
+/usr/share/blender/scripts/addons/blender_id/__init__.py
+/usr/share/blender/scripts/addons/blender_id/communication.py
+/usr/share/blender/scripts/addons/blender_id/profiles.py
+/usr/share/blender/scripts/addons/bone_selection_sets.py
+/usr/share/blender/scripts/addons/btrace/__init__.py
+/usr/share/blender/scripts/addons/btrace/bTrace.py
+/usr/share/blender/scripts/addons/btrace/bTrace_props.py
+/usr/share/blender/scripts/addons/camera_dolly_crane_rigs.py
+/usr/share/blender/scripts/addons/camera_turnaround.py
+/usr/share/blender/scripts/addons/curve_simplify.py
+/usr/share/blender/scripts/addons/cycles/__init__.py
+/usr/share/blender/scripts/addons/cycles/engine.py
+/usr/share/blender/scripts/addons/cycles/license/Apache_2.0.txt
+/usr/share/blender/scripts/addons/cycles/license/ILM.txt
+/usr/share/blender/scripts/addons/cycles/license/NVidia.txt
+/usr/share/blender/scripts/addons/cycles/license/OSL.txt
+/usr/share/blender/scripts/addons/cycles/license/Sobol.txt
+/usr/share/blender/scripts/addons/cycles/license/readme.txt
+/usr/share/blender/scripts/addons/cycles/osl.py
+/usr/share/blender/scripts/addons/cycles/presets.py
+/usr/share/blender/scripts/addons/cycles/properties.py
+/usr/share/blender/scripts/addons/cycles/source/kernel/bvh/bvh.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/bvh/bvh_nodes.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/bvh/bvh_shadow_all.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/bvh/bvh_subsurface.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/bvh/bvh_traversal.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/bvh/bvh_types.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/bvh/bvh_volume.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/bvh/bvh_volume_all.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/bvh/qbvh_nodes.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/bvh/qbvh_shadow_all.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/bvh/qbvh_subsurface.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/bvh/qbvh_traversal.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/bvh/qbvh_volume.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/bvh/qbvh_volume_all.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/closure/alloc.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_ashikhmin_shirley.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_ashikhmin_velvet.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_diffuse.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_diffuse_ramp.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_hair.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_microfacet.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_microfacet_multi.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_microfacet_multi_impl.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_oren_nayar.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_phong_ramp.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_principled_diffuse.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_principled_sheen.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_reflection.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_refraction.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_toon.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_transparent.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/closure/bsdf_util.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/closure/bssrdf.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/closure/emissive.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/closure/volume.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/filter/filter.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/filter/filter_defines.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/filter/filter_features.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/filter/filter_features_sse.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/filter/filter_kernel.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/filter/filter_nlm_cpu.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/filter/filter_nlm_gpu.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/filter/filter_prefilter.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/filter/filter_reconstruction.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/filter/filter_transform.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/filter/filter_transform_gpu.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/filter/filter_transform_sse.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/geom/geom.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/geom/geom_attribute.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/geom/geom_curve.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/geom/geom_motion_curve.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/geom/geom_motion_triangle.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/geom/geom_motion_triangle_intersect.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/geom/geom_motion_triangle_shader.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/geom/geom_object.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/geom/geom_patch.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/geom/geom_primitive.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/geom/geom_subd_triangle.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/geom/geom_triangle.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/geom/geom_triangle_intersect.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/geom/geom_volume.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_accumulate.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_bake.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_camera.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_compat_cpu.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_compat_cuda.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_compat_opencl.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_debug.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_differential.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_emission.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_film.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_globals.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_image_opencl.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_jitter.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_light.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_math.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_montecarlo.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_passes.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_path.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_path_branched.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_path_common.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_path_state.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_path_subsurface.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_path_surface.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_path_volume.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_projection.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_queues.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_random.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_shader.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_shadow.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_subsurface.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_textures.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_types.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_volume.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernel_work_stealing.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernels/cuda/filter.cu
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernels/cuda/kernel.cu
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernels/cuda/kernel_config.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernels/cuda/kernel_split.cu
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/filter.cl
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel.cl
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_buffer_update.cl
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_data_init.cl
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_direct_lighting.cl
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_do_volume.cl
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_enqueue_inactive.cl
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_holdout_emission_blurring_pathtermination_ao.cl
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_indirect_background.cl
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_indirect_subsurface.cl
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_lamp_emission.cl
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_next_iteration_setup.cl
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_path_init.cl
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_queue_enqueue.cl
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_scene_intersect.cl
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_shader_eval.cl
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_shader_setup.cl
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_shader_sort.cl
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_shadow_blocked_ao.cl
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_shadow_blocked_dl.cl
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_split.cl
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_split_function.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_state_buffer_size.cl
+/usr/share/blender/scripts/addons/cycles/source/kernel/kernels/opencl/kernel_subsurface_scatter.cl
+/usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_branched.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_buffer_update.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_data_init.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_direct_lighting.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_do_volume.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_enqueue_inactive.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_holdout_emission_blurring_pathtermination_ao.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_indirect_background.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_indirect_subsurface.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_lamp_emission.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_next_iteration_setup.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_path_init.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_queue_enqueue.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_scene_intersect.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_shader_eval.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_shader_setup.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_shader_sort.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_shadow_blocked_ao.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_shadow_blocked_dl.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_split_common.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_split_data.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_split_data_types.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/split/kernel_subsurface_scatter.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_attribute.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_blackbody.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_brick.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_brightness.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_bump.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_camera.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_checker.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_closure.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_color_util.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_convert.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_displace.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_fresnel.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_gamma.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_geometry.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_gradient.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_hsv.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_image.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_invert.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_light_path.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_magic.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_mapping.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_math.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_math_util.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_mix.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_musgrave.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_noise.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_noisetex.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_normal.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_ramp.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_ramp_util.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_sepcomb_hsv.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_sepcomb_vector.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_sky.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_tex_coord.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_texture.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_types.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_value.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_vector_transform.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_voronoi.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_voxel.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_wave.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_wavelength.h
+/usr/share/blender/scripts/addons/cycles/source/kernel/svm/svm_wireframe.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_atomic.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_color.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_half.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_hash.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_math.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_math_fast.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_math_float2.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_math_float3.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_math_float4.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_math_int2.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_math_int3.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_math_int4.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_math_intersect.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_math_matrix.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_static_assert.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_texture.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_transform.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_types.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_types_float2.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_types_float2_impl.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_types_float3.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_types_float3_impl.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_types_float4.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_types_float4_impl.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_types_int2.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_types_int2_impl.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_types_int3.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_types_int3_impl.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_types_int4.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_types_int4_impl.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_types_uchar2.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_types_uchar2_impl.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_types_uchar3.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_types_uchar3_impl.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_types_uchar4.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_types_uchar4_impl.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_types_uint2.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_types_uint2_impl.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_types_uint3.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_types_uint3_impl.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_types_uint4.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_types_uint4_impl.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_types_vector3.h
+/usr/share/blender/scripts/addons/cycles/source/util/util_types_vector3_impl.h
+/usr/share/blender/scripts/addons/cycles/ui.py
+/usr/share/blender/scripts/addons/cycles/version_update.py
+/usr/share/blender/scripts/addons/development_api_navigator.py
+/usr/share/blender/scripts/addons/development_edit_operator.py
+/usr/share/blender/scripts/addons/development_icon_get.py
+/usr/share/blender/scripts/addons/development_iskeyfree.py
+/usr/share/blender/scripts/addons/development_ui_classes.py
+/usr/share/blender/scripts/addons/game_engine_publishing.py
+/usr/share/blender/scripts/addons/game_engine_save_as_runtime.py
+/usr/share/blender/scripts/addons/io_anim_acclaim/__init__.py
+/usr/share/blender/scripts/addons/io_anim_bvh/__init__.py
+/usr/share/blender/scripts/addons/io_anim_bvh/export_bvh.py
+/usr/share/blender/scripts/addons/io_anim_bvh/import_bvh.py
+/usr/share/blender/scripts/addons/io_anim_c3d/__init__.py
+/usr/share/blender/scripts/addons/io_anim_c3d/import_c3d.py
+/usr/share/blender/scripts/addons/io_anim_camera.py
+/usr/share/blender/scripts/addons/io_anim_nuke_chan/__init__.py
+/usr/share/blender/scripts/addons/io_anim_nuke_chan/export_nuke_chan.py
+/usr/share/blender/scripts/addons/io_anim_nuke_chan/import_nuke_chan.py
+/usr/share/blender/scripts/addons/io_blend_utils/README.md
+/usr/share/blender/scripts/addons/io_blend_utils/__init__.py
+/usr/share/blender/scripts/addons/io_blend_utils/bl_utils/pipe_non_blocking.py
+/usr/share/blender/scripts/addons/io_blend_utils/bl_utils/subprocess_helper.py
+/usr/share/blender/scripts/addons/io_blend_utils/blend/blendfile.py
+/usr/share/blender/scripts/addons/io_blend_utils/blend/blendfile_path_walker.py
+/usr/share/blender/scripts/addons/io_blend_utils/blender_bam-unpacked.whl/bam/__init__.py
+/usr/share/blender/scripts/addons/io_blend_utils/blender_bam-unpacked.whl/bam/__main__.py
+/usr/share/blender/scripts/addons/io_blend_utils/blender_bam-unpacked.whl/bam/blend/__init__.py
+/usr/share/blender/scripts/addons/io_blend_utils/blender_bam-unpacked.whl/bam/blend/blendfile.py
+/usr/share/blender/scripts/addons/io_blend_utils/blender_bam-unpacked.whl/bam/blend/blendfile_copy.py
+/usr/share/blender/scripts/addons/io_blend_utils/blender_bam-unpacked.whl/bam/blend/blendfile_pack.py
+/usr/share/blender/scripts/addons/io_blend_utils/blender_bam-unpacked.whl/bam/blend/blendfile_pack_restore.py
+/usr/share/blender/scripts/addons/io_blend_utils/blender_bam-unpacked.whl/bam/blend/blendfile_path_remap.py
+/usr/share/blender/scripts/addons/io_blend_utils/blender_bam-unpacked.whl/bam/blend/blendfile_path_walker.py
+/usr/share/blender/scripts/addons/io_blend_utils/blender_bam-unpacked.whl/bam/cli.py
+/usr/share/blender/scripts/addons/io_blend_utils/blender_bam-unpacked.whl/bam/pack.py
+/usr/share/blender/scripts/addons/io_blend_utils/blender_bam-unpacked.whl/bam/utils/__init__.py
+/usr/share/blender/scripts/addons/io_blend_utils/blender_bam-unpacked.whl/bam/utils/system.py
+/usr/share/blender/scripts/addons/io_blend_utils/install_whl.py
+/usr/share/blender/scripts/addons/io_blend_utils/utils/system.py
+/usr/share/blender/scripts/addons/io_coat3D/__init__.py
+/usr/share/blender/scripts/addons/io_coat3D/coat.py
+/usr/share/blender/scripts/addons/io_coat3D/tex.py
+/usr/share/blender/scripts/addons/io_convert_image_to_mesh_img/__init__.py
+/usr/share/blender/scripts/addons/io_convert_image_to_mesh_img/mesh/__init__.py
+/usr/share/blender/scripts/addons/io_convert_image_to_mesh_img/mesh/dtm.py
+/usr/share/blender/scripts/addons/io_convert_image_to_mesh_img/mesh/terrain.py
+/usr/share/blender/scripts/addons/io_convert_image_to_mesh_img/mesh/triangulate.py
+/usr/share/blender/scripts/addons/io_convert_image_to_mesh_img/pvl/__init__.py
+/usr/share/blender/scripts/addons/io_convert_image_to_mesh_img/pvl/label.py
+/usr/share/blender/scripts/addons/io_convert_image_to_mesh_img/pvl/parse.py
+/usr/share/blender/scripts/addons/io_convert_image_to_mesh_img/pvl/patterns.py
+/usr/share/blender/scripts/addons/io_convert_image_to_mesh_img/ui/__init__.py
+/usr/share/blender/scripts/addons/io_convert_image_to_mesh_img/ui/importer.py
+/usr/share/blender/scripts/addons/io_convert_image_to_mesh_img/ui/terrainpanel.py
+/usr/share/blender/scripts/addons/io_curve_svg/__init__.py
+/usr/share/blender/scripts/addons/io_curve_svg/import_svg.py
+/usr/share/blender/scripts/addons/io_curve_svg/svg_colors.py
+/usr/share/blender/scripts/addons/io_export_after_effects.py
+/usr/share/blender/scripts/addons/io_export_dxf/__init__.py
+/usr/share/blender/scripts/addons/io_export_dxf/draw_blenders/__init__.py
+/usr/share/blender/scripts/addons/io_export_dxf/export_dxf.py
+/usr/share/blender/scripts/addons/io_export_dxf/model/__init__.py
+/usr/share/blender/scripts/addons/io_export_dxf/model/dxfLibrary.py
+/usr/share/blender/scripts/addons/io_export_dxf/model/migiusModel.py
+/usr/share/blender/scripts/addons/io_export_dxf/model/model.py
+/usr/share/blender/scripts/addons/io_export_dxf/operator.py
+/usr/share/blender/scripts/addons/io_export_dxf/primitive_exporters/__init__.py
+/usr/share/blender/scripts/addons/io_export_dxf/primitive_exporters/base_exporter.py
+/usr/share/blender/scripts/addons/io_export_dxf/primitive_exporters/camera_exporter.py
+/usr/share/blender/scripts/addons/io_export_dxf/primitive_exporters/curve_exporter.py
+/usr/share/blender/scripts/addons/io_export_dxf/primitive_exporters/empty_exporter.py
+/usr/share/blender/scripts/addons/io_export_dxf/primitive_exporters/insert_exporter.py
+/usr/share/blender/scripts/addons/io_export_dxf/primitive_exporters/lamp_exporter.py
+/usr/share/blender/scripts/addons/io_export_dxf/primitive_exporters/mesh_exporter.py
+/usr/share/blender/scripts/addons/io_export_dxf/primitive_exporters/text_exporter.py
+/usr/share/blender/scripts/addons/io_export_dxf/primitive_exporters/viewborder_exporter.py
+/usr/share/blender/scripts/addons/io_export_paper_model.py
+/usr/share/blender/scripts/addons/io_export_pc2.py
+/usr/share/blender/scripts/addons/io_export_unreal_psk_psa.py
+/usr/share/blender/scripts/addons/io_import_dxf/__init__.py
+/usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/__init__.py
+/usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/acdsdata.py
+/usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/blockssection.py
+/usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/codepage.py
+/usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/color.py
+/usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/const.py
+/usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/decode.py
+/usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/defaultchunk.py
+/usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/drawing.py
+/usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/dxfentities.py
+/usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/dxfobjects.py
+/usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/entitysection.py
+/usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/headersection.py
+/usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/juliandate.py
+/usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/layers.py
+/usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/linetypes.py
+/usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/sections.py
+/usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/styles.py
+/usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/tablessection.py
+/usr/share/blender/scripts/addons/io_import_dxf/dxfgrabber/tags.py
+/usr/share/blender/scripts/addons/io_import_dxf/dxfimport/__init__.py
+/usr/share/blender/scripts/addons/io_import_dxf/dxfimport/convert.py
+/usr/share/blender/scripts/addons/io_import_dxf/dxfimport/do.py
+/usr/share/blender/scripts/addons/io_import_dxf/dxfimport/fake_entities.py
+/usr/share/blender/scripts/addons/io_import_dxf/dxfimport/groupsort.py
+/usr/share/blender/scripts/addons/io_import_dxf/dxfimport/is_.py
+/usr/share/blender/scripts/addons/io_import_dxf/dxfimport/line_merger.py
+/usr/share/blender/scripts/addons/io_import_dxf/transverse_mercator.py
+/usr/share/blender/scripts/addons/io_import_gimp_image_to_scene.py
+/usr/share/blender/scripts/addons/io_import_images_as_planes.py
+/usr/share/blender/scripts/addons/io_import_scene_lwo.py
+/usr/share/blender/scripts/addons/io_import_scene_unreal_psa_psk.py
+/usr/share/blender/scripts/addons/io_mesh_pdb/__init__.py
+/usr/share/blender/scripts/addons/io_mesh_pdb/atom_info.dat
+/usr/share/blender/scripts/addons/io_mesh_pdb/export_pdb.py
+/usr/share/blender/scripts/addons/io_mesh_pdb/import_pdb.py
+/usr/share/blender/scripts/addons/io_mesh_ply/__init__.py
+/usr/share/blender/scripts/addons/io_mesh_ply/export_ply.py
+/usr/share/blender/scripts/addons/io_mesh_ply/import_ply.py
+/usr/share/blender/scripts/addons/io_mesh_raw/__init__.py
+/usr/share/blender/scripts/addons/io_mesh_raw/export_raw.py
+/usr/share/blender/scripts/addons/io_mesh_raw/import_raw.py
+/usr/share/blender/scripts/addons/io_mesh_stl/__init__.py
+/usr/share/blender/scripts/addons/io_mesh_stl/blender_utils.py
+/usr/share/blender/scripts/addons/io_mesh_stl/stl_utils.py
+/usr/share/blender/scripts/addons/io_mesh_uv_layout/__init__.py
+/usr/share/blender/scripts/addons/io_mesh_uv_layout/export_uv_eps.py
+/usr/share/blender/scripts/addons/io_mesh_uv_layout/export_uv_png.py
+/usr/share/blender/scripts/addons/io_mesh_uv_layout/export_uv_svg.py
+/usr/share/blender/scripts/addons/io_online_sketchfab/__init__.py
+/usr/share/blender/scripts/addons/io_online_sketchfab/pack_for_export.py
+/usr/share/blender/scripts/addons/io_scene_3ds/__init__.py
+/usr/share/blender/scripts/addons/io_scene_3ds/export_3ds.py
+/usr/share/blender/scripts/addons/io_scene_3ds/import_3ds.py
+/usr/share/blender/scripts/addons/io_scene_fbx/__init__.py
+/usr/share/blender/scripts/addons/io_scene_fbx/data_types.py
+/usr/share/blender/scripts/addons/io_scene_fbx/encode_bin.py
+/usr/share/blender/scripts/addons/io_scene_fbx/export_fbx.py
+/usr/share/blender/scripts/addons/io_scene_fbx/export_fbx_bin.py
+/usr/share/blender/scripts/addons/io_scene_fbx/fbx2json.py
+/usr/share/blender/scripts/addons/io_scene_fbx/fbx_utils.py
+/usr/share/blender/scripts/addons/io_scene_fbx/import_fbx.py
+/usr/share/blender/scripts/addons/io_scene_fbx/json2fbx.py
+/usr/share/blender/scripts/addons/io_scene_fbx/parse_fbx.py
+/usr/share/blender/scripts/addons/io_scene_ms3d/__init__.py
+/usr/share/blender/scripts/addons/io_scene_ms3d/ms3d_export.py
+/usr/share/blender/scripts/addons/io_scene_ms3d/ms3d_import.py
+/usr/share/blender/scripts/addons/io_scene_ms3d/ms3d_spec.py
+/usr/share/blender/scripts/addons/io_scene_ms3d/ms3d_strings.py
+/usr/share/blender/scripts/addons/io_scene_ms3d/ms3d_ui.py
+/usr/share/blender/scripts/addons/io_scene_ms3d/ms3d_utils.py
+/usr/share/blender/scripts/addons/io_scene_obj/__init__.py
+/usr/share/blender/scripts/addons/io_scene_obj/export_obj.py
+/usr/share/blender/scripts/addons/io_scene_obj/import_obj.py
+/usr/share/blender/scripts/addons/io_scene_vrml2/__init__.py
+/usr/share/blender/scripts/addons/io_scene_vrml2/export_vrml2.py
+/usr/share/blender/scripts/addons/io_scene_x/__init__.py
+/usr/share/blender/scripts/addons/io_scene_x/export_x.py
+/usr/share/blender/scripts/addons/io_scene_x3d/__init__.py
+/usr/share/blender/scripts/addons/io_scene_x3d/export_x3d.py
+/usr/share/blender/scripts/addons/io_scene_x3d/import_x3d.py
+/usr/share/blender/scripts/addons/io_sequencer_edl/__init__.py
+/usr/share/blender/scripts/addons/io_sequencer_edl/import_edl.py
+/usr/share/blender/scripts/addons/io_sequencer_edl/parse_edl.py
+/usr/share/blender/scripts/addons/io_shape_mdd/__init__.py
+/usr/share/blender/scripts/addons/io_shape_mdd/export_mdd.py
+/usr/share/blender/scripts/addons/io_shape_mdd/import_mdd.py
+/usr/share/blender/scripts/addons/light_field_tools/__init__.py
+/usr/share/blender/scripts/addons/light_field_tools/light_field_tools.py
+/usr/share/blender/scripts/addons/lighting_dynamic_sky.py
+/usr/share/blender/scripts/addons/materials_library_vx/README.txt
+/usr/share/blender/scripts/addons/materials_library_vx/__init__.py
+/usr/share/blender/scripts/addons/materials_library_vx/blender_internal.blend
+/usr/share/blender/scripts/addons/materials_library_vx/categories.txt
+/usr/share/blender/scripts/addons/materials_library_vx/cycles_materials.blend
+/usr/share/blender/scripts/addons/materials_library_vx/cycles_templates.blend
+/usr/share/blender/scripts/addons/materials_utils/__init__.py
+/usr/share/blender/scripts/addons/materials_utils/material_converter.py
+/usr/share/blender/scripts/addons/materials_utils/materials_cycles_converter.py
+/usr/share/blender/scripts/addons/materials_utils/texture_rename.py
+/usr/share/blender/scripts/addons/materials_utils/warning_messages_utils.py
+/usr/share/blender/scripts/addons/measureit/__init__.py
+/usr/share/blender/scripts/addons/measureit/measureit_geometry.py
+/usr/share/blender/scripts/addons/measureit/measureit_main.py
+/usr/share/blender/scripts/addons/measureit/measureit_render.py
+/usr/share/blender/scripts/addons/mesh_auto_mirror.py
+/usr/share/blender/scripts/addons/mesh_bsurfaces.py
+/usr/share/blender/scripts/addons/mesh_carver.py
+/usr/share/blender/scripts/addons/mesh_custom_normals_tools.py
+/usr/share/blender/scripts/addons/mesh_extra_tools/__init__.py
+/usr/share/blender/scripts/addons/mesh_extra_tools/face_inset_fillet.py
+/usr/share/blender/scripts/addons/mesh_extra_tools/icons/icons.py
+/usr/share/blender/scripts/addons/mesh_extra_tools/icons/ngon.png
+/usr/share/blender/scripts/addons/mesh_extra_tools/icons/triangle.png
+/usr/share/blender/scripts/addons/mesh_extra_tools/mesh_check.py
+/usr/share/blender/scripts/addons/mesh_extra_tools/mesh_cut_faces.py
+/usr/share/blender/scripts/addons/mesh_extra_tools/mesh_edge_roundifier.py
+/usr/share/blender/scripts/addons/mesh_extra_tools/mesh_edges_floor_plan.py
+/usr/share/blender/scripts/addons/mesh_extra_tools/mesh_edges_length.py
+/usr/share/blender/scripts/addons/mesh_extra_tools/mesh_edgetools.py
+/usr/share/blender/scripts/addons/mesh_extra_tools/mesh_extrude_and_reshape.py
+/usr/share/blender/scripts/addons/mesh_extra_tools/mesh_fastloop.py
+/usr/share/blender/scripts/addons/mesh_extra_tools/mesh_filletplus.py
+/usr/share/blender/scripts/addons/mesh_extra_tools/mesh_help.py
+/usr/share/blender/scripts/addons/mesh_extra_tools/mesh_mextrude_plus.py
+/usr/share/blender/scripts/addons/mesh_extra_tools/mesh_offset_edges.py
+/usr/share/blender/scripts/addons/mesh_extra_tools/mesh_pen_tool.py
+/usr/share/blender/scripts/addons/mesh_extra_tools/mesh_select_tools/__init__.py
+/usr/share/blender/scripts/addons/mesh_extra_tools/mesh_select_tools/mesh_index_select.py
+/usr/share/blender/scripts/addons/mesh_extra_tools/mesh_select_tools/mesh_info_select.py
+/usr/share/blender/scripts/addons/mesh_extra_tools/mesh_select_tools/mesh_select_by_direction.py
+/usr/share/blender/scripts/addons/mesh_extra_tools/mesh_select_tools/mesh_select_by_edge_length.py
+/usr/share/blender/scripts/addons/mesh_extra_tools/mesh_select_tools/mesh_select_by_pi.py
+/usr/share/blender/scripts/addons/mesh_extra_tools/mesh_select_tools/mesh_select_by_type.py
+/usr/share/blender/scripts/addons/mesh_extra_tools/mesh_select_tools/mesh_select_connected_faces.py
+/usr/share/blender/scripts/addons/mesh_extra_tools/mesh_select_tools/mesh_selection_topokit.py
+/usr/share/blender/scripts/addons/mesh_extra_tools/mesh_vertex_chamfer.py
+/usr/share/blender/scripts/addons/mesh_extra_tools/pkhg_faces.py
+/usr/share/blender/scripts/addons/mesh_extra_tools/random_vertices.py
+/usr/share/blender/scripts/addons/mesh_extra_tools/split_solidify.py
+/usr/share/blender/scripts/addons/mesh_extra_tools/vertex_align.py
+/usr/share/blender/scripts/addons/mesh_extra_tools/vfe_specials.py
+/usr/share/blender/scripts/addons/mesh_f2.py
+/usr/share/blender/scripts/addons/mesh_inset/__init__.py
+/usr/share/blender/scripts/addons/mesh_inset/geom.py
+/usr/share/blender/scripts/addons/mesh_inset/model.py
+/usr/share/blender/scripts/addons/mesh_inset/offset.py
+/usr/share/blender/scripts/addons/mesh_inset/triquad.py
+/usr/share/blender/scripts/addons/mesh_looptools.py
+/usr/share/blender/scripts/addons/mesh_relax.py
+/usr/share/blender/scripts/addons/mesh_snap_utilities_line.py
+/usr/share/blender/scripts/addons/mesh_tiny_cad/BIX.py
+/usr/share/blender/scripts/addons/mesh_tiny_cad/CCEN.py
+/usr/share/blender/scripts/addons/mesh_tiny_cad/CFG.py
+/usr/share/blender/scripts/addons/mesh_tiny_cad/E2F.py
+/usr/share/blender/scripts/addons/mesh_tiny_cad/V2X.py
+/usr/share/blender/scripts/addons/mesh_tiny_cad/VTX.py
+/usr/share/blender/scripts/addons/mesh_tiny_cad/XALL.py
+/usr/share/blender/scripts/addons/mesh_tiny_cad/__init__.py
+/usr/share/blender/scripts/addons/mesh_tiny_cad/cad_module.py
+/usr/share/blender/scripts/addons/mesh_tiny_cad/icons/BIX.png
+/usr/share/blender/scripts/addons/mesh_tiny_cad/icons/CCEN.png
+/usr/share/blender/scripts/addons/mesh_tiny_cad/icons/E2F.png
+/usr/share/blender/scripts/addons/mesh_tiny_cad/icons/V2X.png
+/usr/share/blender/scripts/addons/mesh_tiny_cad/icons/VTX.png
+/usr/share/blender/scripts/addons/mesh_tiny_cad/icons/XALL.png
+/usr/share/blender/scripts/addons/mesh_tissue/README.md
+/usr/share/blender/scripts/addons/mesh_tissue/__init__.py
+/usr/share/blender/scripts/addons/mesh_tissue/colors_groups_exchanger.py
+/usr/share/blender/scripts/addons/mesh_tissue/dual_mesh.py
+/usr/share/blender/scripts/addons/mesh_tissue/lattice.py
+/usr/share/blender/scripts/addons/mesh_tissue/tessellate_numpy.py
+/usr/share/blender/scripts/addons/mesh_tissue/uv_to_mesh.py
+/usr/share/blender/scripts/addons/mocap/__init__.py
+/usr/share/blender/scripts/addons/mocap/mocap_constraints.py
+/usr/share/blender/scripts/addons/mocap/mocap_tools.py
+/usr/share/blender/scripts/addons/mocap/retarget.py
+/usr/share/blender/scripts/addons/modules/cycles_shader_compat.py
+/usr/share/blender/scripts/addons/modules/extensions_framework/__init__.py
+/usr/share/blender/scripts/addons/modules/extensions_framework/ui.py
+/usr/share/blender/scripts/addons/modules/extensions_framework/util.py
+/usr/share/blender/scripts/addons/modules/extensions_framework/validate.py
+/usr/share/blender/scripts/addons/modules/rna_manual_reference.py
+/usr/share/blender/scripts/addons/modules/selection_utils.py
+/usr/share/blender/scripts/addons/netrender/__init__.py
+/usr/share/blender/scripts/addons/netrender/baking.py
+/usr/share/blender/scripts/addons/netrender/balancing.py
+/usr/share/blender/scripts/addons/netrender/client.py
+/usr/share/blender/scripts/addons/netrender/css/images/themes-preview.gif
+/usr/share/blender/scripts/addons/netrender/css/images/themes.gif
+/usr/share/blender/scripts/addons/netrender/css/images/ui-bg_flat_30_cccccc_40x100.png
+/usr/share/blender/scripts/addons/netrender/css/images/ui-bg_flat_50_5c5c5c_40x100.png
+/usr/share/blender/scripts/addons/netrender/css/images/ui-bg_glass_20_555555_1x400.png
+/usr/share/blender/scripts/addons/netrender/css/images/ui-bg_glass_40_0078a3_1x400.png
+/usr/share/blender/scripts/addons/netrender/css/images/ui-bg_glass_40_ffc73d_1x400.png
+/usr/share/blender/scripts/addons/netrender/css/images/ui-bg_gloss-wave_25_333333_500x100.png
+/usr/share/blender/scripts/addons/netrender/css/images/ui-bg_highlight-soft_80_eeeeee_1x100.png
+/usr/share/blender/scripts/addons/netrender/css/images/ui-bg_inset-soft_25_000000_1x100.png
+/usr/share/blender/scripts/addons/netrender/css/images/ui-bg_inset-soft_30_f58400_1x100.png
+/usr/share/blender/scripts/addons/netrender/css/images/ui-icons_222222_256x240.png
+/usr/share/blender/scripts/addons/netrender/css/images/ui-icons_4b8e0b_256x240.png
+/usr/share/blender/scripts/addons/netrender/css/images/ui-icons_a83300_256x240.png
+/usr/share/blender/scripts/addons/netrender/css/images/ui-icons_cccccc_256x240.png
+/usr/share/blender/scripts/addons/netrender/css/images/ui-icons_ffffff_256x240.png
+/usr/share/blender/scripts/addons/netrender/css/jquery-ui.css
+/usr/share/blender/scripts/addons/netrender/css/jquery.themes.css
+/usr/share/blender/scripts/addons/netrender/js/jquery-ui.js
+/usr/share/blender/scripts/addons/netrender/js/jquery.js
+/usr/share/blender/scripts/addons/netrender/js/jquery.themes.js
+/usr/share/blender/scripts/addons/netrender/js/netrender-action.js
+/usr/share/blender/scripts/addons/netrender/js/netrender-widget.js
+/usr/share/blender/scripts/addons/netrender/js/netrender.js
+/usr/share/blender/scripts/addons/netrender/js/netrender_balance.js
+/usr/share/blender/scripts/addons/netrender/master.py
+/usr/share/blender/scripts/addons/netrender/master_html.py
+/usr/share/blender/scripts/addons/netrender/model.py
+/usr/share/blender/scripts/addons/netrender/netrender.css
+/usr/share/blender/scripts/addons/netrender/netrender.js
+/usr/share/blender/scripts/addons/netrender/newui.html
+/usr/share/blender/scripts/addons/netrender/operators.py
+/usr/share/blender/scripts/addons/netrender/repath.py
+/usr/share/blender/scripts/addons/netrender/slave.py
+/usr/share/blender/scripts/addons/netrender/thumbnail.py
+/usr/share/blender/scripts/addons/netrender/ui.py
+/usr/share/blender/scripts/addons/netrender/utils.py
+/usr/share/blender/scripts/addons/netrender/versioning.py
+/usr/share/blender/scripts/addons/node_wrangler.py
+/usr/share/blender/scripts/addons/object_animrenderbake.py
+/usr/share/blender/scripts/addons/object_boolean_tools.py
+/usr/share/blender/scripts/addons/object_cloud_gen.py
+/usr/share/blender/scripts/addons/object_edit_linked.py
+/usr/share/blender/scripts/addons/object_fracture/__init__.py
+/usr/share/blender/scripts/addons/object_fracture/data.blend
+/usr/share/blender/scripts/addons/object_fracture/fracture_ops.py
+/usr/share/blender/scripts/addons/object_fracture/fracture_setup.py
+/usr/share/blender/scripts/addons/object_fracture_cell/__init__.py
+/usr/share/blender/scripts/addons/object_fracture_cell/fracture_cell_calc.py
+/usr/share/blender/scripts/addons/object_fracture_cell/fracture_cell_setup.py
+/usr/share/blender/scripts/addons/object_fracture_crack/__init__.py
+/usr/share/blender/scripts/addons/object_fracture_crack/crack_it.py
+/usr/share/blender/scripts/addons/object_fracture_crack/materials/materials1.blend
+/usr/share/blender/scripts/addons/object_fracture_crack/operator.py
+/usr/share/blender/scripts/addons/object_grease_scatter.py
+/usr/share/blender/scripts/addons/object_print3d_utils/__init__.py
+/usr/share/blender/scripts/addons/object_print3d_utils/export.py
+/usr/share/blender/scripts/addons/object_print3d_utils/mesh_helpers.py
+/usr/share/blender/scripts/addons/object_print3d_utils/operators.py
+/usr/share/blender/scripts/addons/object_print3d_utils/readme.rst
+/usr/share/blender/scripts/addons/object_print3d_utils/report.py
+/usr/share/blender/scripts/addons/object_print3d_utils/todo.rst
+/usr/share/blender/scripts/addons/object_print3d_utils/ui.py
+/usr/share/blender/scripts/addons/object_skinify.py
+/usr/share/blender/scripts/addons/oscurart_tools/__init__.py
+/usr/share/blender/scripts/addons/oscurart_tools/oscurart_animation.py
+/usr/share/blender/scripts/addons/oscurart_tools/oscurart_files.py
+/usr/share/blender/scripts/addons/oscurart_tools/oscurart_meshes.py
+/usr/share/blender/scripts/addons/oscurart_tools/oscurart_objects.py
+/usr/share/blender/scripts/addons/oscurart_tools/oscurart_overrides.py
+/usr/share/blender/scripts/addons/oscurart_tools/oscurart_render.py
+/usr/share/blender/scripts/addons/oscurart_tools/oscurart_shapes.py
+/usr/share/blender/scripts/addons/paint_palette.py
+/usr/share/blender/scripts/addons/pie_menus_official/__init__.py
+/usr/share/blender/scripts/addons/pie_menus_official/pie_clip_marker_of.py
+/usr/share/blender/scripts/addons/pie_menus_official/pie_manipulator_of.py
+/usr/share/blender/scripts/addons/pie_menus_official/pie_object_modes_of.py
+/usr/share/blender/scripts/addons/pie_menus_official/pie_pivot_of.py
+/usr/share/blender/scripts/addons/pie_menus_official/pie_shade_of.py
+/usr/share/blender/scripts/addons/pie_menus_official/pie_snap_of.py
+/usr/share/blender/scripts/addons/pie_menus_official/pie_view_of.py
+/usr/share/blender/scripts/addons/presets/operator/curve.torus_knot_plus/13x8_wicker_globe.py
+/usr/share/blender/scripts/addons/presets/operator/curve.torus_knot_plus/7x6.py
+/usr/share/blender/scripts/addons/presets/operator/curve.torus_knot_plus/9x9_color.py
+/usr/share/blender/scripts/addons/presets/operator/curve.torus_knot_plus/braided_coil.py
+/usr/share/blender/scripts/addons/presets/operator/curve.torus_knot_plus/flower_mesh_(2d).py
+/usr/share/blender/scripts/addons/presets/operator/curve.torus_knot_plus/slinky_knot.py
+/usr/share/blender/scripts/addons/presets/operator/curve.torus_knot_plus/snowflake_(2d).py
+/usr/share/blender/scripts/addons/presets/operator/curve.torus_knot_plus/sun_cross_(2d).py
+/usr/share/blender/scripts/addons/presets/operator/curve.torus_knot_plus/tripple_dna.py
+/usr/share/blender/scripts/addons/presets/operator/curve.torus_knot_plus/wicker_basket.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.bolt_add/default.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.bolt_add/m10.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.bolt_add/m12.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.bolt_add/m3.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.bolt_add/m4.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.bolt_add/m5.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.bolt_add/m6.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.bolt_add/m8.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.eroder/default.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.eroder/light_erosion.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.eroder/medium_erosion.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.eroder/strong_erosion.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.eroder/thermal_diffusion.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/abstract.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/another_noise.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/billow.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/canion.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/canions.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/cauliflower_hills.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/cliff.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/cristaline.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/default.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/default_large.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/dunes.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/flatstones.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/gully.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/lakes_1.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/lakes_2.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/large_terrain.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/mesa.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/mounds.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/mountain_1.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/mountain_2.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/planet.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/planet_noise.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/ridged.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/river.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/rock.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/slick_rock.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/tech_effect.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/techno_cell.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/vlnoise_turbulence.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/voronoi_hills.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/vulcano.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.landscape_add/yin_yang.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.primitive_round_cube_add/Capsule.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.primitive_round_cube_add/Clay_Bar.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.primitive_round_cube_add/Cube.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.primitive_round_cube_add/Grid_3D.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.primitive_round_cube_add/Octahedron.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.primitive_round_cube_add/Quadsphere.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.primitive_round_cube_add/Rounded_Cube.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/bonbon.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/boy.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/catalan.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/catenoid.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/clifford_torus.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/cochlea.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/cosinus.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/dini.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/enneper.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/helicoidal.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/helix.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/hexahedron.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/hyperhelicoidal.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/klein.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/moebius.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/pseudo_catenoid.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/pseudosphere.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/ridged_torus.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/shell.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/sine.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/snake.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/sterosphere.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/torus.py
+/usr/share/blender/scripts/addons/presets/operator/mesh.primitive_xyz_function_surface/twisted_torus.py
+/usr/share/blender/scripts/addons/render_auto_tile_size.py
+/usr/share/blender/scripts/addons/render_clay.py
+/usr/share/blender/scripts/addons/render_copy_settings/__init__.py
+/usr/share/blender/scripts/addons/render_copy_settings/operator.py
+/usr/share/blender/scripts/addons/render_copy_settings/panel.py
+/usr/share/blender/scripts/addons/render_copy_settings/presets.py
+/usr/share/blender/scripts/addons/render_copy_settings/translations.py
+/usr/share/blender/scripts/addons/render_freestyle_svg.py
+/usr/share/blender/scripts/addons/render_povray/__init__.py
+/usr/share/blender/scripts/addons/render_povray/df3.py
+/usr/share/blender/scripts/addons/render_povray/nodes.py
+/usr/share/blender/scripts/addons/render_povray/primitives.py
+/usr/share/blender/scripts/addons/render_povray/render.py
+/usr/share/blender/scripts/addons/render_povray/shading.py
+/usr/share/blender/scripts/addons/render_povray/templates_pov/abyss.pov
+/usr/share/blender/scripts/addons/render_povray/templates_pov/biscuit.pov
+/usr/share/blender/scripts/addons/render_povray/templates_pov/bsp_Tango.pov
+/usr/share/blender/scripts/addons/render_povray/templates_pov/chess2.pov
+/usr/share/blender/scripts/addons/render_povray/templates_pov/cornell.pov
+/usr/share/blender/scripts/addons/render_povray/templates_pov/diffract.pov
+/usr/share/blender/scripts/addons/render_povray/templates_pov/diffuse_back.pov
+/usr/share/blender/scripts/addons/render_povray/templates_pov/float5.pov
+/usr/share/blender/scripts/addons/render_povray/templates_pov/gamma_showcase.pov
+/usr/share/blender/scripts/addons/render_povray/templates_pov/grenadine.pov
+/usr/share/blender/scripts/addons/render_povray/templates_pov/isocacti.pov
+/usr/share/blender/scripts/addons/render_povray/templates_pov/mediasky.pov
+/usr/share/blender/scripts/addons/render_povray/templates_pov/patio-radio.pov
+/usr/share/blender/scripts/addons/render_povray/templates_pov/subsurface.pov
+/usr/share/blender/scripts/addons/render_povray/templates_pov/wallstucco.pov
+/usr/share/blender/scripts/addons/render_povray/ui.py
+/usr/share/blender/scripts/addons/render_povray/update_files.py
+/usr/share/blender/scripts/addons/rigify/__init__.py
+/usr/share/blender/scripts/addons/rigify/generate.py
+/usr/share/blender/scripts/addons/rigify/legacy/__init__.py
+/usr/share/blender/scripts/addons/rigify/legacy/generate.py
+/usr/share/blender/scripts/addons/rigify/legacy/metarig_menu.py
+/usr/share/blender/scripts/addons/rigify/legacy/metarigs/__init__.py
+/usr/share/blender/scripts/addons/rigify/legacy/metarigs/human.py
+/usr/share/blender/scripts/addons/rigify/legacy/metarigs/pitchipoy_human.py
+/usr/share/blender/scripts/addons/rigify/legacy/rig_lists.py
+/usr/share/blender/scripts/addons/rigify/legacy/rig_ui_pitchipoy_template.py
+/usr/share/blender/scripts/addons/rigify/legacy/rig_ui_template.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/__init__.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/basic/__init__.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/basic/copy.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/basic/copy_chain.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/biped/__init__.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/biped/arm/__init__.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/biped/arm/deform.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/biped/arm/fk.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/biped/arm/ik.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/biped/leg/__init__.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/biped/leg/deform.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/biped/leg/fk.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/biped/leg/ik.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/biped/limb_common.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/finger.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/misc/__init__.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/misc/delta.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/neck_short.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/palm.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/__init__.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/limbs/__init__.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/limbs/arm.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/limbs/leg.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/limbs/limb_utils.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/limbs/paw.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/limbs/super_limb.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/limbs/ui.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/simple_tentacle.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/super_copy.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/super_face.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/super_finger.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/super_palm.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/super_torso_turbo.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/super_widgets.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/pitchipoy/tentacle.py
+/usr/share/blender/scripts/addons/rigify/legacy/rigs/spine.py
+/usr/share/blender/scripts/addons/rigify/legacy/ui.py
+/usr/share/blender/scripts/addons/rigify/legacy/utils.py
+/usr/share/blender/scripts/addons/rigify/metarig_menu.py
+/usr/share/blender/scripts/addons/rigify/metarigs/Animals/__init__.py
+/usr/share/blender/scripts/addons/rigify/metarigs/Animals/bird.py
+/usr/share/blender/scripts/addons/rigify/metarigs/Animals/cat.py
+/usr/share/blender/scripts/addons/rigify/metarigs/Animals/horse.py
+/usr/share/blender/scripts/addons/rigify/metarigs/Animals/shark.py
+/usr/share/blender/scripts/addons/rigify/metarigs/Animals/wolf.py
+/usr/share/blender/scripts/addons/rigify/metarigs/Basic/basic_human.py
+/usr/share/blender/scripts/addons/rigify/metarigs/Basic/basic_quadruped.py
+/usr/share/blender/scripts/addons/rigify/metarigs/__init__.py
+/usr/share/blender/scripts/addons/rigify/metarigs/human.py
+/usr/share/blender/scripts/addons/rigify/rig_lists.py
+/usr/share/blender/scripts/addons/rigify/rig_ui_template.py
+/usr/share/blender/scripts/addons/rigify/rigs/__init__.py
+/usr/share/blender/scripts/addons/rigify/rigs/basic/__init__.py
+/usr/share/blender/scripts/addons/rigify/rigs/basic/copy_chain.py
+/usr/share/blender/scripts/addons/rigify/rigs/basic/super_copy.py
+/usr/share/blender/scripts/addons/rigify/rigs/experimental/__init__.py
+/usr/share/blender/scripts/addons/rigify/rigs/experimental/super_chain.py
+/usr/share/blender/scripts/addons/rigify/rigs/experimental/super_eye.py
+/usr/share/blender/scripts/addons/rigify/rigs/faces/__init__.py
+/usr/share/blender/scripts/addons/rigify/rigs/faces/super_face.py
+/usr/share/blender/scripts/addons/rigify/rigs/limbs/__init__.py
+/usr/share/blender/scripts/addons/rigify/rigs/limbs/arm.py
+/usr/share/blender/scripts/addons/rigify/rigs/limbs/leg.py
+/usr/share/blender/scripts/addons/rigify/rigs/limbs/limb_utils.py
+/usr/share/blender/scripts/addons/rigify/rigs/limbs/paw.py
+/usr/share/blender/scripts/addons/rigify/rigs/limbs/rear_paw.py
+/usr/share/blender/scripts/addons/rigify/rigs/limbs/simple_tentacle.py
+/usr/share/blender/scripts/addons/rigify/rigs/limbs/super_finger.py
+/usr/share/blender/scripts/addons/rigify/rigs/limbs/super_limb.py
+/usr/share/blender/scripts/addons/rigify/rigs/limbs/super_palm.py
+/usr/share/blender/scripts/addons/rigify/rigs/limbs/ui.py
+/usr/share/blender/scripts/addons/rigify/rigs/spines/__init__.py
+/usr/share/blender/scripts/addons/rigify/rigs/spines/super_spine.py
+/usr/share/blender/scripts/addons/rigify/rigs/utils.py
+/usr/share/blender/scripts/addons/rigify/rigs/widgets.py
+/usr/share/blender/scripts/addons/rigify/rot_mode.py
+/usr/share/blender/scripts/addons/rigify/ui.py
+/usr/share/blender/scripts/addons/rigify/utils.py
+/usr/share/blender/scripts/addons/sequencer_kinoraw_tools/__init__.py
+/usr/share/blender/scripts/addons/sequencer_kinoraw_tools/audio_tools.py
+/usr/share/blender/scripts/addons/sequencer_kinoraw_tools/datamosh.py
+/usr/share/blender/scripts/addons/sequencer_kinoraw_tools/eco.py
+/usr/share/blender/scripts/addons/sequencer_kinoraw_tools/exiftool.py
+/usr/share/blender/scripts/addons/sequencer_kinoraw_tools/functions.py
+/usr/share/blender/scripts/addons/sequencer_kinoraw_tools/jumptocut.py
+/usr/share/blender/scripts/addons/sequencer_kinoraw_tools/operators_extra_actions.py
+/usr/share/blender/scripts/addons/sequencer_kinoraw_tools/proxy_tools.py
+/usr/share/blender/scripts/addons/sequencer_kinoraw_tools/random_editor.py
+/usr/share/blender/scripts/addons/sequencer_kinoraw_tools/recursive_loader.py
+/usr/share/blender/scripts/addons/sequencer_kinoraw_tools/ui.py
+/usr/share/blender/scripts/addons/space_clip_editor_autotracker.py
+/usr/share/blender/scripts/addons/space_clip_editor_refine_solution.py
+/usr/share/blender/scripts/addons/space_view3d_3d_navigation.py
+/usr/share/blender/scripts/addons/space_view3d_brush_menus/__init__.py
+/usr/share/blender/scripts/addons/space_view3d_brush_menus/brush_menu.py
+/usr/share/blender/scripts/addons/space_view3d_brush_menus/brushes.py
+/usr/share/blender/scripts/addons/space_view3d_brush_menus/curve_menu.py
+/usr/share/blender/scripts/addons/space_view3d_brush_menus/dyntopo_menu.py
+/usr/share/blender/scripts/addons/space_view3d_brush_menus/stroke_menu.py
+/usr/share/blender/scripts/addons/space_view3d_brush_menus/symmetry_menu.py
+/usr/share/blender/scripts/addons/space_view3d_brush_menus/texture_menu.py
+/usr/share/blender/scripts/addons/space_view3d_brush_menus/utils_core.py
+/usr/share/blender/scripts/addons/space_view3d_copy_attributes.py
+/usr/share/blender/scripts/addons/space_view3d_display_tools/__init__.py
+/usr/share/blender/scripts/addons/space_view3d_display_tools/display.py
+/usr/share/blender/scripts/addons/space_view3d_display_tools/fast_navigate.py
+/usr/share/blender/scripts/addons/space_view3d_display_tools/modifier_tools.py
+/usr/share/blender/scripts/addons/space_view3d_display_tools/scene_vis.py
+/usr/share/blender/scripts/addons/space_view3d_display_tools/select_tools.py
+/usr/share/blender/scripts/addons/space_view3d_display_tools/selection_restrictor.py
+/usr/share/blender/scripts/addons/space_view3d_display_tools/shading_menu.py
+/usr/share/blender/scripts/addons/space_view3d_display_tools/useless_tools.py
+/usr/share/blender/scripts/addons/space_view3d_math_vis/__init__.py
+/usr/share/blender/scripts/addons/space_view3d_math_vis/draw.py
+/usr/share/blender/scripts/addons/space_view3d_math_vis/utils.py
+/usr/share/blender/scripts/addons/space_view3d_modifier_tools.py
+/usr/share/blender/scripts/addons/space_view3d_pie_menus/__init__.py
+/usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_align_menu.py
+/usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_animation_menu.py
+/usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_apply_transform_menu.py
+/usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_cursor.py
+/usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_delete_menu.py
+/usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_editor_switch_menu.py
+/usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_manipulator_menu.py
+/usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_modes_menu.py
+/usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_orientation_menu.py
+/usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_origin.py
+/usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_pivot_point_menu.py
+/usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_proportional_menu.py
+/usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_save_open_menu.py
+/usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_sculpt_menu.py
+/usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_select_menu.py
+/usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_shading_menu.py
+/usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_snap_menu.py
+/usr/share/blender/scripts/addons/space_view3d_pie_menus/pie_views_numpad_menu.py
+/usr/share/blender/scripts/addons/space_view3d_spacebar_menu.py
+/usr/share/blender/scripts/addons/space_view3d_stored_views/__init__.py
+/usr/share/blender/scripts/addons/space_view3d_stored_views/core.py
+/usr/share/blender/scripts/addons/space_view3d_stored_views/io.py
+/usr/share/blender/scripts/addons/space_view3d_stored_views/operators.py
+/usr/share/blender/scripts/addons/space_view3d_stored_views/properties.py
+/usr/share/blender/scripts/addons/space_view3d_stored_views/ui.py
+/usr/share/blender/scripts/addons/system_blend_info.py
+/usr/share/blender/scripts/addons/system_demo_mode/__init__.py
+/usr/share/blender/scripts/addons/system_demo_mode/config.py
+/usr/share/blender/scripts/addons/system_demo_mode/demo_mode.py
+/usr/share/blender/scripts/addons/system_property_chart.py
+/usr/share/blender/scripts/addons/ui_layer_manager.py
+/usr/share/blender/scripts/addons/ui_translate/__init__.py
+/usr/share/blender/scripts/addons/ui_translate/edit_translation.py
+/usr/share/blender/scripts/addons/ui_translate/settings.py
+/usr/share/blender/scripts/addons/ui_translate/update_addon.py
+/usr/share/blender/scripts/addons/ui_translate/update_svn.py
+/usr/share/blender/scripts/addons/ui_translate/update_ui.py
+/usr/share/blender/scripts/addons/uv_bake_texture_to_vcols.py
+/usr/share/blender/scripts/addons/uv_magic_uv/__init__.py
+/usr/share/blender/scripts/addons/uv_magic_uv/muv_common.py
+/usr/share/blender/scripts/addons/uv_magic_uv/muv_cpuv_ops.py
+/usr/share/blender/scripts/addons/uv_magic_uv/muv_cpuv_selseq_ops.py
+/usr/share/blender/scripts/addons/uv_magic_uv/muv_fliprot_ops.py
+/usr/share/blender/scripts/addons/uv_magic_uv/muv_menu.py
+/usr/share/blender/scripts/addons/uv_magic_uv/muv_mirroruv_ops.py
+/usr/share/blender/scripts/addons/uv_magic_uv/muv_mvuv_ops.py
+/usr/share/blender/scripts/addons/uv_magic_uv/muv_packuv_ops.py
+/usr/share/blender/scripts/addons/uv_magic_uv/muv_preferences.py
+/usr/share/blender/scripts/addons/uv_magic_uv/muv_preserve_uv_aspect.py
+/usr/share/blender/scripts/addons/uv_magic_uv/muv_props.py
+/usr/share/blender/scripts/addons/uv_magic_uv/muv_texlock_ops.py
+/usr/share/blender/scripts/addons/uv_magic_uv/muv_texproj_ops.py
+/usr/share/blender/scripts/addons/uv_magic_uv/muv_transuv_ops.py
+/usr/share/blender/scripts/addons/uv_magic_uv/muv_unwrapconst_ops.py
+/usr/share/blender/scripts/addons/uv_magic_uv/muv_uvbb_ops.py
+/usr/share/blender/scripts/addons/uv_magic_uv/muv_wsuv_ops.py
+/usr/share/blender/scripts/addons/uv_texture_atlas.py
+
+%files license
+%defattr(0644,root,root,0755)
+/usr/share/package-licenses/blender/COPYING
+/usr/share/package-licenses/blender/build_files_package_spec_debian_copyright
+/usr/share/package-licenses/blender/extern_carve_LICENSE.GPL2
+/usr/share/package-licenses/blender/extern_carve_LICENSE.GPL3
+/usr/share/package-licenses/blender/extern_ceres_LICENSE
+/usr/share/package-licenses/blender/extern_cuew_LICENSE
+/usr/share/package-licenses/blender/extern_gflags_COPYING.txt
+/usr/share/package-licenses/blender/extern_glog_COPYING
+/usr/share/package-licenses/blender/extern_gmock_LICENSE
+/usr/share/package-licenses/blender/extern_gtest_LICENSE
+/usr/share/package-licenses/blender/extern_libopenjpeg_license.txt
+/usr/share/package-licenses/blender/extern_lzo_minilzo_COPYING
+/usr/share/package-licenses/blender/extern_recastnavigation_License.txt
+/usr/share/package-licenses/blender/intern_audaspace_COPYING
+/usr/share/package-licenses/blender/intern_elbeem_COPYING
+/usr/share/package-licenses/blender/intern_elbeem_COPYING_trimesh2
+/usr/share/package-licenses/blender/intern_smoke_intern_LICENSE.txt
+/usr/share/package-licenses/blender/release_datafiles_LICENSE-bfont.ttf.txt
+/usr/share/package-licenses/blender/release_datafiles_LICENSE-bmonofont-i18n.ttf.txt
+/usr/share/package-licenses/blender/release_datafiles_LICENSE-droidsans.ttf.txt
+/usr/share/package-licenses/blender/release_datafiles_matcaps_license.txt
+/usr/share/package-licenses/blender/release_text_copyright.txt
+
+%files man
+%defattr(0644,root,root,0755)
+/usr/share/man/man1/blender.1
+/usr/share/man/man1/blenderplayer.1
+
+%files locales -f blender.lang
+%defattr(-,root,root,-)
+

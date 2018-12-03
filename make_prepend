@@ -1,0 +1,3 @@
+pushd intern/libmv
+make -j1
+popd

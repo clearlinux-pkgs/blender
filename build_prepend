@@ -1,0 +1,1 @@
+for i in `grep -rl "/usr/bin/env python3"`;do sed -i '1s/^#!.*/#!\/usr\/bin\/python3/' ${i} ;done
