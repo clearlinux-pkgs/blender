@@ -1,15 +1,13 @@
 # This file contains additional pkgconfig build requirements that did
 # not get picked up automatically. One name per line, no whitespace.
+# This file contains additional pkgconfig build requirements that did
+# not get picked up automatically. One name per line, no whitespace.
 fftw3
 lcms2
-python3
-freetype2
 gl
 glew
 glu
-libxml-2.0
 x11
 xfixes
 xi
-xrender
 zlib

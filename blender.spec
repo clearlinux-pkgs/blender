@@ -4,7 +4,7 @@
 #
 Name     : blender
 Version  : 2.79b
-Release  : 11
+Release  : 15
 URL      : https://download.blender.org/source/blender-2.79b.tar.gz
 Source0  : https://download.blender.org/source/blender-2.79b.tar.gz
 Summary  : No detailed summary available
@@ -17,58 +17,45 @@ Requires: blender-locales = %{version}-%{release}
 Requires: blender-man = %{version}-%{release}
 Requires: OpenColorIO
 Requires: oiio
+Requires: python3
+Requires: scene-alembic
 Requires: yaml-cpp
 BuildRequires : OpenColorIO-dev
-BuildRequires : SDL2-dev
 BuildRequires : boost-dev
 BuildRequires : buildreq-cmake
 BuildRequires : cmake
 BuildRequires : desktop-file-utils
 BuildRequires : eigen-dev
-BuildRequires : expat-dev
 BuildRequires : extra-cmake-modules pkgconfig(OpenEXR)
 BuildRequires : freeglut-dev
 BuildRequires : freetype-dev
 BuildRequires : git
 BuildRequires : glew-dev
 BuildRequires : glibc-dev
-BuildRequires : jemalloc
 BuildRequires : jemalloc-dev
 BuildRequires : libX11-dev libICE-dev libSM-dev libXau-dev libXcomposite-dev libXcursor-dev libXdamage-dev libXdmcp-dev libXext-dev libXfixes-dev libXft-dev libXi-dev libXinerama-dev libXi-dev libXmu-dev libXpm-dev libXrandr-dev libXrender-dev libXres-dev libXScrnSaver-dev libXt-dev libXtst-dev libXv-dev libXxf86misc-dev libXxf86vm-dev
 BuildRequires : libjpeg-turbo-dev
-BuildRequires : libtool
-BuildRequires : libxml2-dev
-BuildRequires : libxml2-python
 BuildRequires : llvm
 BuildRequires : lzo-dev
 BuildRequires : mesa-dev
-BuildRequires : numpy
 BuildRequires : oiio-dev
 BuildRequires : openal-soft-dev
-BuildRequires : openexr-dev
-BuildRequires : openssl-dev
-BuildRequires : pcre-dev
 BuildRequires : pkg-config
 BuildRequires : pkgconfig(fftw3)
-BuildRequires : pkgconfig(freetype2)
 BuildRequires : pkgconfig(gl)
 BuildRequires : pkgconfig(glew)
 BuildRequires : pkgconfig(glu)
 BuildRequires : pkgconfig(lcms2)
-BuildRequires : pkgconfig(libxml-2.0)
-BuildRequires : pkgconfig(python3)
 BuildRequires : pkgconfig(x11)
 BuildRequires : pkgconfig(xfixes)
 BuildRequires : pkgconfig(xi)
-BuildRequires : pkgconfig(xrender)
 BuildRequires : pkgconfig(zlib)
 BuildRequires : pugixml-dev
-BuildRequires : python3
 BuildRequires : python3-dev
-BuildRequires : requests
-BuildRequires : requests-python
+BuildRequires : scene-alembic-dev
 BuildRequires : tbb-dev
 BuildRequires : tiff-dev
+BuildRequires : xorgproto-dev
 BuildRequires : zlib-dev
 Patch1: blender-2.79-fix-case.patch
 Patch2: blender-2.79-satisfy-clang.patch
@@ -83,6 +70,7 @@ Patch10: blender-2.79-droid.patch
 Patch11: blender-2.79-locale.patch
 Patch12: blender-2.79-openvdb3-abi.patch
 Patch13: blender-2.79-add-mime-file.patch
+Patch14: blender-2.79-cmake-add-usr-to-alembic-search-path.patch
 
 %description
 Files:
@@ -168,6 +156,7 @@ man components for the blender package.
 %patch11 -p1
 %patch12 -p1
 %patch13 -p1
+%patch14 -p1
 pushd ..
 cp -a blender-2.79b buildavx2
 popd
@@ -180,7 +169,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1543857892
+export SOURCE_DATE_EPOCH=1545328463
 mkdir -p clr-build
 pushd clr-build
 export CC=clang
@@ -192,6 +181,7 @@ unset LDFLAGS
 -DWITH_BUILDINFO:BOOL=ON \
 -DWITH_LLVM:BOOL=ON \
 -DWITH_DOC_MANPAGE:BOOL=ON \
+-DWITH_ALEMBIC:BOOL=ON \
 -DWITH_FFTW3:BOOL=ON \
 -DWITH_JACK:BOOL=OFF \
 -DWITH_JACK_DYNLOAD:BOOL=OFF \
@@ -203,7 +193,6 @@ unset LDFLAGS
 -DWITH_LIBMV_SCHUR_SPECIALIZATIONS:BOOL=ON \
 -DWITH_CODEC_FFMPEG:BOOL=OFF \
 -DWITH_OPENVDB:BOOL=OFF \
--DWITH_OPENVDB_BLOSC:BOOL=OFF \
 -DWITH_OPENCOLLADA:BOOL=OFF \
 -DWITH_AUDASPACE:BOOL=ON \
 -DWITH_SYSTEM_AUDASPACE:BOOL=OFF \
@@ -218,7 +207,7 @@ unset LDFLAGS
 -DWITH_PLAYER:BOOL=ON \
 -DWITH_INSTALL_PORTABLE:BOOL=OFF \
 -DWITH_SYSTEM_GLEW:BOOL=ON \
--DWITH_SYSTEM_GLES:BOOL=ON \
+-DWITH_GLU:BOOL=ON \
 -DWITH_SDL:BOOL=ON \
 -DWITH_SDL_DYNLOAD:BOOL=ON \
 -DWITH_RAYOPTIMIZATION:BOOL=ON \
@@ -231,8 +220,7 @@ unset LDFLAGS
 -DPYTHON_LIBRARY=python$(pkg-config python3 --modversion)m \
 -DPYTHON_INCLUDE_DIRS=%{_includedir}/python$(pkg-config python3 --modversion)m \
 -DWITH_PYTHON_INSTALL_NUMPY=OFF \
--DWITH_SYSTEM_LZO:BOOL=ON \
--DWITH_LINKER_GOLD:BOOL=ON
+-DWITH_SYSTEM_LZO:BOOL=ON
 ## make_prepend content
 pushd intern/libmv
 make -j1
@@ -260,6 +248,7 @@ export CXXFLAGS="$CXXFLAGS -march=haswell -m64"
 -DWITH_BUILDINFO:BOOL=ON \
 -DWITH_LLVM:BOOL=ON \
 -DWITH_DOC_MANPAGE:BOOL=ON \
+-DWITH_ALEMBIC:BOOL=ON \
 -DWITH_FFTW3:BOOL=ON \
 -DWITH_JACK:BOOL=OFF \
 -DWITH_JACK_DYNLOAD:BOOL=OFF \
@@ -271,7 +260,6 @@ export CXXFLAGS="$CXXFLAGS -march=haswell -m64"
 -DWITH_LIBMV_SCHUR_SPECIALIZATIONS:BOOL=ON \
 -DWITH_CODEC_FFMPEG:BOOL=OFF \
 -DWITH_OPENVDB:BOOL=OFF \
--DWITH_OPENVDB_BLOSC:BOOL=OFF \
 -DWITH_OPENCOLLADA:BOOL=OFF \
 -DWITH_AUDASPACE:BOOL=ON \
 -DWITH_SYSTEM_AUDASPACE:BOOL=OFF \
@@ -286,7 +274,7 @@ export CXXFLAGS="$CXXFLAGS -march=haswell -m64"
 -DWITH_PLAYER:BOOL=ON \
 -DWITH_INSTALL_PORTABLE:BOOL=OFF \
 -DWITH_SYSTEM_GLEW:BOOL=ON \
--DWITH_SYSTEM_GLES:BOOL=ON \
+-DWITH_GLU:BOOL=ON \
 -DWITH_SDL:BOOL=ON \
 -DWITH_SDL_DYNLOAD:BOOL=ON \
 -DWITH_RAYOPTIMIZATION:BOOL=ON \
@@ -299,8 +287,7 @@ export CXXFLAGS="$CXXFLAGS -march=haswell -m64"
 -DPYTHON_LIBRARY=python$(pkg-config python3 --modversion)m \
 -DPYTHON_INCLUDE_DIRS=%{_includedir}/python$(pkg-config python3 --modversion)m \
 -DWITH_PYTHON_INSTALL_NUMPY=OFF \
--DWITH_SYSTEM_LZO:BOOL=ON \
--DWITH_LINKER_GOLD:BOOL=ON
+-DWITH_SYSTEM_LZO:BOOL=ON
 ## make_prepend content
 pushd intern/libmv
 make -j1
@@ -310,7 +297,7 @@ make  %{?_smp_mflags} VERBOSE=1
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1543857892
+export SOURCE_DATE_EPOCH=1545328463
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/blender
 cp COPYING %{buildroot}/usr/share/package-licenses/blender/COPYING

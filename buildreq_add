@@ -1,25 +1,13 @@
 # This file contains additional build requirements that did not get
 # picked up automatically. One name per line, no whitespace.
-python3-dev
-python3
-numpy
-requests
-requests-python
-boost-dev
-openexr-dev
-expat-dev
-jemalloc
-jemalloc-dev
-oiio-dev
-libtool
-libxml2-dev
-libxml2-python
-openssl-dev
-pcre-dev
 lzo-dev
-SDL2-dev
-OpenColorIO-dev
-pugixml-dev
-numpy
-desktop-file-utils
+oiio-dev
 eigen-dev
+OpenColorIO-dev
+xorgproto-dev
+jemalloc-dev
+pugixml-dev
+freeglut-dev
+mesa-dev
+glew-dev
+scene-alembic-dev

@@ -11,3 +11,4 @@ blender-2.79-droid.patch
 blender-2.79-locale.patch
 blender-2.79-openvdb3-abi.patch
 blender-2.79-add-mime-file.patch
+blender-2.79-cmake-add-usr-to-alembic-search-path.patch

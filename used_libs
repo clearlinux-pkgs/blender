@@ -1,4 +1,5 @@
 ld-linux-x86-64.so.2
+libAlembic.so.1.7
 libGL.so.1
 libGLEW.so.2.0
 libGLU.so.1
