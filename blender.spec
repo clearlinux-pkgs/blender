@@ -4,7 +4,7 @@
 #
 Name     : blender
 Version  : 2.79b
-Release  : 18
+Release  : 19
 URL      : https://download.blender.org/source/blender-2.79b.tar.gz
 Source0  : https://download.blender.org/source/blender-2.79b.tar.gz
 Summary  : No detailed summary available
@@ -46,6 +46,7 @@ BuildRequires : pkgconfig(gl)
 BuildRequires : pkgconfig(glew)
 BuildRequires : pkgconfig(glu)
 BuildRequires : pkgconfig(lcms2)
+BuildRequires : pkgconfig(python3)
 BuildRequires : pkgconfig(x11)
 BuildRequires : pkgconfig(xfixes)
 BuildRequires : pkgconfig(xi)
@@ -86,7 +87,6 @@ Summary: bin components for the blender package.
 Group: Binaries
 Requires: blender-data = %{version}-%{release}
 Requires: blender-license = %{version}-%{release}
-Requires: blender-man = %{version}-%{release}
 
 %description bin
 bin components for the blender package.
@@ -169,7 +169,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1545328463
+export SOURCE_DATE_EPOCH=1551373481
 mkdir -p clr-build
 pushd clr-build
 export CC=clang
@@ -297,7 +297,7 @@ make  %{?_smp_mflags} VERBOSE=1
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1545328463
+export SOURCE_DATE_EPOCH=1551373481
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/blender
 cp COPYING %{buildroot}/usr/share/package-licenses/blender/COPYING

@@ -1,4 +1,6 @@
 2.79b
 desktop-file-utils
 libjpeg-turbo-dev
+pkgconfig(python3)
+python3-dev
 tbb-dev
