@@ -4,10 +4,10 @@
 #
 Name     : blender
 Version  : 2.79b
-Release  : 19
+Release  : 20
 URL      : https://download.blender.org/source/blender-2.79b.tar.gz
 Source0  : https://download.blender.org/source/blender-2.79b.tar.gz
-Summary  : No detailed summary available
+Summary  : A fully integrated 3D graphics creation suite
 Group    : Development/Tools
 License  : Apache-2.0 BSD-2-Clause BSD-3-Clause GPL-2.0 GPL-3.0 LGPL-2.1 OFL-1.0 Zlib
 Requires: blender-bin = %{version}-%{release}
@@ -169,7 +169,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1551373481
+export SOURCE_DATE_EPOCH=1552410095
 mkdir -p clr-build
 pushd clr-build
 export CC=clang
@@ -226,7 +226,7 @@ pushd intern/libmv
 make -j1
 popd
 ## make_prepend end
-make  %{?_smp_mflags} VERBOSE=1
+make  %{?_smp_mflags}
 popd
 mkdir -p clr-build-avx2
 pushd clr-build-avx2
@@ -293,11 +293,11 @@ pushd intern/libmv
 make -j1
 popd
 ## make_prepend end
-make  %{?_smp_mflags} VERBOSE=1
+make  %{?_smp_mflags}
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1551373481
+export SOURCE_DATE_EPOCH=1552410095
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/blender
 cp COPYING %{buildroot}/usr/share/package-licenses/blender/COPYING
@@ -330,15 +330,15 @@ pushd clr-build
 popd
 %find_lang blender
 ## install_append content
-find %{buildroot}%{_datadir}/%{name}/scripts -type f -exec sed -i -e 's/\r$//g' {} \;
+find %{buildroot}/usr/share/blender/scripts -type f -exec sed -i -e 's/\r$//g' {} \;
 find %{buildroot} -name "*.py" -perm 0644 -print0 | \
 xargs -0r grep -l '#!' | xargs -d'\n' chmod -f 0755;
-rm -rf %{buildroot}%{_datadir}/%{name}/%{_version}/datafiles/fonts
-rm -f %{buildroot}%{_datadir}/%{name}/%{_version}/scripts/addons/.gitignore
-install -p -D -m 644 %{name}.xml %{buildroot}%{_datadir}/mime/packages/%{name}.xml
-desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
-%find_lang %{name}
-rm -fr %{buildroot}%{_datadir}/locale/languages
+rm -rf %{buildroot}/usr/share/blender/%{_version}/datafiles/fonts
+rm -f %{buildroot}/usr/share/blender/%{_version}/scripts/addons/.gitignore
+install -p -D -m 644 blender.xml %{buildroot}/usr/share/mime/packages/blender.xml
+desktop-file-validate %{buildroot}/usr/share/applications/blender.desktop
+%find_lang blender
+rm -fr %{buildroot}/usr/share/locale/languages
 ## install_append end
 
 %files

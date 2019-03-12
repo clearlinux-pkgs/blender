@@ -1,20 +1,20 @@
 # Line breaks
-find %{buildroot}%{_datadir}/%{name}/scripts -type f -exec sed -i -e 's/\r$//g' {} \;
+find %{buildroot}/usr/share/blender/scripts -type f -exec sed -i -e 's/\r$//g' {} \;
 
 # Fix any .py files with shebangs and wrong permissions.
 find %{buildroot} -name "*.py" -perm 0644 -print0 | \
         xargs -0r grep -l '#!' | xargs -d'\n' chmod -f 0755;
 
 # Remove folder, it's not supposed to be installed here.
-rm -rf %{buildroot}%{_datadir}/%{name}/%{_version}/datafiles/fonts
-rm -f %{buildroot}%{_datadir}/%{name}/%{_version}/scripts/addons/.gitignore
+rm -rf %{buildroot}/usr/share/blender/%{_version}/datafiles/fonts
+rm -f %{buildroot}/usr/share/blender/%{_version}/scripts/addons/.gitignore
 
 # Mime support
-install -p -D -m 644 %{name}.xml %{buildroot}%{_datadir}/mime/packages/%{name}.xml
+install -p -D -m 644 blender.xml %{buildroot}/usr/share/mime/packages/blender.xml
 
 # Desktop icon
-desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
+desktop-file-validate %{buildroot}/usr/share/applications/blender.desktop
 
 # Localization
-%find_lang %{name}
-rm -fr %{buildroot}%{_datadir}/locale/languages
+%find_lang blender
+rm -fr %{buildroot}/usr/share/locale/languages
