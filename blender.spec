@@ -4,7 +4,7 @@
 #
 Name     : blender
 Version  : 2.79b
-Release  : 21
+Release  : 22
 URL      : https://download.blender.org/source/blender-2.79b.tar.gz
 Source0  : https://download.blender.org/source/blender-2.79b.tar.gz
 Summary  : A fully integrated 3D graphics creation suite
