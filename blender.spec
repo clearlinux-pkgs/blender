@@ -4,10 +4,10 @@
 #
 Name     : blender
 Version  : 2.79b
-Release  : 22
+Release  : 23
 URL      : https://download.blender.org/source/blender-2.79b.tar.gz
 Source0  : https://download.blender.org/source/blender-2.79b.tar.gz
-Summary  : A fully integrated 3D graphics creation suite
+Summary  : No detailed summary available
 Group    : Development/Tools
 License  : Apache-2.0 BSD-2-Clause BSD-3-Clause GPL-2.0 GPL-3.0 LGPL-2.1 OFL-1.0 Zlib
 Requires: blender-bin = %{version}-%{release}
@@ -36,6 +36,7 @@ BuildRequires : jemalloc-dev
 BuildRequires : libX11-dev libICE-dev libSM-dev libXau-dev libXcomposite-dev libXcursor-dev libXdamage-dev libXdmcp-dev libXext-dev libXfixes-dev libXft-dev libXi-dev libXinerama-dev libXi-dev libXmu-dev libXpm-dev libXrandr-dev libXrender-dev libXres-dev libXScrnSaver-dev libXt-dev libXtst-dev libXv-dev libXxf86misc-dev libXxf86vm-dev
 BuildRequires : libjpeg-turbo-dev
 BuildRequires : llvm
+BuildRequires : llvm-dev
 BuildRequires : lzo-dev
 BuildRequires : mesa-dev
 BuildRequires : oiio-dev
@@ -74,13 +75,8 @@ Patch13: blender-2.79-add-mime-file.patch
 Patch14: blender-2.79-cmake-add-usr-to-alembic-search-path.patch
 
 %description
-Files:
-logImageLib.h, logImageLib.c: combined cineon/dpx image library
-dpxlib.h, dpxlib.c: dpx specific library
-dpxfile.h: dpx file structure
-cineonlib.h, cineonlib.c: cineon specific library
-cineonfile.h: cineon file structure
-logImageCore.h, logImageCore.c: log image routines common to cineon amd dpx
+This repository contains a C++ implementation of the Google logging
+module.  Documentation for the implementation is in doc/.
 
 %package bin
 Summary: bin components for the blender package.
@@ -157,9 +153,6 @@ man components for the blender package.
 %patch12 -p1
 %patch13 -p1
 %patch14 -p1
-pushd ..
-cp -a blender-2.79b buildavx2
-popd
 
 %build
 ## build_prepend content
@@ -169,12 +162,16 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1552410095
+export SOURCE_DATE_EPOCH=1558572733
 mkdir -p clr-build
 pushd clr-build
+export GCC_IGNORE_WERROR=1
 export CC=clang
 export CXX=clang++
 export LD=ld.gold
+export CFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wformat -Wformat-security -Wno-error -Wl,-z,max-page-size=0x1000 -march=westmere -mtune=haswell"
+export CXXFLAGS=$CFLAGS
+unset LDFLAGS
 unset LDFLAGS
 %cmake .. -DBUILD_SHARED_LIBS:BOOL=OFF \
 -DWITH_MEM_JEMALLOC:BOOL=ON \
@@ -226,16 +223,20 @@ pushd intern/libmv
 make -j1
 popd
 ## make_prepend end
-make  %{?_smp_mflags}
+make  %{?_smp_mflags} VERBOSE=1
 popd
 mkdir -p clr-build-avx2
 pushd clr-build-avx2
 ## build_prepend content
 for i in `grep -rl "/usr/bin/env python3"`;do sed -i '1s/^#!.*/#!\/usr\/bin\/python3/' ${i} ;done
 ## build_prepend end
+export GCC_IGNORE_WERROR=1
 export CC=clang
 export CXX=clang++
 export LD=ld.gold
+export CFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wformat -Wformat-security -Wno-error -Wl,-z,max-page-size=0x1000 -march=westmere -mtune=haswell"
+export CXXFLAGS=$CFLAGS
+unset LDFLAGS
 unset LDFLAGS
 export CFLAGS="$CFLAGS -O3 -march=haswell "
 export FCFLAGS="$CFLAGS -O3 -march=haswell "
@@ -293,11 +294,11 @@ pushd intern/libmv
 make -j1
 popd
 ## make_prepend end
-make  %{?_smp_mflags}
+make  %{?_smp_mflags} VERBOSE=1
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1552410095
+export SOURCE_DATE_EPOCH=1558572733
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/blender
 cp COPYING %{buildroot}/usr/share/package-licenses/blender/COPYING

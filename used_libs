@@ -8,7 +8,6 @@ libIex-2_3.so.24
 libIlmImf-2_3.so.24
 libIlmThread-2_3.so.24
 libImath-2_3.so.24
-libLLVM-7.so
 libOpenColorIO.so.1
 libOpenImageIO.so.1.8
 libX11.so.6
