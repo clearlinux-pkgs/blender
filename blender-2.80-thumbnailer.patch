@@ -1,0 +1,39 @@
+From 6b49cecd0561e8ea34f3cad88d84f5e76d3d8ff1 Mon Sep 17 00:00:00 2001
+From: "Li, Guangli" <guangli.li@intel.com>
+Date: Mon, 26 Aug 2019 17:44:26 +0800
+Subject: [PATCH] blender.thumbnailer
+
+Signed-off-by: Li, Guangli <guangli.li@intel.com>
+Signed-off-by: Sean V Kelley <sean.v.kelley@linux.intel.com>
+---
+ blender.thumbnailer           | 4 ++++
+ source/creator/CMakeLists.txt | 2 +-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+ create mode 100644 blender.thumbnailer
+
+diff --git a/blender.thumbnailer b/blender.thumbnailer
+new file mode 100644
+index 0000000..05d4fae
+--- /dev/null
++++ b/blender.thumbnailer
+@@ -0,0 +1,4 @@
++[Thumbnailer Entry]
++TryExec=/usr/share/blender/scripts/blender-thumbnailer.py
++Exec=/usr/share/blender/scripts/blender-thumbnailer.py %i %o
++MimeType=application/x-blender;
+diff --git a/source/creator/CMakeLists.txt b/source/creator/CMakeLists.txt
+index 7747e62..f4938b7 100644
+--- a/source/creator/CMakeLists.txt
++++ b/source/creator/CMakeLists.txt
+@@ -543,7 +543,7 @@ if(UNIX AND NOT APPLE)
+     )
+     install(
+       PROGRAMS ${CMAKE_SOURCE_DIR}/release/bin/blender-thumbnailer.py
+-      DESTINATION bin
++      DESTINATION ${CMAKE_INSTALL_PREFIX}/share/blender/scripts
+     )
+     set(BLENDER_TEXT_FILES_DESTINATION share/doc/blender)
+   endif()
+-- 
+2.22.0
+

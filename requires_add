@@ -5,3 +5,4 @@ oiio
 OpenColorIO
 yaml-cpp
 scene-alembic
+embree

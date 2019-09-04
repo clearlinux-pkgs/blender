@@ -11,3 +11,6 @@ freeglut-dev
 mesa-dev
 glew-dev
 scene-alembic-dev
+embree-dev
+embree-lib
+numpy-dev

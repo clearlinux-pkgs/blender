@@ -1,0 +1,48 @@
+From 37e72ae4447058576d46ff75db3b99bde99ea1b2 Mon Sep 17 00:00:00 2001
+From: "Li, Guangli" <guangli.li@intel.com>
+Date: Mon, 26 Aug 2019 21:45:45 +0800
+Subject: [PATCH] add workaround for embree
+
+Signed-off-by: Li, Guangli <guangli.li@intel.com>
+---
+ build_files/cmake/Modules/FindEmbree.cmake | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
+
+diff --git a/build_files/cmake/Modules/FindEmbree.cmake b/build_files/cmake/Modules/FindEmbree.cmake
+index cb660b9..1ab98b0 100644
+--- a/build_files/cmake/Modules/FindEmbree.cmake
++++ b/build_files/cmake/Modules/FindEmbree.cmake
+@@ -29,6 +29,7 @@ ENDIF()
+ 
+ SET(_embree_SEARCH_DIRS
+   ${EMBREE_ROOT_DIR}
++  /usr/lib64
+   /usr/local
+   /sw # Fink
+   /opt/local # DarwinPorts
+@@ -48,14 +49,14 @@ FIND_PATH(EMBREE_INCLUDE_DIR
+ 
+ SET(_embree_FIND_COMPONENTS
+   embree3
+-  embree_avx
+-  embree_avx2
+-  embree_sse42
+-  lexers
+-  math
+-  simd
+-  sys
+-  tasking
++  #embree_avx
++  #embree_avx2
++  #embree_sse42
++  #lexers
++  #math
++  #simd
++  #sys
++  #tasking
+ )
+ 
+ SET(_embree_LIBRARIES)
+-- 
+2.22.0
+

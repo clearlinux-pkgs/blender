@@ -43,3 +43,4 @@
 -DPYTHON_INCLUDE_DIRS=%{_includedir}/python$(pkg-config python3 --modversion)m
 -DWITH_PYTHON_INSTALL_NUMPY=OFF
 -DWITH_SYSTEM_LZO:BOOL=ON
+-DWITH_CYCLES_EMBREE=ON
