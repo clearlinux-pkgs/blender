@@ -4,7 +4,7 @@
 #
 Name     : blender
 Version  : 2.80
-Release  : 27
+Release  : 28
 URL      : https://download.blender.org/source/blender-2.80.tar.gz
 Source0  : https://download.blender.org/source/blender-2.80.tar.gz
 Summary  : No detailed summary available
@@ -164,7 +164,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1567603398
+export SOURCE_DATE_EPOCH=1567610408
 mkdir -p clr-build
 pushd clr-build
 export GCC_IGNORE_WERROR=1
@@ -306,7 +306,7 @@ make  %{?_smp_mflags} VERBOSE=1
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1567603398
+export SOURCE_DATE_EPOCH=1567610408
 rm -rf %{buildroot}
 pushd clr-build-avx2
 %make_install_avx2  || :
