@@ -4,7 +4,7 @@
 #
 Name     : blender
 Version  : 2.80
-Release  : 28
+Release  : 29
 URL      : https://download.blender.org/source/blender-2.80.tar.gz
 Source0  : https://download.blender.org/source/blender-2.80.tar.gz
 Summary  : No detailed summary available
