@@ -13,3 +13,4 @@ blender-2.80-cmake-add-usr-to-alembic-search-path.patch
 blender-2.80-embree-path.patch
 blender-2.80-add-support-for-numpy.patch
 
+gnu11.patch

@@ -14,3 +14,4 @@ scene-alembic-dev
 embree-dev
 embree-lib
 numpy-dev
+python3-dev

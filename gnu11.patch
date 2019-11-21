@@ -1,0 +1,11 @@
+--- blender-2.81/CMakeLists.txt~	2019-11-20 14:01:53.000000000 +0000
++++ blender-2.81/CMakeLists.txt	2019-11-21 15:03:17.356748989 +0000
+@@ -1636,7 +1636,7 @@
+   CMAKE_C_COMPILER_ID MATCHES "Intel"
+ )
+   # TODO(sergey): Do we want c++11 or gnu-c++11 here?
+-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
++  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
+ else()
+   message(FATAL_ERROR "Unknown compiler ${CMAKE_C_COMPILER_ID}, can't enable C++11 build")
+ endif()
