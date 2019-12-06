@@ -4,7 +4,7 @@
 #
 Name     : blender
 Version  : 2.81
-Release  : 32
+Release  : 33
 URL      : https://download.blender.org/source/blender-2.81.tar.xz
 Source0  : https://download.blender.org/source/blender-2.81.tar.xz
 Summary  : A fully integrated 3D graphics creation suite
@@ -238,8 +238,8 @@ export CXXFLAGS="$CXXFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fn
 -DCMAKE_EXE_LINKER_FLAGS:STRING="-pie" \
 -DPYTHON_VERSION=$(pkg-config python3 --modversion) \
 -DPYTHON_LIBPATH=%{_libexecdir} \
--DPYTHON_LIBRARY=python$(pkg-config python3 --modversion)m \
--DPYTHON_INCLUDE_DIRS=%{_includedir}/python$(pkg-config python3 --modversion)m \
+-DPYTHON_LIBRARY=python$(pkg-config python3 --modversion) \
+-DPYTHON_INCLUDE_DIRS=%{_includedir}/python$(pkg-config python3 --modversion) \
 -DWITH_PYTHON_INSTALL_NUMPY=OFF \
 -DWITH_SYSTEM_LZO:BOOL=ON \
 -DWITH_CYCLES_EMBREE=ON
@@ -309,8 +309,8 @@ export CXXFLAGS="$CXXFLAGS -march=haswell -m64"
 -DCMAKE_EXE_LINKER_FLAGS:STRING="-pie" \
 -DPYTHON_VERSION=$(pkg-config python3 --modversion) \
 -DPYTHON_LIBPATH=%{_libexecdir} \
--DPYTHON_LIBRARY=python$(pkg-config python3 --modversion)m \
--DPYTHON_INCLUDE_DIRS=%{_includedir}/python$(pkg-config python3 --modversion)m \
+-DPYTHON_LIBRARY=python$(pkg-config python3 --modversion) \
+-DPYTHON_INCLUDE_DIRS=%{_includedir}/python$(pkg-config python3 --modversion) \
 -DWITH_PYTHON_INSTALL_NUMPY=OFF \
 -DWITH_SYSTEM_LZO:BOOL=ON \
 -DWITH_CYCLES_EMBREE=ON

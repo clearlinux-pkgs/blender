@@ -40,8 +40,8 @@
 -DCMAKE_EXE_LINKER_FLAGS:STRING="-pie"
 -DPYTHON_VERSION=$(pkg-config python3 --modversion)
 -DPYTHON_LIBPATH=%{_libexecdir}
--DPYTHON_LIBRARY=python$(pkg-config python3 --modversion)m
--DPYTHON_INCLUDE_DIRS=%{_includedir}/python$(pkg-config python3 --modversion)m
+-DPYTHON_LIBRARY=python$(pkg-config python3 --modversion)
+-DPYTHON_INCLUDE_DIRS=%{_includedir}/python$(pkg-config python3 --modversion)
 -DWITH_PYTHON_INSTALL_NUMPY=OFF
 -DWITH_SYSTEM_LZO:BOOL=ON
 -DWITH_CYCLES_EMBREE=ON
