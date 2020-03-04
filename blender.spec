@@ -4,7 +4,7 @@
 #
 Name     : blender
 Version  : 2.81
-Release  : 35
+Release  : 36
 URL      : https://download.blender.org/source/blender-2.81.tar.xz
 Source0  : https://download.blender.org/source/blender-2.81.tar.xz
 Summary  : A fully integrated 3D graphics creation suite
