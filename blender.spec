@@ -4,12 +4,12 @@
 #
 Name     : blender
 Version  : 2.81
-Release  : 37
+Release  : 38
 URL      : https://download.blender.org/source/blender-2.81.tar.xz
 Source0  : https://download.blender.org/source/blender-2.81.tar.xz
 Summary  : A fully integrated 3D graphics creation suite
 Group    : Development/Tools
-License  : Apache-2.0 BSD-2-Clause BSD-3-Clause BSL-1.0 CC0-1.0 GPL-2.0 GPL-3.0 LGPL-2.1 MIT OFL-1.0 Python-2.0
+License  : Apache-2.0 BSD-2-Clause BSD-3-Clause BSD-3-Clause-LBNL BSL-1.0 CC0-1.0 GPL-2.0 GPL-3.0 LGPL-2.1 MIT OFL-1.0 Python-2.0
 Requires: blender-bin = %{version}-%{release}
 Requires: blender-data = %{version}-%{release}
 Requires: blender-license = %{version}-%{release}
@@ -23,6 +23,7 @@ Requires: scene-alembic
 Requires: tqdm
 Requires: yaml-cpp
 BuildRequires : OpenColorIO
+BuildRequires : OpenColorIO-data
 BuildRequires : OpenColorIO-dev
 BuildRequires : SDL-dev
 BuildRequires : boost-dev
@@ -184,17 +185,18 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1574356828
+export SOURCE_DATE_EPOCH=1592436437
 mkdir -p clr-build
 pushd clr-build
-# -Werror is for werrorists
 export GCC_IGNORE_WERROR=1
 export CFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wformat -Wformat-security -Wno-error -Wl,-z,max-page-size=0x1000 -march=westmere -mtune=haswell"
 export CXXFLAGS=$CFLAGS
+export FFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wno-error -Wl,-z,max-page-size=0x1000 -march=westmere -mtune=haswell"
+export FCFLAGS=$FFLAGS
 unset LDFLAGS
 export CFLAGS="$CFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
-export FCFLAGS="$CFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
-export FFLAGS="$CFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
+export FCFLAGS="$FFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
+export FFLAGS="$FFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
 export CXXFLAGS="$CXXFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
 %cmake .. -DBUILD_SHARED_LIBS:BOOL=OFF \
 -DWITH_MEM_JEMALLOC:BOOL=OFF \
@@ -256,17 +258,20 @@ pushd clr-build-avx2
 ## build_prepend content
 for i in `grep -rl "/usr/bin/env python3"`;do sed -i '1s/^#!.*/#!\/usr\/bin\/python3/' ${i} ;done
 ## build_prepend end
-# -Werror is for werrorists
 export GCC_IGNORE_WERROR=1
 export CFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wformat -Wformat-security -Wno-error -Wl,-z,max-page-size=0x1000 -march=westmere -mtune=haswell"
 export CXXFLAGS=$CFLAGS
+export FFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wno-error -Wl,-z,max-page-size=0x1000 -march=westmere -mtune=haswell"
+export FCFLAGS=$FFLAGS
 unset LDFLAGS
 export CFLAGS="$CFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fno-semantic-interposition -fno-trapping-math -march=haswell "
-export FCFLAGS="$CFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fno-semantic-interposition -fno-trapping-math -march=haswell "
-export FFLAGS="$CFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fno-semantic-interposition -fno-trapping-math -march=haswell "
+export FCFLAGS="$FFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fno-semantic-interposition -fno-trapping-math -march=haswell "
+export FFLAGS="$FFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fno-semantic-interposition -fno-trapping-math -march=haswell "
 export CXXFLAGS="$CXXFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fno-semantic-interposition -fno-trapping-math -march=haswell "
 export CFLAGS="$CFLAGS -march=haswell -m64"
 export CXXFLAGS="$CXXFLAGS -march=haswell -m64"
+export FFLAGS="$FFLAGS -march=haswell -m64"
+export FCFLAGS="$FCFLAGS -march=haswell -m64"
 %cmake .. -DBUILD_SHARED_LIBS:BOOL=OFF \
 -DWITH_MEM_JEMALLOC:BOOL=OFF \
 -DWITH_BUILDINFO:BOOL=ON \
@@ -324,7 +329,7 @@ make  %{?_smp_mflags}  VERBOSE=1
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1574356828
+export SOURCE_DATE_EPOCH=1592436437
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/blender
 cp %{_builddir}/blender-2.81/COPYING %{buildroot}/usr/share/package-licenses/blender/002c2409e6067c4266c849727f3fc57978f4a2b5
@@ -341,6 +346,7 @@ cp %{_builddir}/blender-2.81/extern/gmock/LICENSE %{buildroot}/usr/share/package
 cp %{_builddir}/blender-2.81/extern/gtest/LICENSE %{buildroot}/usr/share/package-licenses/blender/5a2314153eadadc69258a9429104cd11804ea304
 cp %{_builddir}/blender-2.81/extern/lzo/minilzo/COPYING %{buildroot}/usr/share/package-licenses/blender/4cc77b90af91e615a64ae04893fdffa7939db84c
 cp %{_builddir}/blender-2.81/extern/quadriflow/3rd/lemon-1.3.1/LICENSE %{buildroot}/usr/share/package-licenses/blender/b34f205f74c018d0d5b8c116015f58df92375a11
+cp %{_builddir}/blender-2.81/extern/quadriflow/LICENSE.txt %{buildroot}/usr/share/package-licenses/blender/86241cf770af908f25bb6be748d736dda1e3cd44
 cp %{_builddir}/blender-2.81/intern/elbeem/COPYING %{buildroot}/usr/share/package-licenses/blender/dd5da6970afe16ba9d3f14603dde0d7e9dacd7d7
 cp %{_builddir}/blender-2.81/intern/elbeem/COPYING_trimesh2 %{buildroot}/usr/share/package-licenses/blender/1a85e62f407ed11033452c1e3826f4408ceb0e0f
 cp %{_builddir}/blender-2.81/intern/numaapi/LICENSE %{buildroot}/usr/share/package-licenses/blender/50159ef1fd8035c7dd7e2e9aa9d6e34adc2eaf54
@@ -364,13 +370,24 @@ pushd clr-build
 popd
 %find_lang blender
 ## install_append content
+# Line breaks
 find %{buildroot}/usr/share/blender/scripts -type f -exec sed -i -e 's/\r$//g' {} \;
+
+# Fix any .py files with shebangs and wrong permissions.
 find %{buildroot} -name "*.py" -perm 0644 -print0 | \
 xargs -0r grep -l '#!' | xargs -d'\n' chmod -f 0755;
+
+# Remove folder, it's not supposed to be installed here.
 rm -rf %{buildroot}/usr/share/blender/%{_version}/datafiles/fonts
 rm -f %{buildroot}/usr/share/blender/%{_version}/scripts/addons/.gitignore
+
+# Mime support
 install -p -D -m 644 blender.xml %{buildroot}/usr/share/mime/packages/blender.xml
+
+# Desktop icon
 desktop-file-validate %{buildroot}/usr/share/applications/blender.desktop
+
+# Localization
 %find_lang blender
 rm -fr %{buildroot}/usr/share/locale/languages
 ## install_append end
@@ -2357,6 +2374,7 @@ rm -fr %{buildroot}/usr/share/locale/languages
 /usr/share/package-licenses/blender/798004dbc54c6d764f549ea6ad5e32755241c7a7
 /usr/share/package-licenses/blender/823ab2688ac7fe2082b9d53afd9ebb2122aeb337
 /usr/share/package-licenses/blender/83b54b10518c3d114a1ff5ea7e2653a20d9d3458
+/usr/share/package-licenses/blender/86241cf770af908f25bb6be748d736dda1e3cd44
 /usr/share/package-licenses/blender/8624bcdae55baeef00cd11d5dfcfa60f68710a02
 /usr/share/package-licenses/blender/8c2be1d672c152b1ba97c9357b6a8888fc50e87e
 /usr/share/package-licenses/blender/8e278c84a1bf9b2df9c1ee407349c4634f104777
