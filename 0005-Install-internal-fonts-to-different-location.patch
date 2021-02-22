@@ -1,0 +1,44 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Sean V Kelley <sean.v.kelley@linux.intel.com>
+Date: Mon, 3 Dec 2018 09:25:08 -0800
+Subject: [PATCH] Install internal fonts to different location
+
+2019-08-23: Rebased for upstream refactoring in 2.80
+2021-02-21: Revised patch subject; rebased for upstream refactoring in
+            2.91.2
+
+Signed-off-by: Li, Guangli <guangli.li@intel.com>
+Signed-off-by: Patrick McCarty <patrick.mccarty@intel.com>
+---
+ source/blender/blenfont/intern/blf_font_default.c | 2 +-
+ source/creator/CMakeLists.txt                     | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/source/blender/blenfont/intern/blf_font_default.c b/source/blender/blenfont/intern/blf_font_default.c
+index f33d7cd..ec93ebc 100644
+--- a/source/blender/blenfont/intern/blf_font_default.c
++++ b/source/blender/blenfont/intern/blf_font_default.c
+@@ -33,7 +33,7 @@
+ 
+ static int blf_load_font_default(const char *filename, const bool unique)
+ {
+-  const char *dir = BKE_appdir_folder_id(BLENDER_DATAFILES, "fonts");
++  const char *dir = "/usr/share/fonts/blender";
+   if (dir == NULL) {
+     fprintf(stderr,
+             "%s: 'fonts' data path not found for '%s', will not be able to display text\n",
+diff --git a/source/creator/CMakeLists.txt b/source/creator/CMakeLists.txt
+index c152ec7..f6464bd 100644
+--- a/source/creator/CMakeLists.txt
++++ b/source/creator/CMakeLists.txt
+@@ -366,8 +366,8 @@ endif()
+ # fonts
+ install(
+   DIRECTORY
+-    ${CMAKE_SOURCE_DIR}/release/datafiles/fonts
+-  DESTINATION ${TARGETDIR_VER}/datafiles
++    ${CMAKE_SOURCE_DIR}/release/datafiles/fonts/
++  DESTINATION ${CMAKE_INSTALL_PREFIX}/share/fonts/blender
+ )
+ 
+ # localization

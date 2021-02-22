@@ -1,9 +1,8 @@
-From 3cb9668dcbbb5b821bb48ba4b62481377585a1b4 Mon Sep 17 00:00:00 2001
-From: "Li, Guangli" <guangli.li@intel.com>
-Date: Fri, 23 Aug 2019 22:12:06 +0800
-Subject: [PATCH] Subject: [PATCH] add mime file
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Sean V Kelley <sean.v.kelley@linux.intel.com>
+Date: Tue, 27 Nov 2018 17:32:09 -0800
+Subject: [PATCH] add mime file
 
-Signed-off-by: Li, Guangli <guangli.li@intel.com>
 Signed-off-by: Sean V Kelley <sean.v.kelley@linux.intel.com>
 ---
  blender.xml | 7 +++++++
@@ -23,6 +22,3 @@ index 0000000..7cee114
 +        <glob pattern="*.blend" />
 +  </mime-type>
 +</mime-info>
--- 
-2.22.0
-

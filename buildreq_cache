@@ -1,7 +1,4 @@
-2.81
+2.91.2
 desktop-file-utils
-libjpeg-turbo-dev
-llvm-dev
-pkgconfig(python3)
-python3-dev
+gmp-dev
 tbb-dev

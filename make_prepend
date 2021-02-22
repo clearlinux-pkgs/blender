@@ -1,4 +1,0 @@
-pushd intern/libmv
-make -j1
-popd
-unset LD_AS_NEEDED

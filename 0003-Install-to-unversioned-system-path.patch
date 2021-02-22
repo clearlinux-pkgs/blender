@@ -1,33 +1,37 @@
-From a31fd5f2d45c0d2bfe3a04893cd0ee3cff0c04cb Mon Sep 17 00:00:00 2001
-From: "Li, Guangli" <guangli.li@intel.com>
-Date: Mon, 26 Aug 2019 17:51:44 +0800
-Subject: [PATCH] unversioned-system-path
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Sean V Kelley <sean.v.kelley@linux.intel.com>
+Date: Mon, 3 Dec 2018 09:25:08 -0800
+Subject: [PATCH] Install to unversioned system path
+
+2019-08-26: Rebased for update to 2.80
+2021-02-21: Revised patch subject
 
 Signed-off-by: Li, Guangli <guangli.li@intel.com>
-Signed-off-by: Sean V Kelley <sean.v.kelley@linux.intel.com>
+Signed-off-by: Patrick McCarty <patrick.mccarty@intel.com>
 ---
- intern/ghost/intern/GHOST_SystemPathsUnix.cpp | 2 ++
+ intern/ghost/intern/GHOST_SystemPathsUnix.cpp | 3 +++
  source/creator/CMakeLists.txt                 | 2 +-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/intern/ghost/intern/GHOST_SystemPathsUnix.cpp b/intern/ghost/intern/GHOST_SystemPathsUnix.cpp
-index 9514edb..2e4a95d 100644
+index ad3d490..df675b3 100644
 --- a/intern/ghost/intern/GHOST_SystemPathsUnix.cpp
 +++ b/intern/ghost/intern/GHOST_SystemPathsUnix.cpp
-@@ -54,6 +54,8 @@ GHOST_SystemPathsUnix::~GHOST_SystemPathsUnix()
+@@ -54,6 +54,9 @@ GHOST_SystemPathsUnix::~GHOST_SystemPathsUnix()
  
  const GHOST_TUns8 *GHOST_SystemPathsUnix::getSystemDir(int, const char *versionstr) const
  {
 +  /* ignore versionstr when building the system path */
 +  versionstr = "";
++
    /* no prefix assumes a portable build which only uses bundled scripts */
    if (static_path) {
      static string system_path = string(static_path) + "/blender/" + versionstr;
 diff --git a/source/creator/CMakeLists.txt b/source/creator/CMakeLists.txt
-index f4938b7..1da5da1 100644
+index 0561eaa..ff557db 100644
 --- a/source/creator/CMakeLists.txt
 +++ b/source/creator/CMakeLists.txt
-@@ -329,7 +329,7 @@ if(UNIX AND NOT APPLE)
+@@ -302,7 +302,7 @@ if(UNIX AND NOT APPLE)
      if(WITH_INSTALL_PORTABLE)
        set(TARGETDIR_VER ${BLENDER_VERSION})
      else()
@@ -36,6 +40,3 @@ index f4938b7..1da5da1 100644
      endif()
    endif()
  
--- 
-2.22.0
-

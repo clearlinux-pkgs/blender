@@ -1,7 +1,26 @@
-diff -Naur blender-2.79.old/doc/manpage/blenderplayer.1 blender-2.79/doc/manpage/blenderplayer.1
---- blender-2.79.old/doc/manpage/blenderplayer.1	1970-01-01 01:00:00.000000000 +0100
-+++ blender-2.79/doc/manpage/blenderplayer.1	2017-09-12 14:20:26.719981643 +0200
-@@ -0,0 +1,131 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Sean V Kelley <sean.v.kelley@linux.intel.com>
+Date: Mon, 3 Dec 2018 09:25:08 -0800
+Subject: [PATCH] Install blenderplayer manpage
+
+2019-08-24: Rebased for update to 2.80
+2021-02-21: Revised patch subject; removed trailing blank line from
+            man page; tabs->spaces for indentation
+
+Signed-off-by: Li, Guangli <guangli.li@intel.com>
+Signed-off-by: Patrick McCarty <patrick.mccarty@intel.com>
+---
+ doc/manpage/blenderplayer.1   | 130 ++++++++++++++++++++++++++++++++++
+ source/creator/CMakeLists.txt |   6 +-
+ 2 files changed, 135 insertions(+), 1 deletion(-)
+ create mode 100644 doc/manpage/blenderplayer.1
+
+diff --git a/doc/manpage/blenderplayer.1 b/doc/manpage/blenderplayer.1
+new file mode 100644
+index 0000000..57dfb33
+--- /dev/null
++++ b/doc/manpage/blenderplayer.1
+@@ -0,0 +1,130 @@
 +.TH "BLENDERPLAYER" "1" "October 17, 2011" "Blender 2\&.60 (sub 0)"
 +.SH "NAME"
 +blenderplayer \- the blender game engine runner
@@ -129,29 +148,31 @@ diff -Naur blender-2.79.old/doc/manpage/blenderplayer.1 blender-2.79/doc/manpage
 +
 +.SH "SEE ALSO"
 +.B blender(1)
-+
 +.br
 +.SH AUTHORS
 +This manpage was written for a Debian by Kevin Roy <kiniou@gmail.com>.
-diff -Naur blender-2.79.old/source/creator/CMakeLists.txt blender-2.79/source/creator/CMakeLists.txt
---- blender-2.79.old/source/creator/CMakeLists.txt	2017-09-12 14:20:11.165691089 +0200
-+++ blender-2.79/source/creator/CMakeLists.txt	2017-09-12 14:20:26.719981643 +0200
-@@ -468,6 +468,7 @@
- 			FILES
- 				${CMAKE_SOURCE_DIR}/release/freedesktop/blender.desktop
- 				${CMAKE_SOURCE_DIR}/release/freedesktop/icons/scalable/apps/blender.svg
-+				${CMAKE_SOURCE_DIR}/doc/manpage/blenderplayer.1
- 			DESTINATION "."
- 		)
- 
-@@ -490,6 +491,10 @@
- 				FILES ${CMAKE_CURRENT_BINARY_DIR}/blender.1
- 				DESTINATION share/man/man1
- 			)
-+			install(
-+				FILES ${CMAKE_SOURCE_DIR}/doc/manpage/blenderplayer.1
-+				DESTINATION share/man/man1
-+			)
- 		endif()
- 
- 		# misc files
+diff --git a/source/creator/CMakeLists.txt b/source/creator/CMakeLists.txt
+index ff557db..c152ec7 100644
+--- a/source/creator/CMakeLists.txt
++++ b/source/creator/CMakeLists.txt
+@@ -477,6 +477,7 @@ if(UNIX AND NOT APPLE)
+       FILES
+         ${CMAKE_SOURCE_DIR}/release/freedesktop/blender.desktop
+         ${CMAKE_SOURCE_DIR}/release/freedesktop/icons/scalable/apps/blender.svg
++        ${CMAKE_SOURCE_DIR}/doc/manpage/blenderplayer.1
+         ${CMAKE_SOURCE_DIR}/release/freedesktop/icons/symbolic/apps/blender-symbolic.svg
+       DESTINATION "."
+     )
+@@ -510,8 +511,11 @@ if(UNIX AND NOT APPLE)
+         FILES ${CMAKE_CURRENT_BINARY_DIR}/blender.1
+         DESTINATION share/man/man1
+       )
++      install(
++        FILES ${CMAKE_SOURCE_DIR}/doc/manpage/blenderplayer.1
++        DESTINATION share/man/man1
++      )
+     endif()
+-
+     # misc files
+     install(
+       FILES ${CMAKE_SOURCE_DIR}/release/freedesktop/blender.desktop

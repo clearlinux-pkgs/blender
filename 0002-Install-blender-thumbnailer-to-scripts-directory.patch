@@ -1,10 +1,13 @@
-From 6b49cecd0561e8ea34f3cad88d84f5e76d3d8ff1 Mon Sep 17 00:00:00 2001
-From: "Li, Guangli" <guangli.li@intel.com>
-Date: Mon, 26 Aug 2019 17:44:26 +0800
-Subject: [PATCH] blender.thumbnailer
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Sean V Kelley <sean.v.kelley@linux.intel.com>
+Date: Mon, 3 Dec 2018 09:25:08 -0800
+Subject: [PATCH] Install blender thumbnailer to scripts directory
+
+2019-08-26: Rebased for update to 2.80
+2021-02-21: Revised patch subject
 
 Signed-off-by: Li, Guangli <guangli.li@intel.com>
-Signed-off-by: Sean V Kelley <sean.v.kelley@linux.intel.com>
+Signed-off-by: Patrick McCarty <patrick.mccarty@intel.com>
 ---
  blender.thumbnailer           | 4 ++++
  source/creator/CMakeLists.txt | 2 +-
@@ -22,10 +25,10 @@ index 0000000..05d4fae
 +Exec=/usr/share/blender/scripts/blender-thumbnailer.py %i %o
 +MimeType=application/x-blender;
 diff --git a/source/creator/CMakeLists.txt b/source/creator/CMakeLists.txt
-index 7747e62..f4938b7 100644
+index ef1dcbc..0561eaa 100644
 --- a/source/creator/CMakeLists.txt
 +++ b/source/creator/CMakeLists.txt
-@@ -543,7 +543,7 @@ if(UNIX AND NOT APPLE)
+@@ -527,7 +527,7 @@ if(UNIX AND NOT APPLE)
      )
      install(
        PROGRAMS ${CMAKE_SOURCE_DIR}/release/bin/blender-thumbnailer.py
@@ -34,6 +37,3 @@ index 7747e62..f4938b7 100644
      )
      set(BLENDER_TEXT_FILES_DESTINATION share/doc/blender)
    endif()
--- 
-2.22.0
-

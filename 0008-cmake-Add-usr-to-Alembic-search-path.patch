@@ -1,26 +1,25 @@
-From dcd0052dbbd0b12f9897a7b4519ee30a4892928e Mon Sep 17 00:00:00 2001
-From: "Li, Guangli" <guangli.li@intel.com>
-Date: Fri, 23 Aug 2019 22:14:59 +0800
-Subject: [PATCH 2/3] Subject: [PATCH] cmake:  Add /usr to Alembic search path
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Sean V Kelley <sean.v.kelley@linux.intel.com>
+Date: Wed, 19 Dec 2018 14:44:01 -0800
+Subject: [PATCH] cmake: Add /usr to Alembic search path
 
-Signed-off-by: Li, Guangli <guangli.li@intel.com>
+2021-02-21: Rebased for update to 2.91.2
+
 Signed-off-by: Sean V Kelley <sean.v.kelley@linux.intel.com>
+Signed-off-by: Patrick McCarty <patrick.mccarty@intel.com>
 ---
  build_files/cmake/Modules/FindAlembic.cmake | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/build_files/cmake/Modules/FindAlembic.cmake b/build_files/cmake/Modules/FindAlembic.cmake
-index 59eb240..38d1f43 100644
+index 18214b2..51889fb 100644
 --- a/build_files/cmake/Modules/FindAlembic.cmake
 +++ b/build_files/cmake/Modules/FindAlembic.cmake
-@@ -27,6 +27,7 @@ ENDIF()
+@@ -23,6 +23,7 @@ ENDIF()
  
  SET(_alembic_SEARCH_DIRS
    ${ALEMBIC_ROOT_DIR}
 +  /usr
-   /usr/local
-   /sw # Fink
-   /opt/local # DarwinPorts
--- 
-2.22.0
-
+   /opt/lib/alembic
+ )
+ 

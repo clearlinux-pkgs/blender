@@ -1,19 +1,22 @@
-From 573c0134a5b271d48a170c2781d69a332cb70b59 Mon Sep 17 00:00:00 2001
-From: "Li, Guangli" <guangli.li@intel.com>
-Date: Mon, 26 Aug 2019 17:39:40 +0800
-Subject: [PATCH] [Subject]: scripts.patch
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Sean V Kelley <sean.v.kelley@linux.intel.com>
+Date: Mon, 3 Dec 2018 09:25:08 -0800
+Subject: [PATCH] Install scripts to different location
+
+2019-08-26: Rebased for update to 2.80
+2021-02-21: Revised patch subject
 
 Signed-off-by: Li, Guangli <guangli.li@intel.com>
-Signed-off-by: Sean V Kelley <sean.v.kelley@linux.intel.com>
+Signed-off-by: Patrick McCarty <patrick.mccarty@intel.com>
 ---
  source/creator/CMakeLists.txt | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/source/creator/CMakeLists.txt b/source/creator/CMakeLists.txt
-index 12046c0..be88686 100644
+index 74c2797..ef1dcbc 100644
 --- a/source/creator/CMakeLists.txt
 +++ b/source/creator/CMakeLists.txt
-@@ -376,8 +376,8 @@ if(WITH_PYTHON)
+@@ -349,8 +349,8 @@ if(WITH_PYTHON)
    endif()
  
    install(
@@ -24,6 +27,3 @@ index 12046c0..be88686 100644
      PATTERN ".git" EXCLUDE
      PATTERN ".gitignore" EXCLUDE
      PATTERN ".arcconfig" EXCLUDE
--- 
-2.22.0
-

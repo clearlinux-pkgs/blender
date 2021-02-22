@@ -1,17 +1,17 @@
 # This file contains additional build requirements that did not get
 # picked up automatically. One name per line, no whitespace.
-lzo-dev
-oiio-dev
-eigen-dev
 OpenColorIO-dev
-xorgproto-dev
-jemalloc-dev
-pugixml-dev
-freeglut-dev
-mesa-dev
-glew-dev
-scene-alembic-dev
+eigen-dev
 embree-dev
 embree-lib
+freeglut-dev
+glew-dev
+jemalloc-dev
+lzo-dev
+mesa-dev
 numpy-dev
+oiio-dev
+pugixml-dev
 python3-dev
+scene-alembic-dev
+xorgproto-dev
