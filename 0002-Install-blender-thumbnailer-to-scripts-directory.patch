@@ -25,10 +25,10 @@ index 0000000..05d4fae
 +Exec=/usr/share/blender/scripts/blender-thumbnailer.py %i %o
 +MimeType=application/x-blender;
 diff --git a/source/creator/CMakeLists.txt b/source/creator/CMakeLists.txt
-index ef1dcbc..0561eaa 100644
+index 3050c62..296c26a 100644
 --- a/source/creator/CMakeLists.txt
 +++ b/source/creator/CMakeLists.txt
-@@ -527,7 +527,7 @@ if(UNIX AND NOT APPLE)
+@@ -542,7 +542,7 @@ if(UNIX AND NOT APPLE)
      )
      install(
        PROGRAMS ${CMAKE_SOURCE_DIR}/release/bin/blender-thumbnailer.py

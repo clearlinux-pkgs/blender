@@ -16,10 +16,10 @@ Signed-off-by: Patrick McCarty <patrick.mccarty@intel.com>
  4 files changed, 9 insertions(+), 6 deletions(-)
 
 diff --git a/source/blender/blenkernel/BKE_appdir.h b/source/blender/blenkernel/BKE_appdir.h
-index 3e52d7f..af478c9 100644
+index c9d6715..6e967de 100644
 --- a/source/blender/blenkernel/BKE_appdir.h
 +++ b/source/blender/blenkernel/BKE_appdir.h
-@@ -84,6 +84,7 @@ enum {
+@@ -87,6 +87,7 @@ enum {
    BLENDER_SYSTEM_DATAFILES = 52,
    BLENDER_SYSTEM_SCRIPTS = 53,
    BLENDER_SYSTEM_PYTHON = 54,
@@ -28,10 +28,10 @@ index 3e52d7f..af478c9 100644
  
  /* for BKE_appdir_folder_id_version only */
 diff --git a/source/blender/blenkernel/intern/appdir.c b/source/blender/blenkernel/intern/appdir.c
-index 2038079..e31b242 100644
+index ff799d9..560d54d 100644
 --- a/source/blender/blenkernel/intern/appdir.c
 +++ b/source/blender/blenkernel/intern/appdir.c
-@@ -625,6 +625,8 @@ bool BKE_appdir_folder_id_ex(const int folder_id,
+@@ -662,6 +662,8 @@ bool BKE_appdir_folder_id_ex(const int folder_id,
          break;
        }
        return false;
@@ -41,7 +41,7 @@ index 2038079..e31b242 100644
      default:
        BLI_assert(0);
 diff --git a/source/blender/blentranslation/intern/blt_lang.c b/source/blender/blentranslation/intern/blt_lang.c
-index 078ded7..adab4f7 100644
+index bd0352d..c67b523 100644
 --- a/source/blender/blentranslation/intern/blt_lang.c
 +++ b/source/blender/blentranslation/intern/blt_lang.c
 @@ -85,9 +85,9 @@ static void free_locales(void)
@@ -84,10 +84,10 @@ index 078ded7..adab4f7 100644
    else {
      printf("%s: 'locale' data path for translations not found, continuing\n", __func__);
 diff --git a/source/creator/CMakeLists.txt b/source/creator/CMakeLists.txt
-index f6464bd..4ea9278 100644
+index 6ac9393..1a461ae 100644
 --- a/source/creator/CMakeLists.txt
 +++ b/source/creator/CMakeLists.txt
-@@ -373,7 +373,7 @@ install(
+@@ -388,7 +388,7 @@ install(
  # localization
  if(WITH_INTERNATIONAL)
    set(_locale_dir "${CMAKE_SOURCE_DIR}/release/datafiles/locale")
