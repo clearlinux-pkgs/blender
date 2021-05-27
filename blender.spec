@@ -4,7 +4,7 @@
 #
 Name     : blender
 Version  : 2.92.0
-Release  : 46
+Release  : 47
 URL      : https://download.blender.org/source/blender-2.92.0.tar.xz
 Source0  : https://download.blender.org/source/blender-2.92.0.tar.xz
 Summary  : A fully integrated 3D graphics creation suite
@@ -22,6 +22,7 @@ Requires: python3
 Requires: scene-alembic
 Requires: tqdm
 Requires: yaml-cpp
+BuildRequires : Imath-dev
 BuildRequires : OpenColorIO
 BuildRequires : OpenColorIO-data
 BuildRequires : OpenColorIO-dev
@@ -56,6 +57,7 @@ BuildRequires : numpy-dev
 BuildRequires : oiio
 BuildRequires : oiio-dev
 BuildRequires : openal-soft-dev
+BuildRequires : openexr-dev
 BuildRequires : pkg-config
 BuildRequires : pkgconfig(fftw3)
 BuildRequires : pkgconfig(gl)
@@ -86,6 +88,7 @@ Patch5: 0005-Install-internal-fonts-to-different-location.patch
 Patch6: 0006-Install-locale-files-to-different-location.patch
 Patch7: 0007-add-mime-file.patch
 Patch8: 0008-cmake-Add-usr-to-Alembic-search-path.patch
+Patch9: 0009-Fix-build-with-openexr-3.x.patch
 
 %description
 Blender is the free and open source 3D creation suite. It supports the entirety
@@ -162,13 +165,14 @@ cd %{_builddir}/blender-2.92.0
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
+%patch9 -p1
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1614626460
+export SOURCE_DATE_EPOCH=1622078031
 mkdir -p clr-build
 pushd clr-build
 export GCC_IGNORE_WERROR=1
@@ -222,7 +226,7 @@ export CXXFLAGS="$CXXFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fn
 -DWITH_SYSTEM_EIGEN3:BOOL=ON \
 -DWITH_SYSTEM_GLEW:BOOL=ON \
 -DWITH_SYSTEM_LZO:BOOL=ON
-make  %{?_smp_mflags}
+make  %{?_smp_mflags}  -O
 popd
 mkdir -p clr-build-avx2
 pushd clr-build-avx2
@@ -281,11 +285,11 @@ export FCFLAGS="$FCFLAGS -march=haswell -m64"
 -DWITH_SYSTEM_EIGEN3:BOOL=ON \
 -DWITH_SYSTEM_GLEW:BOOL=ON \
 -DWITH_SYSTEM_LZO:BOOL=ON
-make  %{?_smp_mflags}
+make  %{?_smp_mflags}  -O
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1614626460
+export SOURCE_DATE_EPOCH=1622078031
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/blender
 cp %{_builddir}/blender-2.92.0/COPYING %{buildroot}/usr/share/package-licenses/blender/002c2409e6067c4266c849727f3fc57978f4a2b5

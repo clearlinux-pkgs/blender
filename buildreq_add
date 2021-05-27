@@ -1,5 +1,6 @@
 # This file contains additional build requirements that did not get
 # picked up automatically. One name per line, no whitespace.
+Imath-dev
 OpenColorIO-dev
 desktop-file-utils
 eigen-dev
@@ -12,6 +13,7 @@ lzo-dev
 mesa-dev
 numpy-dev
 oiio-dev
+openexr-dev
 pugixml-dev
 python3-dev
 scene-alembic-dev
