@@ -18,3 +18,6 @@ pugixml-dev
 python3-dev
 scene-alembic-dev
 xorgproto-dev
+llvm
+OpenColorIO-dev
+potrace-dev
