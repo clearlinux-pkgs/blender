@@ -30,6 +30,7 @@ liblzo2.so.2
 libm.so.6
 libopenal.so.1
 libpng16.so.16
+libpotrace.so.0
 libpthread.so.0
 libpugixml.so.1
 libpython3.9.so.1.0
