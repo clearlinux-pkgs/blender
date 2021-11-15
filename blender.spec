@@ -4,7 +4,7 @@
 #
 Name     : blender
 Version  : 2.93.5
-Release  : 54
+Release  : 55
 URL      : https://download.blender.org/source/blender-2.93.5.tar.xz
 Source0  : https://download.blender.org/source/blender-2.93.5.tar.xz
 Summary  : A fully integrated 3D graphics creation suite
