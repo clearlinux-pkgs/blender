@@ -4,7 +4,7 @@
 #
 Name     : blender
 Version  : 3.0.0
-Release  : 58
+Release  : 59
 URL      : https://download.blender.org/source/blender-3.0.0.tar.xz
 Source0  : https://download.blender.org/source/blender-3.0.0.tar.xz
 Summary  : A fully integrated 3D graphics creation suite
