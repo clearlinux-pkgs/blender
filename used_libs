@@ -36,3 +36,4 @@ libstdc++.so.6
 libtbb.so.2
 libtiff.so.5
 libz.so.1
+libzstd.so.1

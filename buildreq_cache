@@ -1,2 +1,5 @@
 3.0.0
+gmp-dev
 pypi(phabricator)
+tbb-dev
+zstd-dev
