@@ -4,7 +4,7 @@
 #
 Name     : blender
 Version  : 3.0.0
-Release  : 60
+Release  : 61
 URL      : https://download.blender.org/source/blender-3.0.0.tar.xz
 Source0  : https://download.blender.org/source/blender-3.0.0.tar.xz
 Summary  : A fully integrated 3D graphics creation suite
@@ -51,7 +51,6 @@ BuildRequires : llvm
 BuildRequires : llvm-dev
 BuildRequires : lzo-dev
 BuildRequires : mesa-dev
-BuildRequires : numpy-dev
 BuildRequires : oiio-dev
 BuildRequires : openal-soft-dev
 BuildRequires : openexr-dev
@@ -70,6 +69,7 @@ BuildRequires : pkgconfig(zlib)
 BuildRequires : potrace-dev
 BuildRequires : pugixml-dev
 BuildRequires : pypi(phabricator)
+BuildRequires : pypi-numpy-dev
 BuildRequires : python3
 BuildRequires : python3-dev
 BuildRequires : scene-alembic-dev
@@ -177,7 +177,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1641233824
+export SOURCE_DATE_EPOCH=1641472733
 mkdir -p clr-build
 pushd clr-build
 export GCC_IGNORE_WERROR=1
@@ -300,7 +300,7 @@ make  %{?_smp_mflags}  -O
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1641233824
+export SOURCE_DATE_EPOCH=1641472733
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/blender
 cp %{_builddir}/blender-3.0.0/COPYING %{buildroot}/usr/share/package-licenses/blender/002c2409e6067c4266c849727f3fc57978f4a2b5

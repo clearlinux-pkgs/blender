@@ -11,7 +11,7 @@ glew-dev
 jemalloc-dev
 lzo-dev
 mesa-dev
-numpy-dev
+pypi-numpy-dev
 oiio-dev
 openexr-dev
 pugixml-dev
