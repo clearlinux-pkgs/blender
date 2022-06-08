@@ -5,4 +5,4 @@
 0006-Install-locale-files-to-different-location.patch
 0007-add-mime-file.patch
 0008-cmake-Add-usr-to-Alembic-search-path.patch
-0009-Fix-build-with-openexr-3.x.patch
+#0009-Fix-build-with-openexr-3.x.patch
