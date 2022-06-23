@@ -4,7 +4,7 @@
 #
 Name     : blender
 Version  : 3.2.0
-Release  : 65
+Release  : 66
 URL      : https://download.blender.org/source/blender-3.2.0.tar.xz
 Source0  : https://download.blender.org/source/blender-3.2.0.tar.xz
 Summary  : A fully integrated 3D graphics creation suite
@@ -176,7 +176,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1654726674
+export SOURCE_DATE_EPOCH=1656010451
 mkdir -p clr-build
 pushd clr-build
 export GCC_IGNORE_WERROR=1
@@ -299,7 +299,7 @@ make  %{?_smp_mflags}  -O
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1654726674
+export SOURCE_DATE_EPOCH=1656010451
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/blender
 cp %{_builddir}/blender-3.2.0/COPYING %{buildroot}/usr/share/package-licenses/blender/002c2409e6067c4266c849727f3fc57978f4a2b5
@@ -383,7 +383,7 @@ desktop-file-validate %{buildroot}/usr/share/applications/blender.desktop
 # Localization
 rm -vrf %{buildroot}/usr/share/locale/languages
 ## install_append end
-/usr/bin/elf-move.py avx2 %{buildroot}-v3 %{buildroot}/usr/share/clear/optimized-elf/ %{buildroot}/usr/share/clear/filemap/filemap-%{name}
+/usr/bin/elf-move.py avx2 %{buildroot}-v3 %{buildroot} %{buildroot}/usr/share/clear/filemap/filemap-%{name}
 
 %files
 %defattr(-,root,root,-)
