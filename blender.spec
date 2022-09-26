@@ -4,7 +4,7 @@
 #
 Name     : blender
 Version  : 3.2.2
-Release  : 71
+Release  : 72
 URL      : https://download.blender.org/source/blender-3.2.2.tar.xz
 Source0  : https://download.blender.org/source/blender-3.2.2.tar.xz
 Summary  : A fully integrated 3D graphics creation suite
