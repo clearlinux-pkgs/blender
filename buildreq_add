@@ -21,3 +21,6 @@ xorgproto-dev
 llvm
 OpenColorIO-dev
 potrace-dev
+zstd-dev
+tbb-dev
+gmp-dev

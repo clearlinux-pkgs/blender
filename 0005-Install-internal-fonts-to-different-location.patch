@@ -14,19 +14,6 @@ Signed-off-by: Patrick McCarty <patrick.mccarty@intel.com>
  source/creator/CMakeLists.txt                     | 4 ++--
  2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/source/blender/blenfont/intern/blf_font_default.c b/source/blender/blenfont/intern/blf_font_default.c
-index f33d7cd..ec93ebc 100644
---- a/source/blender/blenfont/intern/blf_font_default.c
-+++ b/source/blender/blenfont/intern/blf_font_default.c
-@@ -33,7 +33,7 @@
- 
- static int blf_load_font_default(const char *filename, const bool unique)
- {
--  const char *dir = BKE_appdir_folder_id(BLENDER_DATAFILES, "fonts");
-+  const char *dir = "/usr/share/fonts/blender";
-   if (dir == NULL) {
-     fprintf(stderr,
-             "%s: 'fonts' data path not found for '%s', will not be able to display text\n",
 diff --git a/source/creator/CMakeLists.txt b/source/creator/CMakeLists.txt
 index 9e30789..6ac9393 100644
 --- a/source/creator/CMakeLists.txt
@@ -42,3 +29,14 @@ index 9e30789..6ac9393 100644
  )
  
  # localization
+--- blender-3.3.1/source/blender/blenfont/intern/blf_font_default.c~	2022-08-22 12:53:52.000000000 +0000
++++ blender-3.3.1/source/blender/blenfont/intern/blf_font_default.c	2022-10-27 02:17:07.249915848 +0000
+@@ -18,7 +18,7 @@
+ 
+ static int blf_load_font_default(const char *filename, const bool unique)
+ {
+-  const char *dir = BKE_appdir_folder_id(BLENDER_DATAFILES, BLF_DATAFILES_FONTS_DIR);
++  const char *dir = "/usr/share/fonts/blender";
+   if (dir == NULL) {
+     fprintf(stderr,
+             "%s: 'fonts' data path not found for '%s', will not be able to display text\n",
