@@ -4,7 +4,7 @@
 #
 Name     : blender
 Version  : 3.3.1
-Release  : 74
+Release  : 75
 URL      : https://download.blender.org/source/blender-3.3.1.tar.xz
 Source0  : https://download.blender.org/source/blender-3.3.1.tar.xz
 Summary  : A fully integrated 3D graphics creation suite
@@ -176,22 +176,22 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1666842651
+export SOURCE_DATE_EPOCH=1672247536
 mkdir -p clr-build
 pushd clr-build
 export GCC_IGNORE_WERROR=1
-export CFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wformat -Wformat-security -Wno-error -Wl,-z,max-page-size=0x4000 -march=westmere -mtune=haswell"
+export CFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wformat -Wformat-security -Wno-error -Wl,-z,max-page-size=0x1000 -march=westmere -mtune=haswell"
 export CXXFLAGS=$CFLAGS
-export FFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wno-error -Wl,-z,max-page-size=0x4000 -march=westmere -mtune=haswell"
+export FFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wno-error -Wl,-z,max-page-size=0x1000 -march=westmere -mtune=haswell"
 export FCFLAGS=$FFLAGS
 unset LDFLAGS
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
 export NM=gcc-nm
-export CFLAGS="$CFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -mprefer-vector-width=256 "
-export FCFLAGS="$FFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -mprefer-vector-width=256 "
-export FFLAGS="$FFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -mprefer-vector-width=256 "
-export CXXFLAGS="$CXXFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -mprefer-vector-width=256 "
+export CFLAGS="$CFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -mprefer-vector-width=512 "
+export FCFLAGS="$FFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -mprefer-vector-width=512 "
+export FFLAGS="$FFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -mprefer-vector-width=512 "
+export CXXFLAGS="$CXXFLAGS -O3 -Ofast -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -mprefer-vector-width=512 "
 %cmake .. -DBUILD_SHARED_LIBS:BOOL=OFF \
 -DCMAKE_EXE_LINKER_FLAGS:STRING="-pie" \
 -DCMAKE_INSTALL_PREFIX:PATH=/usr \
@@ -238,18 +238,18 @@ popd
 mkdir -p clr-build-avx2
 pushd clr-build-avx2
 export GCC_IGNORE_WERROR=1
-export CFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wformat -Wformat-security -Wno-error -Wl,-z,max-page-size=0x4000 -march=westmere -mtune=haswell"
+export CFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wformat -Wformat-security -Wno-error -Wl,-z,max-page-size=0x1000 -march=westmere -mtune=haswell"
 export CXXFLAGS=$CFLAGS
-export FFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wno-error -Wl,-z,max-page-size=0x4000 -march=westmere -mtune=haswell"
+export FFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wno-error -Wl,-z,max-page-size=0x1000 -march=westmere -mtune=haswell"
 export FCFLAGS=$FFLAGS
 unset LDFLAGS
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
 export NM=gcc-nm
-export CFLAGS="$CFLAGS -O3 -Ofast -Wl,-z,x86-64-v3 -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -march=x86-64-v3 -mprefer-vector-width=256 -mtune=skylake "
-export FCFLAGS="$FFLAGS -O3 -Ofast -Wl,-z,x86-64-v3 -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -march=x86-64-v3 -mprefer-vector-width=256 -mtune=skylake "
-export FFLAGS="$FFLAGS -O3 -Ofast -Wl,-z,x86-64-v3 -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -march=x86-64-v3 -mprefer-vector-width=256 -mtune=skylake "
-export CXXFLAGS="$CXXFLAGS -O3 -Ofast -Wl,-z,x86-64-v3 -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -march=x86-64-v3 -mprefer-vector-width=256 -mtune=skylake "
+export CFLAGS="$CFLAGS -O3 -Ofast -Wl,-z,x86-64-v3 -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -march=x86-64-v3 -mprefer-vector-width=512 -mtune=skylake "
+export FCFLAGS="$FFLAGS -O3 -Ofast -Wl,-z,x86-64-v3 -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -march=x86-64-v3 -mprefer-vector-width=512 -mtune=skylake "
+export FFLAGS="$FFLAGS -O3 -Ofast -Wl,-z,x86-64-v3 -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -march=x86-64-v3 -mprefer-vector-width=512 -mtune=skylake "
+export CXXFLAGS="$CXXFLAGS -O3 -Ofast -Wl,-z,x86-64-v3 -falign-functions=32 -ffat-lto-objects -flto=auto -fno-semantic-interposition -march=x86-64-v3 -mprefer-vector-width=512 -mtune=skylake "
 export CFLAGS="$CFLAGS -march=x86-64-v3 -m64 -Wl,-z,x86-64-v3"
 export CXXFLAGS="$CXXFLAGS -march=x86-64-v3 -m64 -Wl,-z,x86-64-v3"
 export FFLAGS="$FFLAGS -march=x86-64-v3 -m64 -Wl,-z,x86-64-v3"
@@ -299,62 +299,62 @@ make  %{?_smp_mflags}  -O
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1666842651
+export SOURCE_DATE_EPOCH=1672247536
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/blender
-cp %{_builddir}/blender-%{version}/COPYING %{buildroot}/usr/share/package-licenses/blender/002c2409e6067c4266c849727f3fc57978f4a2b5 || :
-cp %{_builddir}/blender-%{version}/doc/license/Apache2-license.txt %{buildroot}/usr/share/package-licenses/blender/2b8b815229aa8a61e483fb4ba0588b8b6c491890 || :
-cp %{_builddir}/blender-%{version}/doc/license/Apache2-license.txt %{buildroot}/usr/share/package-licenses/blender/2b8b815229aa8a61e483fb4ba0588b8b6c491890 || :
-cp %{_builddir}/blender-%{version}/doc/license/BSD-3-Clause-license.txt %{buildroot}/usr/share/package-licenses/blender/6167dbf96cbf9e18895b6d383f51844e5d110f55 || :
-cp %{_builddir}/blender-%{version}/doc/license/BSD-3-Clause-license.txt %{buildroot}/usr/share/package-licenses/blender/6167dbf96cbf9e18895b6d383f51844e5d110f55 || :
-cp %{_builddir}/blender-%{version}/doc/license/GPL-license.txt %{buildroot}/usr/share/package-licenses/blender/83b54b10518c3d114a1ff5ea7e2653a20d9d3458 || :
-cp %{_builddir}/blender-%{version}/doc/license/GPL-license.txt %{buildroot}/usr/share/package-licenses/blender/83b54b10518c3d114a1ff5ea7e2653a20d9d3458 || :
-cp %{_builddir}/blender-%{version}/doc/license/GPL3-license.txt %{buildroot}/usr/share/package-licenses/blender/8624bcdae55baeef00cd11d5dfcfa60f68710a02 || :
-cp %{_builddir}/blender-%{version}/doc/license/GPL3-license.txt %{buildroot}/usr/share/package-licenses/blender/8624bcdae55baeef00cd11d5dfcfa60f68710a02 || :
-cp %{_builddir}/blender-%{version}/doc/license/LGPL2.1-license.txt %{buildroot}/usr/share/package-licenses/blender/3704f4680301a60004b20f94e0b5b8c7ff1484a9 || :
-cp %{_builddir}/blender-%{version}/doc/license/LGPL2.1-license.txt %{buildroot}/usr/share/package-licenses/blender/3704f4680301a60004b20f94e0b5b8c7ff1484a9 || :
-cp %{_builddir}/blender-%{version}/doc/license/MIT-license.txt %{buildroot}/usr/share/package-licenses/blender/c400eb7f95b900b81e287bfe7375a7d0040d15bc || :
-cp %{_builddir}/blender-%{version}/doc/license/MIT-license.txt %{buildroot}/usr/share/package-licenses/blender/c400eb7f95b900b81e287bfe7375a7d0040d15bc || :
-cp %{_builddir}/blender-%{version}/extern/audaspace/LICENSE %{buildroot}/usr/share/package-licenses/blender/2b8b815229aa8a61e483fb4ba0588b8b6c491890 || :
-cp %{_builddir}/blender-%{version}/extern/ceres/LICENSE %{buildroot}/usr/share/package-licenses/blender/d0ff4c471ef8a7916faefe220ec4c13fefc7ff71 || :
-cp %{_builddir}/blender-%{version}/extern/cuew/LICENSE %{buildroot}/usr/share/package-licenses/blender/d2bf36877185a0d9b2baf0450ef8f0e01be1125d || :
-cp %{_builddir}/blender-%{version}/extern/draco/draco/LICENSE %{buildroot}/usr/share/package-licenses/blender/1128f8f91104ba9ef98d37eea6523a888dcfa5de || :
-cp %{_builddir}/blender-%{version}/extern/fast_float/LICENSE-MIT %{buildroot}/usr/share/package-licenses/blender/11e6be99fa6ad788d013a38598c7da3e5d90efbe || :
-cp %{_builddir}/blender-%{version}/extern/fmtlib/LICENSE.rst %{buildroot}/usr/share/package-licenses/blender/a6571b819c2fb290e2bb182e92a7a20d7d42318d || :
-cp %{_builddir}/blender-%{version}/extern/gflags/COPYING.txt %{buildroot}/usr/share/package-licenses/blender/b2d4ab17f1b8ef9e0646ba932dce81efe3b852ab || :
-cp %{_builddir}/blender-%{version}/extern/glew-es/LICENSE.txt %{buildroot}/usr/share/package-licenses/blender/0ca22faedb8ee495473a82c4d91452493b22ac9f || :
-cp %{_builddir}/blender-%{version}/extern/glew/LICENSE.txt %{buildroot}/usr/share/package-licenses/blender/0ca22faedb8ee495473a82c4d91452493b22ac9f || :
-cp %{_builddir}/blender-%{version}/extern/glog/COPYING %{buildroot}/usr/share/package-licenses/blender/43c9d4e201bf773d965455b593cd8a244d98564b || :
-cp %{_builddir}/blender-%{version}/extern/gmock/LICENSE %{buildroot}/usr/share/package-licenses/blender/5a2314153eadadc69258a9429104cd11804ea304 || :
-cp %{_builddir}/blender-%{version}/extern/gtest/LICENSE %{buildroot}/usr/share/package-licenses/blender/5a2314153eadadc69258a9429104cd11804ea304 || :
-cp %{_builddir}/blender-%{version}/extern/lzo/minilzo/COPYING %{buildroot}/usr/share/package-licenses/blender/4cc77b90af91e615a64ae04893fdffa7939db84c || :
-cp %{_builddir}/blender-%{version}/extern/mantaflow/LICENSE %{buildroot}/usr/share/package-licenses/blender/6596d7deb814bf619e0b2c0a7c29dbb3b9f8f43e || :
-cp %{_builddir}/blender-%{version}/extern/quadriflow/3rd/lemon-1.3.1/LICENSE %{buildroot}/usr/share/package-licenses/blender/b34f205f74c018d0d5b8c116015f58df92375a11 || :
-cp %{_builddir}/blender-%{version}/extern/quadriflow/LICENSE.txt %{buildroot}/usr/share/package-licenses/blender/86241cf770af908f25bb6be748d736dda1e3cd44 || :
-cp %{_builddir}/blender-%{version}/intern/cycles/doc/license/Apache2-license.txt %{buildroot}/usr/share/package-licenses/blender/2b8b815229aa8a61e483fb4ba0588b8b6c491890 || :
-cp %{_builddir}/blender-%{version}/intern/cycles/doc/license/Apache2-license.txt %{buildroot}/usr/share/package-licenses/blender/2b8b815229aa8a61e483fb4ba0588b8b6c491890 || :
-cp %{_builddir}/blender-%{version}/intern/cycles/doc/license/BSD-3-Clause-license.txt %{buildroot}/usr/share/package-licenses/blender/6167dbf96cbf9e18895b6d383f51844e5d110f55 || :
-cp %{_builddir}/blender-%{version}/intern/cycles/doc/license/BSD-3-Clause-license.txt %{buildroot}/usr/share/package-licenses/blender/6167dbf96cbf9e18895b6d383f51844e5d110f55 || :
-cp %{_builddir}/blender-%{version}/intern/cycles/doc/license/MIT-license.txt %{buildroot}/usr/share/package-licenses/blender/7c0bf9e974fd970e8b1cf294f019fe69fe1d6f25 || :
-cp %{_builddir}/blender-%{version}/intern/cycles/doc/license/MIT-license.txt %{buildroot}/usr/share/package-licenses/blender/7c0bf9e974fd970e8b1cf294f019fe69fe1d6f25 || :
-cp %{_builddir}/blender-%{version}/release/datafiles/studiolights/matcap/license.txt %{buildroot}/usr/share/package-licenses/blender/faddfe17fb1306925298bb760341d43212999be4 || :
-cp %{_builddir}/blender-%{version}/release/datafiles/studiolights/world/license.txt %{buildroot}/usr/share/package-licenses/blender/8e278c84a1bf9b2df9c1ee407349c4634f104777 || :
-cp %{_builddir}/blender-%{version}/release/license/Apache-2.0.txt %{buildroot}/usr/share/package-licenses/blender/2b8b815229aa8a61e483fb4ba0588b8b6c491890 || :
-cp %{_builddir}/blender-%{version}/release/license/BSD-3-Clause.txt %{buildroot}/usr/share/package-licenses/blender/ab32191e75e89eb296c426b1113463df26d80e0d || :
-cp %{_builddir}/blender-%{version}/release/license/BSL-1.0.txt %{buildroot}/usr/share/package-licenses/blender/3cba29011be2b9d59f6204d6fa0a386b1b2dbd90 || :
-cp %{_builddir}/blender-%{version}/release/license/FTL.txt %{buildroot}/usr/share/package-licenses/blender/b8537c877bf9c9a2b6ccd25f56818b5f6a8c9596 || :
-cp %{_builddir}/blender-%{version}/release/license/GPL-3.0.txt %{buildroot}/usr/share/package-licenses/blender/8624bcdae55baeef00cd11d5dfcfa60f68710a02 || :
-cp %{_builddir}/blender-%{version}/release/license/GPL-license.txt %{buildroot}/usr/share/package-licenses/blender/aa84cb217f40293d65b82d5b5947bd0c77e63fd3 || :
-cp %{_builddir}/blender-%{version}/release/license/GPL-license.txt %{buildroot}/usr/share/package-licenses/blender/aa84cb217f40293d65b82d5b5947bd0c77e63fd3 || :
-cp %{_builddir}/blender-%{version}/release/license/MIT.txt %{buildroot}/usr/share/package-licenses/blender/11e6a1998d4b5600ca82cbfa176f298cabe3a9a1 || :
-cp %{_builddir}/blender-%{version}/release/license/OpenColorIO.txt %{buildroot}/usr/share/package-licenses/blender/7577e466fcf0562bc87cf7a419b825a8391785ba || :
-cp %{_builddir}/blender-%{version}/release/license/OpenSSL.txt %{buildroot}/usr/share/package-licenses/blender/607e96d7bc75d9f884a8e210d276cca4006e0753 || :
-cp %{_builddir}/blender-%{version}/release/license/Python.txt %{buildroot}/usr/share/package-licenses/blender/10b5af8000836ba694405d7a982760d747bc0e82 || :
-cp %{_builddir}/blender-%{version}/release/license/THIRD-PARTY-LICENSES.txt %{buildroot}/usr/share/package-licenses/blender/13b6df922f191c50e02dc8ebfbd0c91783d4d78e || :
-cp %{_builddir}/blender-%{version}/release/license/bfont.ttf.txt %{buildroot}/usr/share/package-licenses/blender/798004dbc54c6d764f549ea6ad5e32755241c7a7 || :
-cp %{_builddir}/blender-%{version}/release/license/droidsans.ttf.txt %{buildroot}/usr/share/package-licenses/blender/6a28391061dc5ad64b0955707354c3f0bd1b4e8b || :
-cp %{_builddir}/blender-%{version}/release/license/jemalloc.txt %{buildroot}/usr/share/package-licenses/blender/8c2be1d672c152b1ba97c9357b6a8888fc50e87e || :
-cp %{_builddir}/blender-%{version}/release/text/copyright.txt %{buildroot}/usr/share/package-licenses/blender/823ab2688ac7fe2082b9d53afd9ebb2122aeb337 || :
+cp %{_builddir}/blender-%{version}/COPYING %{buildroot}/usr/share/package-licenses/blender/002c2409e6067c4266c849727f3fc57978f4a2b5
+cp %{_builddir}/blender-%{version}/doc/license/Apache2-license.txt %{buildroot}/usr/share/package-licenses/blender/2b8b815229aa8a61e483fb4ba0588b8b6c491890
+cp %{_builddir}/blender-%{version}/doc/license/Apache2-license.txt %{buildroot}/usr/share/package-licenses/blender/2b8b815229aa8a61e483fb4ba0588b8b6c491890
+cp %{_builddir}/blender-%{version}/doc/license/BSD-3-Clause-license.txt %{buildroot}/usr/share/package-licenses/blender/6167dbf96cbf9e18895b6d383f51844e5d110f55
+cp %{_builddir}/blender-%{version}/doc/license/BSD-3-Clause-license.txt %{buildroot}/usr/share/package-licenses/blender/6167dbf96cbf9e18895b6d383f51844e5d110f55
+cp %{_builddir}/blender-%{version}/doc/license/GPL-license.txt %{buildroot}/usr/share/package-licenses/blender/83b54b10518c3d114a1ff5ea7e2653a20d9d3458
+cp %{_builddir}/blender-%{version}/doc/license/GPL-license.txt %{buildroot}/usr/share/package-licenses/blender/83b54b10518c3d114a1ff5ea7e2653a20d9d3458
+cp %{_builddir}/blender-%{version}/doc/license/GPL3-license.txt %{buildroot}/usr/share/package-licenses/blender/8624bcdae55baeef00cd11d5dfcfa60f68710a02
+cp %{_builddir}/blender-%{version}/doc/license/GPL3-license.txt %{buildroot}/usr/share/package-licenses/blender/8624bcdae55baeef00cd11d5dfcfa60f68710a02
+cp %{_builddir}/blender-%{version}/doc/license/LGPL2.1-license.txt %{buildroot}/usr/share/package-licenses/blender/3704f4680301a60004b20f94e0b5b8c7ff1484a9
+cp %{_builddir}/blender-%{version}/doc/license/LGPL2.1-license.txt %{buildroot}/usr/share/package-licenses/blender/3704f4680301a60004b20f94e0b5b8c7ff1484a9
+cp %{_builddir}/blender-%{version}/doc/license/MIT-license.txt %{buildroot}/usr/share/package-licenses/blender/c400eb7f95b900b81e287bfe7375a7d0040d15bc
+cp %{_builddir}/blender-%{version}/doc/license/MIT-license.txt %{buildroot}/usr/share/package-licenses/blender/c400eb7f95b900b81e287bfe7375a7d0040d15bc
+cp %{_builddir}/blender-%{version}/extern/audaspace/LICENSE %{buildroot}/usr/share/package-licenses/blender/2b8b815229aa8a61e483fb4ba0588b8b6c491890
+cp %{_builddir}/blender-%{version}/extern/ceres/LICENSE %{buildroot}/usr/share/package-licenses/blender/d0ff4c471ef8a7916faefe220ec4c13fefc7ff71
+cp %{_builddir}/blender-%{version}/extern/cuew/LICENSE %{buildroot}/usr/share/package-licenses/blender/d2bf36877185a0d9b2baf0450ef8f0e01be1125d
+cp %{_builddir}/blender-%{version}/extern/draco/draco/LICENSE %{buildroot}/usr/share/package-licenses/blender/1128f8f91104ba9ef98d37eea6523a888dcfa5de
+cp %{_builddir}/blender-%{version}/extern/fast_float/LICENSE-MIT %{buildroot}/usr/share/package-licenses/blender/11e6be99fa6ad788d013a38598c7da3e5d90efbe
+cp %{_builddir}/blender-%{version}/extern/fmtlib/LICENSE.rst %{buildroot}/usr/share/package-licenses/blender/a6571b819c2fb290e2bb182e92a7a20d7d42318d
+cp %{_builddir}/blender-%{version}/extern/gflags/COPYING.txt %{buildroot}/usr/share/package-licenses/blender/b2d4ab17f1b8ef9e0646ba932dce81efe3b852ab
+cp %{_builddir}/blender-%{version}/extern/glew-es/LICENSE.txt %{buildroot}/usr/share/package-licenses/blender/0ca22faedb8ee495473a82c4d91452493b22ac9f
+cp %{_builddir}/blender-%{version}/extern/glew/LICENSE.txt %{buildroot}/usr/share/package-licenses/blender/0ca22faedb8ee495473a82c4d91452493b22ac9f
+cp %{_builddir}/blender-%{version}/extern/glog/COPYING %{buildroot}/usr/share/package-licenses/blender/43c9d4e201bf773d965455b593cd8a244d98564b
+cp %{_builddir}/blender-%{version}/extern/gmock/LICENSE %{buildroot}/usr/share/package-licenses/blender/5a2314153eadadc69258a9429104cd11804ea304
+cp %{_builddir}/blender-%{version}/extern/gtest/LICENSE %{buildroot}/usr/share/package-licenses/blender/5a2314153eadadc69258a9429104cd11804ea304
+cp %{_builddir}/blender-%{version}/extern/lzo/minilzo/COPYING %{buildroot}/usr/share/package-licenses/blender/4cc77b90af91e615a64ae04893fdffa7939db84c
+cp %{_builddir}/blender-%{version}/extern/mantaflow/LICENSE %{buildroot}/usr/share/package-licenses/blender/6596d7deb814bf619e0b2c0a7c29dbb3b9f8f43e
+cp %{_builddir}/blender-%{version}/extern/quadriflow/3rd/lemon-1.3.1/LICENSE %{buildroot}/usr/share/package-licenses/blender/b34f205f74c018d0d5b8c116015f58df92375a11
+cp %{_builddir}/blender-%{version}/extern/quadriflow/LICENSE.txt %{buildroot}/usr/share/package-licenses/blender/86241cf770af908f25bb6be748d736dda1e3cd44
+cp %{_builddir}/blender-%{version}/intern/cycles/doc/license/Apache2-license.txt %{buildroot}/usr/share/package-licenses/blender/2b8b815229aa8a61e483fb4ba0588b8b6c491890
+cp %{_builddir}/blender-%{version}/intern/cycles/doc/license/Apache2-license.txt %{buildroot}/usr/share/package-licenses/blender/2b8b815229aa8a61e483fb4ba0588b8b6c491890
+cp %{_builddir}/blender-%{version}/intern/cycles/doc/license/BSD-3-Clause-license.txt %{buildroot}/usr/share/package-licenses/blender/6167dbf96cbf9e18895b6d383f51844e5d110f55
+cp %{_builddir}/blender-%{version}/intern/cycles/doc/license/BSD-3-Clause-license.txt %{buildroot}/usr/share/package-licenses/blender/6167dbf96cbf9e18895b6d383f51844e5d110f55
+cp %{_builddir}/blender-%{version}/intern/cycles/doc/license/MIT-license.txt %{buildroot}/usr/share/package-licenses/blender/7c0bf9e974fd970e8b1cf294f019fe69fe1d6f25
+cp %{_builddir}/blender-%{version}/intern/cycles/doc/license/MIT-license.txt %{buildroot}/usr/share/package-licenses/blender/7c0bf9e974fd970e8b1cf294f019fe69fe1d6f25
+cp %{_builddir}/blender-%{version}/release/datafiles/studiolights/matcap/license.txt %{buildroot}/usr/share/package-licenses/blender/faddfe17fb1306925298bb760341d43212999be4
+cp %{_builddir}/blender-%{version}/release/datafiles/studiolights/world/license.txt %{buildroot}/usr/share/package-licenses/blender/8e278c84a1bf9b2df9c1ee407349c4634f104777
+cp %{_builddir}/blender-%{version}/release/license/Apache-2.0.txt %{buildroot}/usr/share/package-licenses/blender/2b8b815229aa8a61e483fb4ba0588b8b6c491890
+cp %{_builddir}/blender-%{version}/release/license/BSD-3-Clause.txt %{buildroot}/usr/share/package-licenses/blender/ab32191e75e89eb296c426b1113463df26d80e0d
+cp %{_builddir}/blender-%{version}/release/license/BSL-1.0.txt %{buildroot}/usr/share/package-licenses/blender/3cba29011be2b9d59f6204d6fa0a386b1b2dbd90
+cp %{_builddir}/blender-%{version}/release/license/FTL.txt %{buildroot}/usr/share/package-licenses/blender/b8537c877bf9c9a2b6ccd25f56818b5f6a8c9596
+cp %{_builddir}/blender-%{version}/release/license/GPL-3.0.txt %{buildroot}/usr/share/package-licenses/blender/8624bcdae55baeef00cd11d5dfcfa60f68710a02
+cp %{_builddir}/blender-%{version}/release/license/GPL-license.txt %{buildroot}/usr/share/package-licenses/blender/aa84cb217f40293d65b82d5b5947bd0c77e63fd3
+cp %{_builddir}/blender-%{version}/release/license/GPL-license.txt %{buildroot}/usr/share/package-licenses/blender/aa84cb217f40293d65b82d5b5947bd0c77e63fd3
+cp %{_builddir}/blender-%{version}/release/license/MIT.txt %{buildroot}/usr/share/package-licenses/blender/11e6a1998d4b5600ca82cbfa176f298cabe3a9a1
+cp %{_builddir}/blender-%{version}/release/license/OpenColorIO.txt %{buildroot}/usr/share/package-licenses/blender/7577e466fcf0562bc87cf7a419b825a8391785ba
+cp %{_builddir}/blender-%{version}/release/license/OpenSSL.txt %{buildroot}/usr/share/package-licenses/blender/607e96d7bc75d9f884a8e210d276cca4006e0753
+cp %{_builddir}/blender-%{version}/release/license/Python.txt %{buildroot}/usr/share/package-licenses/blender/10b5af8000836ba694405d7a982760d747bc0e82
+cp %{_builddir}/blender-%{version}/release/license/THIRD-PARTY-LICENSES.txt %{buildroot}/usr/share/package-licenses/blender/13b6df922f191c50e02dc8ebfbd0c91783d4d78e
+cp %{_builddir}/blender-%{version}/release/license/bfont.ttf.txt %{buildroot}/usr/share/package-licenses/blender/798004dbc54c6d764f549ea6ad5e32755241c7a7
+cp %{_builddir}/blender-%{version}/release/license/droidsans.ttf.txt %{buildroot}/usr/share/package-licenses/blender/6a28391061dc5ad64b0955707354c3f0bd1b4e8b
+cp %{_builddir}/blender-%{version}/release/license/jemalloc.txt %{buildroot}/usr/share/package-licenses/blender/8c2be1d672c152b1ba97c9357b6a8888fc50e87e
+cp %{_builddir}/blender-%{version}/release/text/copyright.txt %{buildroot}/usr/share/package-licenses/blender/823ab2688ac7fe2082b9d53afd9ebb2122aeb337
 pushd clr-build-avx2
 %make_install_v3  || :
 popd
