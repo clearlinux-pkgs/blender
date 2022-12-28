@@ -4,7 +4,7 @@
 #
 Name     : blender
 Version  : 3.3.1
-Release  : 73
+Release  : 74
 URL      : https://download.blender.org/source/blender-3.3.1.tar.xz
 Source0  : https://download.blender.org/source/blender-3.3.1.tar.xz
 Summary  : A fully integrated 3D graphics creation suite
