@@ -1,4 +1,4 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From 30c3059fa07ca9927d4e37cf3c0ec27da7d587cd Mon Sep 17 00:00:00 2001
 From: Sean V Kelley <sean.v.kelley@linux.intel.com>
 Date: Mon, 3 Dec 2018 09:25:08 -0800
 Subject: [PATCH] Install internal fonts to different location
@@ -14,24 +14,11 @@ Signed-off-by: Patrick McCarty <patrick.mccarty@intel.com>
  source/creator/CMakeLists.txt                     | 4 ++--
  2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/source/creator/CMakeLists.txt b/source/creator/CMakeLists.txt
-index 9e30789..6ac9393 100644
---- a/source/creator/CMakeLists.txt
-+++ b/source/creator/CMakeLists.txt
-@@ -381,8 +381,8 @@ endif()
- # fonts
- install(
-   DIRECTORY
--    ${CMAKE_SOURCE_DIR}/release/datafiles/fonts
--  DESTINATION ${TARGETDIR_VER}/datafiles
-+    ${CMAKE_SOURCE_DIR}/release/datafiles/fonts/
-+  DESTINATION ${CMAKE_INSTALL_PREFIX}/share/fonts/blender
- )
- 
- # localization
---- blender-3.3.1/source/blender/blenfont/intern/blf_font_default.c~	2022-08-22 12:53:52.000000000 +0000
-+++ blender-3.3.1/source/blender/blenfont/intern/blf_font_default.c	2022-10-27 02:17:07.249915848 +0000
-@@ -18,7 +18,7 @@
+diff --git a/source/blender/blenfont/intern/blf_font_default.c b/source/blender/blenfont/intern/blf_font_default.c
+index 8b1290352152..3ee647e8ce18 100644
+--- a/source/blender/blenfont/intern/blf_font_default.c
++++ b/source/blender/blenfont/intern/blf_font_default.c
+@@ -22,7 +22,7 @@
  
  static int blf_load_font_default(const char *filename, const bool unique)
  {
@@ -40,3 +27,21 @@ index 9e30789..6ac9393 100644
    if (dir == NULL) {
      fprintf(stderr,
              "%s: 'fonts' data path not found for '%s', will not be able to display text\n",
+diff --git a/source/creator/CMakeLists.txt b/source/creator/CMakeLists.txt
+index 4ae1718fee8a..614e39651fd8 100644
+--- a/source/creator/CMakeLists.txt
++++ b/source/creator/CMakeLists.txt
+@@ -469,8 +469,8 @@ endif()
+ 
+ # fonts
+ install(
+-  DIRECTORY ${CMAKE_SOURCE_DIR}/release/datafiles/fonts
+-  DESTINATION ${TARGETDIR_VER}/datafiles
++  DIRECTORY ${CMAKE_SOURCE_DIR}/release/datafiles/fonts/
++  DESTINATION ${CMAKE_INSTALL_PREFIX}/share/fonts/blender
+ )
+ 
+ # localization
+-- 
+2.41.0
+

@@ -1,4 +1,4 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From 94ddc1ebafe3f5f6c571cc8937925e17897f88f2 Mon Sep 17 00:00:00 2001
 From: Sean V Kelley <sean.v.kelley@linux.intel.com>
 Date: Mon, 3 Dec 2018 09:25:08 -0800
 Subject: [PATCH] Install scripts to different location
@@ -13,17 +13,20 @@ Signed-off-by: Patrick McCarty <patrick.mccarty@intel.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/source/creator/CMakeLists.txt b/source/creator/CMakeLists.txt
-index 7db936b..3050c62 100644
+index 6739511f71a6..dcb58ac26df1 100644
 --- a/source/creator/CMakeLists.txt
 +++ b/source/creator/CMakeLists.txt
-@@ -364,8 +364,8 @@ if(WITH_PYTHON)
+@@ -437,8 +437,8 @@ if(WITH_PYTHON)
    endif()
  
    install(
--    DIRECTORY ${CMAKE_SOURCE_DIR}/release/scripts
+-    DIRECTORY ${CMAKE_SOURCE_DIR}/scripts
 -    DESTINATION ${TARGETDIR_VER}
-+    DIRECTORY ${CMAKE_SOURCE_DIR}/release/scripts/
++    DIRECTORY ${CMAKE_SOURCE_DIR}/scripts/
 +    DESTINATION ${CMAKE_INSTALL_PREFIX}/share/blender/scripts/
      PATTERN ".git" EXCLUDE
      PATTERN ".gitignore" EXCLUDE
-     PATTERN ".arcconfig" EXCLUDE
+     PATTERN ".gitea" EXCLUDE
+-- 
+2.41.0
+

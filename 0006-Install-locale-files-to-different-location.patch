@@ -1,4 +1,4 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From ef88c49d84bdd44dea4bd11cbd094de5b34163b0 Mon Sep 17 00:00:00 2001
 From: Sean V Kelley <sean.v.kelley@linux.intel.com>
 Date: Mon, 3 Dec 2018 09:25:08 -0800
 Subject: [PATCH] Install locale files to different location
@@ -16,10 +16,10 @@ Signed-off-by: Patrick McCarty <patrick.mccarty@intel.com>
  4 files changed, 9 insertions(+), 6 deletions(-)
 
 diff --git a/source/blender/blenkernel/BKE_appdir.h b/source/blender/blenkernel/BKE_appdir.h
-index c9d6715..6e967de 100644
+index bea163a21d06..0e82484d1c8e 100644
 --- a/source/blender/blenkernel/BKE_appdir.h
 +++ b/source/blender/blenkernel/BKE_appdir.h
-@@ -87,6 +87,7 @@ enum {
+@@ -172,6 +172,7 @@ enum {
    BLENDER_SYSTEM_DATAFILES = 52,
    BLENDER_SYSTEM_SCRIPTS = 53,
    BLENDER_SYSTEM_PYTHON = 54,
@@ -28,10 +28,10 @@ index c9d6715..6e967de 100644
  
  /* for BKE_appdir_folder_id_version only */
 diff --git a/source/blender/blenkernel/intern/appdir.c b/source/blender/blenkernel/intern/appdir.c
-index ff799d9..560d54d 100644
+index 7073d69ae545..a9c7adffd326 100644
 --- a/source/blender/blenkernel/intern/appdir.c
 +++ b/source/blender/blenkernel/intern/appdir.c
-@@ -662,6 +662,8 @@ bool BKE_appdir_folder_id_ex(const int folder_id,
+@@ -678,6 +678,8 @@ bool BKE_appdir_folder_id_ex(const int folder_id,
          break;
        }
        return false;
@@ -39,12 +39,12 @@ index ff799d9..560d54d 100644
 +      BLI_strncpy(path, "/usr/share/locale", FILE_MAX); break;
  
      default:
-       BLI_assert(0);
+       BLI_assert_unreachable();
 diff --git a/source/blender/blentranslation/intern/blt_lang.c b/source/blender/blentranslation/intern/blt_lang.c
-index bd0352d..c67b523 100644
+index a25abdae009d..4b0c8db0c669 100644
 --- a/source/blender/blentranslation/intern/blt_lang.c
 +++ b/source/blender/blentranslation/intern/blt_lang.c
-@@ -85,9 +85,9 @@ static void free_locales(void)
+@@ -62,9 +62,9 @@ static void free_locales(void)
    num_locales = num_locales_menu = 0;
  }
  
@@ -56,16 +56,16 @@ index bd0352d..c67b523 100644
    char languages[FILE_MAX];
    LinkNode *lines = NULL, *line;
    char *str;
-@@ -95,7 +95,7 @@ static void fill_locales(void)
+@@ -72,7 +72,7 @@ static void fill_locales(void)
  
    free_locales();
  
--  BLI_join_dirfile(languages, FILE_MAX, languages_path, "languages");
-+  BLI_join_dirfile(languages, FILE_MAX, locale_path, "languages");
+-  BLI_path_join(languages, FILE_MAX, languages_path, "languages");
++  BLI_path_join(languages, FILE_MAX, locale_path, "languages");
    line = lines = BLI_file_read_as_lines(languages);
  
    /* This whole "parsing" code is a bit weak, in that it expects strictly formatted input file...
-@@ -202,7 +202,7 @@ EnumPropertyItem *BLT_lang_RNA_enum_properties(void)
+@@ -179,7 +179,7 @@ EnumPropertyItem *BLT_lang_RNA_enum_properties(void)
  void BLT_lang_init(void)
  {
  #ifdef WITH_INTERNATIONAL
@@ -73,8 +73,8 @@ index bd0352d..c67b523 100644
 +  const char * const messagepath = BKE_appdir_folder_id(BLENDER_SYSTEM_LOCALE, NULL);
  #endif
  
-   /* Make sure LANG is correct and wouldn't cause #std::rumtime_error. */
-@@ -235,7 +235,7 @@ void BLT_lang_init(void)
+   /* Make sure LANG is correct and wouldn't cause #std::runtime_error. */
+@@ -212,7 +212,7 @@ void BLT_lang_init(void)
  #ifdef WITH_INTERNATIONAL
    if (messagepath) {
      bl_locale_init(messagepath, TEXT_DOMAIN_NAME);
@@ -84,15 +84,18 @@ index bd0352d..c67b523 100644
    else {
      printf("%s: 'locale' data path for translations not found, continuing\n", __func__);
 diff --git a/source/creator/CMakeLists.txt b/source/creator/CMakeLists.txt
-index 6ac9393..1a461ae 100644
+index 614e39651fd8..6c847f789682 100644
 --- a/source/creator/CMakeLists.txt
 +++ b/source/creator/CMakeLists.txt
-@@ -388,7 +388,7 @@ install(
+@@ -476,7 +476,7 @@ install(
  # localization
  if(WITH_INTERNATIONAL)
-   set(_locale_dir "${CMAKE_SOURCE_DIR}/release/datafiles/locale")
+   set(_locale_dir "${CMAKE_SOURCE_DIR}/locale")
 -  set(_locale_target_dir ${TARGETDIR_VER}/datafiles/locale)
 +  set(_locale_target_dir ${CMAKE_INSTALL_PREFIX}/share/locale)
  
    file(GLOB _po_files "${_locale_dir}/po/*.po")
    foreach(_po_file ${_po_files})
+-- 
+2.41.0
+

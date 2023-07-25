@@ -1,4 +1,8 @@
-3.3.1
-gmp-dev
-tbb-dev
-zstd-dev
+3.6.1
+pkgconfig(epoxy)
+pkgconfig(wayland-client)
+pkgconfig(wayland-cursor)
+pkgconfig(wayland-egl)
+pkgconfig(wayland-protocols)
+pkgconfig(wayland-scanner)
+pulseaudio-dev

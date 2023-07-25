@@ -1,4 +1,4 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From 9d77162ee95df3503a318a911865a9313a711fd7 Mon Sep 17 00:00:00 2001
 From: Sean V Kelley <sean.v.kelley@linux.intel.com>
 Date: Mon, 3 Dec 2018 09:25:08 -0800
 Subject: [PATCH] Install blenderplayer manpage
@@ -11,13 +11,13 @@ Signed-off-by: Li, Guangli <guangli.li@intel.com>
 Signed-off-by: Patrick McCarty <patrick.mccarty@intel.com>
 ---
  doc/manpage/blenderplayer.1   | 130 ++++++++++++++++++++++++++++++++++
- source/creator/CMakeLists.txt |   6 +-
- 2 files changed, 135 insertions(+), 1 deletion(-)
+ source/creator/CMakeLists.txt |   5 ++
+ 2 files changed, 135 insertions(+)
  create mode 100644 doc/manpage/blenderplayer.1
 
 diff --git a/doc/manpage/blenderplayer.1 b/doc/manpage/blenderplayer.1
 new file mode 100644
-index 0000000..57dfb33
+index 000000000000..57dfb3373e48
 --- /dev/null
 +++ b/doc/manpage/blenderplayer.1
 @@ -0,0 +1,130 @@
@@ -152,10 +152,10 @@ index 0000000..57dfb33
 +.SH AUTHORS
 +This manpage was written for a Debian by Kevin Roy <kiniou@gmail.com>.
 diff --git a/source/creator/CMakeLists.txt b/source/creator/CMakeLists.txt
-index d6bb8a6..9e30789 100644
+index 20d8d0a0802d..4ae1718fee8a 100644
 --- a/source/creator/CMakeLists.txt
 +++ b/source/creator/CMakeLists.txt
-@@ -492,6 +492,7 @@ if(UNIX AND NOT APPLE)
+@@ -624,6 +624,7 @@ if(UNIX AND NOT APPLE)
        FILES
          ${CMAKE_SOURCE_DIR}/release/freedesktop/blender.desktop
          ${CMAKE_SOURCE_DIR}/release/freedesktop/icons/scalable/apps/blender.svg
@@ -163,16 +163,17 @@ index d6bb8a6..9e30789 100644
          ${CMAKE_SOURCE_DIR}/release/freedesktop/icons/symbolic/apps/blender-symbolic.svg
        DESTINATION "."
      )
-@@ -525,8 +526,11 @@ if(UNIX AND NOT APPLE)
-         FILES ${CMAKE_CURRENT_BINARY_DIR}/blender.1
-         DESTINATION share/man/man1
-       )
+@@ -1732,6 +1733,10 @@ endif()\n\
+           FILES ${CMAKE_CURRENT_BINARY_DIR}/blender.1
+           DESTINATION share/man/man1
+         )
 +      install(
 +        FILES ${CMAKE_SOURCE_DIR}/doc/manpage/blenderplayer.1
 +        DESTINATION share/man/man1
 +      )
+       endif()
      endif()
--
-     # misc files
-     install(
-       FILES ${CMAKE_SOURCE_DIR}/release/freedesktop/blender.desktop
+   endif()
+-- 
+2.41.0
+
