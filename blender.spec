@@ -4,10 +4,10 @@
 # Using build pattern: cmake
 #
 Name     : blender
-Version  : 3.6.1
-Release  : 78
-URL      : https://download.blender.org/source/blender-3.6.1.tar.xz
-Source0  : https://download.blender.org/source/blender-3.6.1.tar.xz
+Version  : 3.6.2
+Release  : 79
+URL      : https://download.blender.org/source/blender-3.6.2.tar.xz
+Source0  : https://download.blender.org/source/blender-3.6.2.tar.xz
 Summary  : A fully integrated 3D graphics creation suite
 Group    : Development/Tools
 License  : Apache-2.0 BSD-2-Clause BSD-3-Clause BSD-3-Clause-LBNL BSD-4-Clause BSL-1.0 CC0-1.0 FTL GPL-2.0 GPL-3.0 LGPL-2.1 MIT OFL-1.0 OpenSSL Python-2.0
@@ -46,6 +46,7 @@ BuildRequires : gmp-dev
 BuildRequires : googletest-dev
 BuildRequires : jemalloc-dev
 BuildRequires : libX11-dev libICE-dev libSM-dev libXau-dev libXcomposite-dev libXcursor-dev libXdamage-dev libXdmcp-dev libXext-dev libXfixes-dev libXft-dev libXi-dev libXinerama-dev libXi-dev libXmu-dev libXpm-dev libXrandr-dev libXrender-dev libXres-dev libXScrnSaver-dev libXt-dev libXtst-dev libXv-dev libXxf86vm-dev
+BuildRequires : libepoxy-dev
 BuildRequires : libjpeg-turbo-dev
 BuildRequires : libpng-dev
 BuildRequires : llvm
@@ -57,7 +58,6 @@ BuildRequires : openal-soft-dev
 BuildRequires : openexr-dev
 BuildRequires : pkg-config
 BuildRequires : pkgconfig(dbus-1)
-BuildRequires : pkgconfig(epoxy)
 BuildRequires : pkgconfig(fftw3)
 BuildRequires : pkgconfig(gl)
 BuildRequires : pkgconfig(glew)
@@ -161,8 +161,8 @@ man components for the blender package.
 
 
 %prep
-%setup -q -n blender-3.6.1
-cd %{_builddir}/blender-3.6.1
+%setup -q -n blender-3.6.2
+cd %{_builddir}/blender-3.6.2
 %patch -P 1 -p1
 %patch -P 2 -p1
 %patch -P 3 -p1
@@ -176,11 +176,11 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1690318459
+export SOURCE_DATE_EPOCH=1692289145
 mkdir -p clr-build
 pushd clr-build
 export GCC_IGNORE_WERROR=1
-export CFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wformat -Wformat-security -Wno-error -Wl,-z,max-page-size=0x4000 -march=westmere"
+export CFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wformat -Wformat-security -Wno-error -Wl,-z,max-page-size=0x4000 -fPIC -march=westmere"
 export CXXFLAGS=$CFLAGS
 export FFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wno-error -Wl,-z,max-page-size=0x4000 -march=westmere"
 export FCFLAGS=$FFLAGS
@@ -238,7 +238,7 @@ popd
 mkdir -p clr-build-avx2
 pushd clr-build-avx2
 export GCC_IGNORE_WERROR=1
-export CFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wformat -Wformat-security -Wno-error -Wl,-z,max-page-size=0x4000 -march=westmere"
+export CFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wformat -Wformat-security -Wno-error -Wl,-z,max-page-size=0x4000 -fPIC -march=westmere"
 export CXXFLAGS=$CFLAGS
 export FFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wno-error -Wl,-z,max-page-size=0x4000 -march=westmere"
 export FCFLAGS=$FFLAGS
@@ -299,7 +299,7 @@ make  %{?_smp_mflags}  -O
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1690318459
+export SOURCE_DATE_EPOCH=1692289145
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/blender
 cp %{_builddir}/blender-%{version}/COPYING %{buildroot}/usr/share/package-licenses/blender/002c2409e6067c4266c849727f3fc57978f4a2b5 || :
