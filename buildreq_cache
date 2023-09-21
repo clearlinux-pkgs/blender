@@ -1,4 +1,4 @@
-3.6.2
+3.6.3
 pkgconfig(wayland-client)
 pkgconfig(wayland-cursor)
 pkgconfig(wayland-egl)

@@ -4,10 +4,10 @@
 # Using build pattern: cmake
 #
 Name     : blender
-Version  : 3.6.2
-Release  : 79
-URL      : https://download.blender.org/source/blender-3.6.2.tar.xz
-Source0  : https://download.blender.org/source/blender-3.6.2.tar.xz
+Version  : 3.6.3
+Release  : 80
+URL      : https://download.blender.org/source/blender-3.6.3.tar.xz
+Source0  : https://download.blender.org/source/blender-3.6.3.tar.xz
 Summary  : A fully integrated 3D graphics creation suite
 Group    : Development/Tools
 License  : Apache-2.0 BSD-2-Clause BSD-3-Clause BSD-3-Clause-LBNL BSD-4-Clause BSL-1.0 CC0-1.0 FTL GPL-2.0 GPL-3.0 LGPL-2.1 MIT OFL-1.0 OpenSSL Python-2.0
@@ -161,8 +161,8 @@ man components for the blender package.
 
 
 %prep
-%setup -q -n blender-3.6.2
-cd %{_builddir}/blender-3.6.2
+%setup -q -n blender-3.6.3
+cd %{_builddir}/blender-3.6.3
 %patch -P 1 -p1
 %patch -P 2 -p1
 %patch -P 3 -p1
@@ -176,7 +176,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1692289145
+export SOURCE_DATE_EPOCH=1695322007
 mkdir -p clr-build
 pushd clr-build
 export GCC_IGNORE_WERROR=1
@@ -299,7 +299,7 @@ make  %{?_smp_mflags}  -O
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1692289145
+export SOURCE_DATE_EPOCH=1695322007
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/blender
 cp %{_builddir}/blender-%{version}/COPYING %{buildroot}/usr/share/package-licenses/blender/002c2409e6067c4266c849727f3fc57978f4a2b5 || :
