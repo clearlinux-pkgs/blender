@@ -5,7 +5,7 @@
 #
 Name     : blender
 Version  : 3.6.4
-Release  : 81
+Release  : 82
 URL      : https://download.blender.org/source/blender-3.6.4.tar.xz
 Source0  : https://download.blender.org/source/blender-3.6.4.tar.xz
 Summary  : A fully integrated 3D graphics creation suite
