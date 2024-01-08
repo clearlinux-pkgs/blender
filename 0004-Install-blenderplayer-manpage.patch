@@ -152,10 +152,10 @@ index 000000000000..57dfb3373e48
 +.SH AUTHORS
 +This manpage was written for a Debian by Kevin Roy <kiniou@gmail.com>.
 diff --git a/source/creator/CMakeLists.txt b/source/creator/CMakeLists.txt
-index 20d8d0a0802d..4ae1718fee8a 100644
+index 03749f924295..b5c579199cda 100644
 --- a/source/creator/CMakeLists.txt
 +++ b/source/creator/CMakeLists.txt
-@@ -624,6 +624,7 @@ if(UNIX AND NOT APPLE)
+@@ -637,6 +637,7 @@ if(UNIX AND NOT APPLE)
        FILES
          ${CMAKE_SOURCE_DIR}/release/freedesktop/blender.desktop
          ${CMAKE_SOURCE_DIR}/release/freedesktop/icons/scalable/apps/blender.svg
@@ -163,9 +163,9 @@ index 20d8d0a0802d..4ae1718fee8a 100644
          ${CMAKE_SOURCE_DIR}/release/freedesktop/icons/symbolic/apps/blender-symbolic.svg
        DESTINATION "."
      )
-@@ -1732,6 +1733,10 @@ endif()\n\
+@@ -1824,6 +1825,10 @@ endif()\n\
            FILES ${CMAKE_CURRENT_BINARY_DIR}/blender.1
-           DESTINATION share/man/man1
+           DESTINATION "./share/man/man1"
          )
 +      install(
 +        FILES ${CMAKE_SOURCE_DIR}/doc/manpage/blenderplayer.1
@@ -176,4 +176,3 @@ index 20d8d0a0802d..4ae1718fee8a 100644
    endif()
 -- 
 2.41.0
-

@@ -1,0 +1,120 @@
+From 518a7502717c628bdec449d9d81e617189ef16f0 Mon Sep 17 00:00:00 2001
+From: "Brett T. Warden" <brett.t.warden@intel.com>
+Date: Fri, 5 Jan 2024 16:42:42 -0800
+Subject: [PATCH] Make cpython and python happy together
+
+Adapt for C API changes. Hopefully this will be fixed in a future
+release of Blender.
+---
+ .../intern/python/BPy_IntegrationType.cpp     | 13 +++----
+ .../intern/python/BPy_MediumType.cpp          | 12 ++----
+ .../freestyle/intern/python/BPy_Nature.cpp    | 39 ++++++++-----------
+ 3 files changed, 24 insertions(+), 40 deletions(-)
+
+diff --git a/source/blender/freestyle/intern/python/BPy_IntegrationType.cpp b/source/blender/freestyle/intern/python/BPy_IntegrationType.cpp
+index ba2737d0c5bb..c2f31b493574 100644
+--- a/source/blender/freestyle/intern/python/BPy_IntegrationType.cpp
++++ b/source/blender/freestyle/intern/python/BPy_IntegrationType.cpp
+@@ -188,14 +188,11 @@ PyTypeObject IntegrationType_Type = {
+ 
+ /*-----------------------BPy_IntegrationType instance definitions -------------------------*/
+ 
+-static PyLongObject _IntegrationType_MEAN = {
+-    PyVarObject_HEAD_INIT(&IntegrationType_Type, 1){MEAN}};
+-static PyLongObject _IntegrationType_MIN = {PyVarObject_HEAD_INIT(&IntegrationType_Type, 1){MIN}};
+-static PyLongObject _IntegrationType_MAX = {PyVarObject_HEAD_INIT(&IntegrationType_Type, 1){MAX}};
+-static PyLongObject _IntegrationType_FIRST = {
+-    PyVarObject_HEAD_INIT(&IntegrationType_Type, 1){FIRST}};
+-static PyLongObject _IntegrationType_LAST = {
+-    PyVarObject_HEAD_INIT(&IntegrationType_Type, 1){LAST}};
++static PyLongObject _IntegrationType_MEAN  = {{MEAN}};
++static PyLongObject _IntegrationType_MIN   = {{MIN}};
++static PyLongObject _IntegrationType_MAX   = {{MAX}};
++static PyLongObject _IntegrationType_FIRST = {{FIRST}};
++static PyLongObject _IntegrationType_LAST  = {{LAST}};
+ 
+ #define BPy_IntegrationType_MEAN ((PyObject *)&_IntegrationType_MEAN)
+ #define BPy_IntegrationType_MIN ((PyObject *)&_IntegrationType_MIN)
+diff --git a/source/blender/freestyle/intern/python/BPy_MediumType.cpp b/source/blender/freestyle/intern/python/BPy_MediumType.cpp
+index 61917d2257de..fa36fd5f3068 100644
+--- a/source/blender/freestyle/intern/python/BPy_MediumType.cpp
++++ b/source/blender/freestyle/intern/python/BPy_MediumType.cpp
+@@ -73,15 +73,9 @@ PyTypeObject MediumType_Type = {
+ 
+ /*-----------------------BPy_IntegrationType instance definitions -------------------------*/
+ 
+-PyLongObject _BPy_MediumType_DRY_MEDIUM = {
+-    PyVarObject_HEAD_INIT(&MediumType_Type, 1){Stroke::DRY_MEDIUM},
+-};
+-PyLongObject _BPy_MediumType_HUMID_MEDIUM = {
+-    PyVarObject_HEAD_INIT(&MediumType_Type, 1){Stroke::HUMID_MEDIUM},
+-};
+-PyLongObject _BPy_MediumType_OPAQUE_MEDIUM = {
+-    PyVarObject_HEAD_INIT(&MediumType_Type, 1){Stroke::OPAQUE_MEDIUM},
+-};
++PyLongObject _BPy_MediumType_DRY_MEDIUM    = {{Stroke::DRY_MEDIUM}};
++PyLongObject _BPy_MediumType_HUMID_MEDIUM  = {{Stroke::HUMID_MEDIUM}};
++PyLongObject _BPy_MediumType_OPAQUE_MEDIUM = {{Stroke::OPAQUE_MEDIUM}};
+ 
+ //-------------------MODULE INITIALIZATION--------------------------------
+ 
+diff --git a/source/blender/freestyle/intern/python/BPy_Nature.cpp b/source/blender/freestyle/intern/python/BPy_Nature.cpp
+index f218f1f16c9b..632902561ecb 100644
+--- a/source/blender/freestyle/intern/python/BPy_Nature.cpp
++++ b/source/blender/freestyle/intern/python/BPy_Nature.cpp
+@@ -137,28 +137,21 @@ PyTypeObject Nature_Type = {
+ 
+ /*-----------------------BPy_Nature instance definitions ----------------------------------*/
+ 
+-static PyLongObject _Nature_POINT = {PyVarObject_HEAD_INIT(&Nature_Type, 0){Nature::POINT}};
+-static PyLongObject _Nature_S_VERTEX = {PyVarObject_HEAD_INIT(&Nature_Type, 1){Nature::S_VERTEX}};
+-static PyLongObject _Nature_VIEW_VERTEX = {
+-    PyVarObject_HEAD_INIT(&Nature_Type, 1){Nature::VIEW_VERTEX}};
+-static PyLongObject _Nature_NON_T_VERTEX = {
+-    PyVarObject_HEAD_INIT(&Nature_Type, 1){Nature::NON_T_VERTEX}};
+-static PyLongObject _Nature_T_VERTEX = {PyVarObject_HEAD_INIT(&Nature_Type, 1){Nature::T_VERTEX}};
+-static PyLongObject _Nature_CUSP = {PyVarObject_HEAD_INIT(&Nature_Type, 1){Nature::CUSP}};
+-static PyLongObject _Nature_NO_FEATURE = {
+-    PyVarObject_HEAD_INIT(&Nature_Type, 0){Nature::NO_FEATURE}};
+-static PyLongObject _Nature_SILHOUETTE = {
+-    PyVarObject_HEAD_INIT(&Nature_Type, 1){Nature::SILHOUETTE}};
+-static PyLongObject _Nature_BORDER = {PyVarObject_HEAD_INIT(&Nature_Type, 1){Nature::BORDER}};
+-static PyLongObject _Nature_CREASE = {PyVarObject_HEAD_INIT(&Nature_Type, 1){Nature::CREASE}};
+-static PyLongObject _Nature_RIDGE = {PyVarObject_HEAD_INIT(&Nature_Type, 1){Nature::RIDGE}};
+-static PyLongObject _Nature_VALLEY = {PyVarObject_HEAD_INIT(&Nature_Type, 1){Nature::VALLEY}};
+-static PyLongObject _Nature_SUGGESTIVE_CONTOUR = {
+-    PyVarObject_HEAD_INIT(&Nature_Type, 1){Nature::SUGGESTIVE_CONTOUR}};
+-static PyLongObject _Nature_MATERIAL_BOUNDARY = {
+-    PyVarObject_HEAD_INIT(&Nature_Type, 1){Nature::MATERIAL_BOUNDARY}};
+-static PyLongObject _Nature_EDGE_MARK = {
+-    PyVarObject_HEAD_INIT(&Nature_Type, 1){Nature::EDGE_MARK}};
++static PyLongObject _Nature_POINT              = {{Nature::POINT}};
++static PyLongObject _Nature_S_VERTEX           = {{Nature::S_VERTEX}};
++static PyLongObject _Nature_VIEW_VERTEX        = {{Nature::VIEW_VERTEX}};
++static PyLongObject _Nature_NON_T_VERTEX       = {{Nature::NON_T_VERTEX}};
++static PyLongObject _Nature_T_VERTEX           = {{Nature::T_VERTEX}};
++static PyLongObject _Nature_CUSP               = {{Nature::CUSP}};
++static PyLongObject _Nature_NO_FEATURE         = {{Nature::NO_FEATURE}};
++static PyLongObject _Nature_SILHOUETTE         = {{Nature::SILHOUETTE}};
++static PyLongObject _Nature_BORDER             = {{Nature::BORDER}};
++static PyLongObject _Nature_CREASE             = {{Nature::CREASE}};
++static PyLongObject _Nature_RIDGE              = {{Nature::RIDGE}};
++static PyLongObject _Nature_VALLEY             = {{Nature::VALLEY}};
++static PyLongObject _Nature_SUGGESTIVE_CONTOUR = {{Nature::SUGGESTIVE_CONTOUR}};
++static PyLongObject _Nature_MATERIAL_BOUNDARY  = {{Nature::MATERIAL_BOUNDARY}};
++static PyLongObject _Nature_EDGE_MARK          = {{Nature::EDGE_MARK}};
+ 
+ #define BPy_Nature_POINT ((PyObject *)&_Nature_POINT)
+ #define BPy_Nature_S_VERTEX ((PyObject *)&_Nature_S_VERTEX)
+@@ -249,7 +242,7 @@ static PyObject *BPy_Nature_bitwise(PyObject *a, int op, PyObject *b)
+   else {
+     result = PyObject_NewVar(BPy_Nature, &Nature_Type, 1);
+     if (result) {
+-      result->i.ob_digit[0] = v;
++      result->i.long_value.ob_digit[0] = v;
+     }
+   }
+   return (PyObject *)result;
+-- 
+2.43.0
+

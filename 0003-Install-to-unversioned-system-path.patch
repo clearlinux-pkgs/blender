@@ -32,12 +32,12 @@ index dcb58ac26df1..20d8d0a0802d 100644
 --- a/source/creator/CMakeLists.txt
 +++ b/source/creator/CMakeLists.txt
 @@ -366,7 +366,7 @@ if(UNIX AND NOT APPLE)
-       set(TARGETDIR_TEXT .)
-       set(TARGETDIR_LIB lib)
+       set(TARGETDIR_TEXT ".")
+       set(TARGETDIR_LIB "./lib")
      else()
--      set(TARGETDIR_VER share/blender/${BLENDER_VERSION})
-+      set(TARGETDIR_VER share/blender)
-       set(TARGETDIR_TEXT share/doc/blender)
+-      set(TARGETDIR_VER "./share/blender/${BLENDER_VERSION}")
++      set(TARGETDIR_VER "./share/blender")
+       set(TARGETDIR_TEXT "./share/doc/blender")
      endif()
    endif()
 -- 

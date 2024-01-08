@@ -10,8 +10,8 @@ Signed-off-by: Li, Guangli <guangli.li@intel.com>
 Signed-off-by: Patrick McCarty <patrick.mccarty@intel.com>
 ---
  source/blender/blenkernel/BKE_appdir.h           |  1 +
- source/blender/blenkernel/intern/appdir.c        |  2 ++
- source/blender/blentranslation/intern/blt_lang.c | 10 +++++-----
+ source/blender/blenkernel/intern/appdir.cc       |  2 ++
+ source/blender/blentranslation/intern/blt_lang.cc| 10 +++++-----
  source/creator/CMakeLists.txt                    |  2 +-
  4 files changed, 9 insertions(+), 6 deletions(-)
 
@@ -27,10 +27,10 @@ index bea163a21d06..0e82484d1c8e 100644
  };
  
  /* for BKE_appdir_folder_id_version only */
-diff --git a/source/blender/blenkernel/intern/appdir.c b/source/blender/blenkernel/intern/appdir.c
+diff --git a/source/blender/blenkernel/intern/appdir.cc b/source/blender/blenkernel/intern/appdir.cc
 index 7073d69ae545..a9c7adffd326 100644
---- a/source/blender/blenkernel/intern/appdir.c
-+++ b/source/blender/blenkernel/intern/appdir.c
+--- a/source/blender/blenkernel/intern/appdir.cc
++++ b/source/blender/blenkernel/intern/appdir.cc
 @@ -678,6 +678,8 @@ bool BKE_appdir_folder_id_ex(const int folder_id,
          break;
        }
@@ -40,21 +40,21 @@ index 7073d69ae545..a9c7adffd326 100644
  
      default:
        BLI_assert_unreachable();
-diff --git a/source/blender/blentranslation/intern/blt_lang.c b/source/blender/blentranslation/intern/blt_lang.c
+diff --git a/source/blender/blentranslation/intern/blt_lang.cc b/source/blender/blentranslation/intern/blt_lang.cc
 index a25abdae009d..4b0c8db0c669 100644
---- a/source/blender/blentranslation/intern/blt_lang.c
-+++ b/source/blender/blentranslation/intern/blt_lang.c
+--- a/source/blender/blentranslation/intern/blt_lang.cc
++++ b/source/blender/blentranslation/intern/blt_lang.cc
 @@ -62,9 +62,9 @@ static void free_locales(void)
    num_locales = num_locales_menu = 0;
  }
  
--static void fill_locales(void)
-+static void fill_locales(char *locale_path)
+-static void fill_locales()
++static void fill_locales(const char *locale_path)
  {
 -  const char *const languages_path = BKE_appdir_folder_id(BLENDER_DATAFILES, "locale");
 +  const char * const languages_path = locale_path;
    char languages[FILE_MAX];
-   LinkNode *lines = NULL, *line;
+   LinkNode *lines = nullptr, *line;
    char *str;
 @@ -72,7 +72,7 @@ static void fill_locales(void)
  
@@ -66,14 +66,14 @@ index a25abdae009d..4b0c8db0c669 100644
  
    /* This whole "parsing" code is a bit weak, in that it expects strictly formatted input file...
 @@ -179,7 +179,7 @@ EnumPropertyItem *BLT_lang_RNA_enum_properties(void)
- void BLT_lang_init(void)
+ void BLT_lang_init()
  {
  #ifdef WITH_INTERNATIONAL
 -  const char *const messagepath = BKE_appdir_folder_id(BLENDER_DATAFILES, "locale");
-+  const char * const messagepath = BKE_appdir_folder_id(BLENDER_SYSTEM_LOCALE, NULL);
++  const char *const messagepath = BKE_appdir_folder_id(BLENDER_SYSTEM_LOCALE, nullptr);
  #endif
  
-   /* Make sure LANG is correct and wouldn't cause #std::runtime_error. */
+ /* Make sure LANG is correct and wouldn't cause #std::runtime_error. */
 @@ -212,7 +212,7 @@ void BLT_lang_init(void)
  #ifdef WITH_INTERNATIONAL
    if (messagepath) {
