@@ -1,4 +1,4 @@
-From 30c3059fa07ca9927d4e37cf3c0ec27da7d587cd Mon Sep 17 00:00:00 2001
+From 6bf665586c0cd4164c9a95b74e70a0ae9d4e8512 Mon Sep 17 00:00:00 2001
 From: Sean V Kelley <sean.v.kelley@linux.intel.com>
 Date: Mon, 3 Dec 2018 09:25:08 -0800
 Subject: [PATCH] Install internal fonts to different location
@@ -10,25 +10,26 @@ Subject: [PATCH] Install internal fonts to different location
 Signed-off-by: Li, Guangli <guangli.li@intel.com>
 Signed-off-by: Patrick McCarty <patrick.mccarty@intel.com>
 ---
- source/blender/blenfont/intern/blf_font_default.cc | 2 +-
- source/creator/CMakeLists.txt                     | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ source/blender/blenfont/intern/blf_font_default.cc | 3 +--
+ source/creator/CMakeLists.txt                      | 4 ++--
+ 2 files changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/source/blender/blenfont/intern/blf_font_default.c b/source/blender/blenfont/intern/blf_font_default.c
-index 8b1290352152..3ee647e8ce18 100644
+diff --git a/source/blender/blenfont/intern/blf_font_default.cc b/source/blender/blenfont/intern/blf_font_default.cc
+index 070818d6131a..e8e0e9a84b6d 100644
 --- a/source/blender/blenfont/intern/blf_font_default.cc
 +++ b/source/blender/blenfont/intern/blf_font_default.cc
-@@ -22,7 +22,7 @@
+@@ -23,8 +23,7 @@
  
  static int blf_load_font_default(const char *filename, const bool unique)
  {
--  const char *dir = BKE_appdir_folder_id(BLENDER_DATAFILES, BLF_DATAFILES_FONTS_DIR);
-+  const char *dir = "/usr/share/fonts/blender";
-   if (dir == nullptr) {
+-  const std::optional<std::string> dir = BKE_appdir_folder_id(BLENDER_DATAFILES,
+-                                                              BLF_DATAFILES_FONTS_DIR);
++  const std::optional<std::string> dir = "/usr/share/fonts/blender";
+   if (!dir.has_value()) {
      fprintf(stderr,
              "%s: 'fonts' data path not found for '%s', will not be able to display text\n",
 diff --git a/source/creator/CMakeLists.txt b/source/creator/CMakeLists.txt
-index b5c579199cda..0767e9fa7cfe 100644
+index 23832f21329d..1be9c0605377 100644
 --- a/source/creator/CMakeLists.txt
 +++ b/source/creator/CMakeLists.txt
 @@ -473,8 +473,8 @@ endif()
@@ -43,4 +44,5 @@ index b5c579199cda..0767e9fa7cfe 100644
  
  # localization
 -- 
-2.41.0
+2.44.0
+

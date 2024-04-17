@@ -1,4 +1,4 @@
-From ef88c49d84bdd44dea4bd11cbd094de5b34163b0 Mon Sep 17 00:00:00 2001
+From 5f07790d3c71c7b365992d711a380005600b7071 Mon Sep 17 00:00:00 2001
 From: Sean V Kelley <sean.v.kelley@linux.intel.com>
 Date: Mon, 3 Dec 2018 09:25:08 -0800
 Subject: [PATCH] Install locale files to different location
@@ -9,17 +9,17 @@ Subject: [PATCH] Install locale files to different location
 Signed-off-by: Li, Guangli <guangli.li@intel.com>
 Signed-off-by: Patrick McCarty <patrick.mccarty@intel.com>
 ---
- source/blender/blenkernel/BKE_appdir.h           |  1 +
- source/blender/blenkernel/intern/appdir.cc       |  2 ++
- source/blender/blentranslation/intern/blt_lang.cc| 10 +++++-----
- source/creator/CMakeLists.txt                    |  2 +-
+ source/blender/blenkernel/BKE_appdir.hh           |  1 +
+ source/blender/blenkernel/intern/appdir.cc        |  2 ++
+ source/blender/blentranslation/intern/blt_lang.cc | 10 +++++-----
+ source/creator/CMakeLists.txt                     |  2 +-
  4 files changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/source/blender/blenkernel/BKE_appdir.h b/source/blender/blenkernel/BKE_appdir.h
-index bea163a21d06..0e82484d1c8e 100644
---- a/source/blender/blenkernel/BKE_appdir.h
-+++ b/source/blender/blenkernel/BKE_appdir.h
-@@ -172,6 +172,7 @@ enum {
+diff --git a/source/blender/blenkernel/BKE_appdir.hh b/source/blender/blenkernel/BKE_appdir.hh
+index 528cb849b6e8..d6bcc1716675 100644
+--- a/source/blender/blenkernel/BKE_appdir.hh
++++ b/source/blender/blenkernel/BKE_appdir.hh
+@@ -174,6 +174,7 @@ enum {
    BLENDER_SYSTEM_DATAFILES = 52,
    BLENDER_SYSTEM_SCRIPTS = 53,
    BLENDER_SYSTEM_PYTHON = 54,
@@ -28,10 +28,10 @@ index bea163a21d06..0e82484d1c8e 100644
  
  /* for BKE_appdir_folder_id_version only */
 diff --git a/source/blender/blenkernel/intern/appdir.cc b/source/blender/blenkernel/intern/appdir.cc
-index 7073d69ae545..a9c7adffd326 100644
+index 120a095a1ccc..ff10882189fa 100644
 --- a/source/blender/blenkernel/intern/appdir.cc
 +++ b/source/blender/blenkernel/intern/appdir.cc
-@@ -678,6 +678,8 @@ bool BKE_appdir_folder_id_ex(const int folder_id,
+@@ -676,6 +676,8 @@ bool BKE_appdir_folder_id_ex(const int folder_id,
          break;
        }
        return false;
@@ -41,53 +41,53 @@ index 7073d69ae545..a9c7adffd326 100644
      default:
        BLI_assert_unreachable();
 diff --git a/source/blender/blentranslation/intern/blt_lang.cc b/source/blender/blentranslation/intern/blt_lang.cc
-index a25abdae009d..4b0c8db0c669 100644
+index 6da6d929aa8a..4d187d4179f7 100644
 --- a/source/blender/blentranslation/intern/blt_lang.cc
 +++ b/source/blender/blentranslation/intern/blt_lang.cc
-@@ -62,9 +62,9 @@ static void free_locales(void)
+@@ -63,9 +63,9 @@ static void free_locales()
    num_locales = num_locales_menu = 0;
  }
  
 -static void fill_locales()
 +static void fill_locales(const char *locale_path)
  {
--  const char *const languages_path = BKE_appdir_folder_id(BLENDER_DATAFILES, "locale");
-+  const char * const languages_path = locale_path;
+-  std::optional<std::string> languages_path = BKE_appdir_folder_id(BLENDER_DATAFILES, "locale");
++  std::optional<std::string> languages_path = locale_path;
    char languages[FILE_MAX];
-   LinkNode *lines = nullptr, *line;
+   LinkNode *lines = nullptr, *line = nullptr;
    char *str;
-@@ -72,7 +72,7 @@ static void fill_locales(void)
- 
+@@ -74,7 +74,7 @@ static void fill_locales()
    free_locales();
  
--  BLI_path_join(languages, FILE_MAX, languages_path, "languages");
-+  BLI_path_join(languages, FILE_MAX, locale_path, "languages");
-   line = lines = BLI_file_read_as_lines(languages);
+   if (languages_path.has_value()) {
+-    BLI_path_join(languages, FILE_MAX, languages_path->c_str(), "languages");
++    BLI_path_join(languages, FILE_MAX, locale_path, "languages");
+     line = lines = BLI_file_read_as_lines(languages);
+   }
  
-   /* This whole "parsing" code is a bit weak, in that it expects strictly formatted input file...
-@@ -179,7 +179,7 @@ EnumPropertyItem *BLT_lang_RNA_enum_properties(void)
+@@ -183,7 +183,7 @@ EnumPropertyItem *BLT_lang_RNA_enum_properties()
  void BLT_lang_init()
  {
  #ifdef WITH_INTERNATIONAL
--  const char *const messagepath = BKE_appdir_folder_id(BLENDER_DATAFILES, "locale");
-+  const char *const messagepath = BKE_appdir_folder_id(BLENDER_SYSTEM_LOCALE, nullptr);
+-  const std::optional<std::string> messagepath = BKE_appdir_folder_id(BLENDER_DATAFILES, "locale");
++  const std::optional<std::string> messagepath = BKE_appdir_folder_id(BLENDER_SYSTEM_LOCALE, nullptr);
  #endif
  
  /* Make sure LANG is correct and wouldn't cause #std::runtime_error. */
-@@ -212,7 +212,7 @@ void BLT_lang_init(void)
+@@ -216,7 +216,7 @@ void BLT_lang_init()
  #ifdef WITH_INTERNATIONAL
-   if (messagepath) {
-     bl_locale_init(messagepath, TEXT_DOMAIN_NAME);
+   if (messagepath.has_value()) {
+     bl_locale_init(messagepath->c_str(), TEXT_DOMAIN_NAME);
 -    fill_locales();
-+    fill_locales(messagepath);
++    fill_locales(messagepath->c_str());
    }
    else {
      printf("%s: 'locale' data path for translations not found, continuing\n", __func__);
 diff --git a/source/creator/CMakeLists.txt b/source/creator/CMakeLists.txt
-index 614e39651fd8..6c847f789682 100644
+index 1be9c0605377..e1a00a3ce318 100644
 --- a/source/creator/CMakeLists.txt
 +++ b/source/creator/CMakeLists.txt
-@@ -476,7 +476,7 @@ install(
+@@ -480,7 +480,7 @@ install(
  # localization
  if(WITH_INTERNATIONAL)
    set(_locale_dir "${CMAKE_SOURCE_DIR}/locale")
@@ -97,5 +97,5 @@ index 614e39651fd8..6c847f789682 100644
    file(GLOB _po_files "${_locale_dir}/po/*.po")
    foreach(_po_file ${_po_files})
 -- 
-2.41.0
+2.44.0
 

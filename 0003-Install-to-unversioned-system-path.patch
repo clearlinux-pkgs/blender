@@ -1,4 +1,4 @@
-From 6513f4f3900a749a33b2121630625fee0b0ea12c Mon Sep 17 00:00:00 2001
+From f96bdd2696ab87acd18dd3cb5dc5ac1d13274b27 Mon Sep 17 00:00:00 2001
 From: Sean V Kelley <sean.v.kelley@linux.intel.com>
 Date: Mon, 3 Dec 2018 09:25:08 -0800
 Subject: [PATCH] Install to unversioned system path
@@ -14,10 +14,10 @@ Signed-off-by: Patrick McCarty <patrick.mccarty@intel.com>
  2 files changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/intern/ghost/intern/GHOST_SystemPathsUnix.cc b/intern/ghost/intern/GHOST_SystemPathsUnix.cc
-index 1c1bad320dc8..bfb62fb8fca1 100644
+index 567c56a16dea..d8b49201acdb 100644
 --- a/intern/ghost/intern/GHOST_SystemPathsUnix.cc
 +++ b/intern/ghost/intern/GHOST_SystemPathsUnix.cc
-@@ -32,6 +32,9 @@ GHOST_SystemPathsUnix::~GHOST_SystemPathsUnix() {}
+@@ -33,6 +33,9 @@ GHOST_SystemPathsUnix::~GHOST_SystemPathsUnix() {}
  
  const char *GHOST_SystemPathsUnix::getSystemDir(int /*version*/, const char *versionstr) const
  {
@@ -28,10 +28,10 @@ index 1c1bad320dc8..bfb62fb8fca1 100644
    if (static_path) {
      static string system_path = string(static_path) + "/blender/" + versionstr;
 diff --git a/source/creator/CMakeLists.txt b/source/creator/CMakeLists.txt
-index dcb58ac26df1..20d8d0a0802d 100644
+index 3fe3416c493b..dbf71912e7df 100644
 --- a/source/creator/CMakeLists.txt
 +++ b/source/creator/CMakeLists.txt
-@@ -366,7 +366,7 @@ if(UNIX AND NOT APPLE)
+@@ -377,7 +377,7 @@ if(UNIX AND NOT APPLE)
        set(TARGETDIR_TEXT ".")
        set(TARGETDIR_LIB "./lib")
      else()
@@ -41,5 +41,5 @@ index dcb58ac26df1..20d8d0a0802d 100644
      endif()
    endif()
 -- 
-2.41.0
+2.44.0
 

@@ -1,4 +1,4 @@
-From e0325699d12bdc13aab0d106d72f966c2a6be008 Mon Sep 17 00:00:00 2001
+From 8a18c78a7aec66644c847a44d489bb0079b1c204 Mon Sep 17 00:00:00 2001
 From: Sean V Kelley <sean.v.kelley@linux.intel.com>
 Date: Mon, 3 Dec 2018 09:25:08 -0800
 Subject: [PATCH] Install scripts to different location
@@ -13,7 +13,7 @@ Signed-off-by: Patrick McCarty <patrick.mccarty@intel.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/source/creator/CMakeLists.txt b/source/creator/CMakeLists.txt
-index 669431113802..013c3f9f00eb 100644
+index 7e3235e26415..3fe3416c493b 100644
 --- a/source/creator/CMakeLists.txt
 +++ b/source/creator/CMakeLists.txt
 @@ -441,8 +441,8 @@ if(WITH_PYTHON)
@@ -28,5 +28,5 @@ index 669431113802..013c3f9f00eb 100644
      PATTERN ".gitignore" EXCLUDE
      PATTERN ".gitea" EXCLUDE
 -- 
-2.43.0
+2.44.0
 

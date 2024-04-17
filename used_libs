@@ -3,8 +3,8 @@ libAlembic.so.1.8
 libIex-3_1.so.30
 libImath-3_1.so.29
 libOpenEXR-3_1.so.30
-libOpenImageIO.so.2.4
-libOpenImageIO_Util.so.2.4
+libOpenImageIO.so.2.5
+libOpenImageIO_Util.so.2.5
 libX11.so.6
 libboost_locale.so.1.77.0
 libc.so.6
