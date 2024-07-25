@@ -7,7 +7,7 @@
 #
 Name     : blender
 Version  : 4.1.1
-Release  : 86
+Release  : 87
 URL      : https://download.blender.org/source/blender-4.1.1.tar.xz
 Source0  : https://download.blender.org/source/blender-4.1.1.tar.xz
 Summary  : A fully integrated 3D graphics creation suite
