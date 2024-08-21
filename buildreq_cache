@@ -1,7 +1,2 @@
-4.1.1
-pkgconfig(wayland-client)
-pkgconfig(wayland-cursor)
-pkgconfig(wayland-egl)
-pkgconfig(wayland-protocols)
-pkgconfig(wayland-scanner)
+4.2.0
 pulseaudio-dev
