@@ -7,7 +7,7 @@
 #
 Name     : blender
 Version  : 4.2.3
-Release  : 89
+Release  : 90
 URL      : https://download.blender.org/source/blender-4.2.3.tar.xz
 Source0  : https://download.blender.org/source/blender-4.2.3.tar.xz
 Summary  : A fully integrated 3D graphics creation suite
