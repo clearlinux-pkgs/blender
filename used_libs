@@ -5,6 +5,7 @@ libImath-3_1.so.29
 libOpenEXR-3_1.so.30
 libOpenImageIO.so.2.5
 libOpenImageIO_Util.so.2.5
+libSDL2-2.0.so.0
 libX11.so.6
 libboost_locale.so.1.83.0
 libc.so.6
@@ -25,9 +26,11 @@ libpng16.so.16
 libpotrace.so.0
 libpugixml.so.1
 libpulse.so.0
-libpython3.12.so.1.0
+libpython3.13.so.1.0
+libshaderc_shared.so.1
 libstdc++.so.6
 libtbb.so.12
+libvulkan.so.1
 libwebp.so.7
 libxkbcommon.so.0
 libz.so.1

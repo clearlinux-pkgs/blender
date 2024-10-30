@@ -1,9 +1,9 @@
 0001-Install-scripts-to-different-location.patch
-0003-Install-to-unversioned-system-path.patch
-0004-Install-blenderplayer-manpage.patch
-0005-Install-internal-fonts-to-different-location.patch
-0006-Install-locale-files-to-different-location.patch
-0007-add-mime-file.patch
-0008-cmake-Add-usr-to-Alembic-search-path.patch
-#0009-Fix-build-with-openexr-3.x.patch
-#backport-Make-cpython-and-python-happy-together.patch
+0002-Install-to-unversioned-system-path.patch
+0003-Install-blenderplayer-manpage.patch
+0004-Install-internal-fonts-to-different-location.patch
+0005-Install-locale-files-to-different-location.patch
+0006-add-mime-file.patch
+0007-cmake-Add-usr-to-Alembic-search-path.patch
+0008-PyAPI-support-Python-3.13.patch
+0009-Unbreak-building-with-Python-3.12.patch

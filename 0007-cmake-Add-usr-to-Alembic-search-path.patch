@@ -1,7 +1,7 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From 19d57529a4654afefdf6d6653dfe1b86df445bb7 Mon Sep 17 00:00:00 2001
 From: Sean V Kelley <sean.v.kelley@linux.intel.com>
 Date: Wed, 19 Dec 2018 14:44:01 -0800
-Subject: [PATCH] cmake: Add /usr to Alembic search path
+Subject: [PATCH 7/9] cmake: Add /usr to Alembic search path
 
 2021-02-21: Rebased for update to 2.91.2
 
@@ -12,10 +12,10 @@ Signed-off-by: Patrick McCarty <patrick.mccarty@intel.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/build_files/cmake/Modules/FindAlembic.cmake b/build_files/cmake/Modules/FindAlembic.cmake
-index 18214b2..51889fb 100644
+index 9dfea57..1147ba7 100644
 --- a/build_files/cmake/Modules/FindAlembic.cmake
 +++ b/build_files/cmake/Modules/FindAlembic.cmake
-@@ -23,6 +23,7 @@ ENDIF()
+@@ -24,6 +24,7 @@ endif()
  
  set(_alembic_SEARCH_DIRS
    ${ALEMBIC_ROOT_DIR}
@@ -23,3 +23,6 @@ index 18214b2..51889fb 100644
    /opt/lib/alembic
  )
  
+-- 
+2.47.0
+

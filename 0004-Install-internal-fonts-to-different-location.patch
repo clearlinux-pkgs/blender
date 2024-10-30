@@ -1,7 +1,7 @@
-From 6bf665586c0cd4164c9a95b74e70a0ae9d4e8512 Mon Sep 17 00:00:00 2001
+From 384ab529891abc95ffd833336a29317b9fe3f0cc Mon Sep 17 00:00:00 2001
 From: Sean V Kelley <sean.v.kelley@linux.intel.com>
 Date: Mon, 3 Dec 2018 09:25:08 -0800
-Subject: [PATCH] Install internal fonts to different location
+Subject: [PATCH 4/9] Install internal fonts to different location
 
 2019-08-23: Rebased for upstream refactoring in 2.80
 2021-02-21: Revised patch subject; rebased for upstream refactoring in
@@ -15,7 +15,7 @@ Signed-off-by: Patrick McCarty <patrick.mccarty@intel.com>
  2 files changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/source/blender/blenfont/intern/blf_font_default.cc b/source/blender/blenfont/intern/blf_font_default.cc
-index 070818d6131a..e8e0e9a84b6d 100644
+index 08fb25f..d692159 100644
 --- a/source/blender/blenfont/intern/blf_font_default.cc
 +++ b/source/blender/blenfont/intern/blf_font_default.cc
 @@ -23,8 +23,7 @@
@@ -29,10 +29,10 @@ index 070818d6131a..e8e0e9a84b6d 100644
      fprintf(stderr,
              "%s: 'fonts' data path not found for '%s', will not be able to display text\n",
 diff --git a/source/creator/CMakeLists.txt b/source/creator/CMakeLists.txt
-index 23832f21329d..1be9c0605377 100644
+index 53d42de..ab9366a 100644
 --- a/source/creator/CMakeLists.txt
 +++ b/source/creator/CMakeLists.txt
-@@ -473,8 +473,8 @@ endif()
+@@ -477,8 +477,8 @@ endif()
  
  # fonts
  install(
@@ -44,5 +44,5 @@ index 23832f21329d..1be9c0605377 100644
  
  # localization
 -- 
-2.44.0
+2.47.0
 

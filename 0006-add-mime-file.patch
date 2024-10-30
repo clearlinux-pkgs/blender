@@ -1,7 +1,7 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From 8ad5d1e7bdb2c2335ba56c69fb89f661b264327a Mon Sep 17 00:00:00 2001
 From: Sean V Kelley <sean.v.kelley@linux.intel.com>
 Date: Tue, 27 Nov 2018 17:32:09 -0800
-Subject: [PATCH] add mime file
+Subject: [PATCH 6/9] add mime file
 
 Signed-off-by: Sean V Kelley <sean.v.kelley@linux.intel.com>
 ---
@@ -22,3 +22,6 @@ index 0000000..7cee114
 +        <glob pattern="*.blend" />
 +  </mime-type>
 +</mime-info>
+-- 
+2.47.0
+
