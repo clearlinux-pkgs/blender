@@ -7,7 +7,7 @@
 #
 Name     : blender
 Version  : 4.3
-Release  : 91
+Release  : 92
 URL      : http://localhost/cgit/projects/blender/snapshot/blender-4.3.tar.xz
 Source0  : http://localhost/cgit/projects/blender/snapshot/blender-4.3.tar.xz
 Summary  : A fully integrated 3D graphics creation suite
