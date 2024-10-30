@@ -8,8 +8,8 @@
 Name     : blender
 Version  : 4.3
 Release  : 91
-URL      : https://projects.blender.org/blender/blender/archive/blender-v4.3-release.tar.gz
-Source0  : https://projects.blender.org/blender/blender/archive/blender-v4.3-release.tar.gz
+URL      : http://localhost/cgit/projects/blender/snapshot/blender-4.3.tar.xz
+Source0  : http://localhost/cgit/projects/blender/snapshot/blender-4.3.tar.xz
 Summary  : A fully integrated 3D graphics creation suite
 Group    : Development/Tools
 License  : Apache-2.0 BSD-2-Clause BSD-3-Clause BSD-3-Clause-LBNL BSL-1.0 CC0-1.0 GPL-2.0 GPL-3.0 LGPL-2.1 MIT MPL-2.0-no-copyleft-exception Zlib

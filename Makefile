@@ -1,5 +1,6 @@
 PKG_NAME := blender
-URL = https://projects.blender.org/blender/blender/archive/blender-v4.3-release.tar.gz
+URL = $(CGIT_BASE_URL)/projects/blender/snapshot/blender-4.3.tar.xz
+
 ARCHIVES = 
 
 include ../common/Makefile.common
