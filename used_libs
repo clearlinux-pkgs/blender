@@ -8,7 +8,6 @@ libOpenImageIO.so.3.0
 libOpenImageIO_Util.so.3.0
 libSDL2-2.0.so.0
 libX11.so.6
-libboost_locale.so.1.83.0
 libc.so.6
 libembree4.so.4
 libepoxy.so.0
@@ -23,6 +22,7 @@ libjpeg.so.62
 liblzo2.so.2
 libm.so.6
 libopenal.so.1
+libpipewire-0.3.so.0
 libpng16.so.16
 libpotrace.so.0
 libpugixml.so.1

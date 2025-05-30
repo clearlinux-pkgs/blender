@@ -1,7 +1,7 @@
-From 19d57529a4654afefdf6d6653dfe1b86df445bb7 Mon Sep 17 00:00:00 2001
+From ad2f9016a946fb66481a0e905b0631bf2987521f Mon Sep 17 00:00:00 2001
 From: Sean V Kelley <sean.v.kelley@linux.intel.com>
 Date: Wed, 19 Dec 2018 14:44:01 -0800
-Subject: [PATCH 7/9] cmake: Add /usr to Alembic search path
+Subject: [PATCH] cmake: Add /usr to Alembic search path
 
 2021-02-21: Rebased for update to 2.91.2
 
@@ -24,5 +24,5 @@ index 9dfea57..1147ba7 100644
  )
  
 -- 
-2.47.0
+2.49.0
 

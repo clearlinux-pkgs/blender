@@ -1,5 +1,5 @@
 PKG_NAME := blender
-URL = https://projects.blender.org/blender/blender/archive/v4.3.2.tar.gz
+URL = https://download.blender.org/source/blender-4.4.3.tar.xz
 ARCHIVES = 
 
 include ../common/Makefile.common

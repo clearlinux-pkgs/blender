@@ -5,6 +5,3 @@
 0005-Install-locale-files-to-different-location.patch
 0006-add-mime-file.patch
 0007-cmake-Add-usr-to-Alembic-search-path.patch
-0008-PyAPI-support-Python-3.13.patch
-0009-Unbreak-building-with-Python-3.12.patch
-backport-replace-deprecated-oiio.patch

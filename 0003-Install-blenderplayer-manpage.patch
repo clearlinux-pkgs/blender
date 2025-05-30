@@ -1,7 +1,7 @@
-From 8c65852afb33332049f422374f279a67cb36cfb4 Mon Sep 17 00:00:00 2001
+From c056fb14f83ca58944bb718a0af738fe947a345f Mon Sep 17 00:00:00 2001
 From: Sean V Kelley <sean.v.kelley@linux.intel.com>
 Date: Mon, 3 Dec 2018 09:25:08 -0800
-Subject: [PATCH 3/9] Install blenderplayer manpage
+Subject: [PATCH] Install blenderplayer manpage
 
 2019-08-24: Rebased for update to 2.80
 2021-02-21: Revised patch subject; removed trailing blank line from
@@ -152,10 +152,10 @@ index 0000000..57dfb33
 +.SH AUTHORS
 +This manpage was written for a Debian by Kevin Roy <kiniou@gmail.com>.
 diff --git a/source/creator/CMakeLists.txt b/source/creator/CMakeLists.txt
-index f0aafaa..53d42de 100644
+index c1bdd0d..489ff97 100644
 --- a/source/creator/CMakeLists.txt
 +++ b/source/creator/CMakeLists.txt
-@@ -711,6 +711,7 @@ if(UNIX AND NOT APPLE)
+@@ -742,6 +742,7 @@ if(UNIX AND NOT APPLE)
        FILES
          ${CMAKE_SOURCE_DIR}/release/freedesktop/blender.desktop
          ${CMAKE_SOURCE_DIR}/release/freedesktop/icons/scalable/apps/blender.svg
@@ -163,7 +163,7 @@ index f0aafaa..53d42de 100644
          ${CMAKE_SOURCE_DIR}/release/freedesktop/icons/symbolic/apps/blender-symbolic.svg
        DESTINATION "."
      )
-@@ -2024,6 +2025,10 @@ endif()\n\
+@@ -2107,6 +2108,10 @@ endif()\n\
            FILES ${CMAKE_CURRENT_BINARY_DIR}/blender.1
            DESTINATION "./share/man/man1"
          )
@@ -175,5 +175,5 @@ index f0aafaa..53d42de 100644
      endif()
    endif()
 -- 
-2.47.0
+2.49.0
 

@@ -1,7 +1,7 @@
-From 384ab529891abc95ffd833336a29317b9fe3f0cc Mon Sep 17 00:00:00 2001
+From 51acf0806668e917b508cfa436325653c1305150 Mon Sep 17 00:00:00 2001
 From: Sean V Kelley <sean.v.kelley@linux.intel.com>
 Date: Mon, 3 Dec 2018 09:25:08 -0800
-Subject: [PATCH 4/9] Install internal fonts to different location
+Subject: [PATCH] Install internal fonts to different location
 
 2019-08-23: Rebased for upstream refactoring in 2.80
 2021-02-21: Revised patch subject; rebased for upstream refactoring in
@@ -29,10 +29,10 @@ index 08fb25f..d692159 100644
      fprintf(stderr,
              "%s: 'fonts' data path not found for '%s', will not be able to display text\n",
 diff --git a/source/creator/CMakeLists.txt b/source/creator/CMakeLists.txt
-index 53d42de..ab9366a 100644
+index 489ff97..cc7dff1 100644
 --- a/source/creator/CMakeLists.txt
 +++ b/source/creator/CMakeLists.txt
-@@ -477,8 +477,8 @@ endif()
+@@ -504,8 +504,8 @@ endif()
  
  # fonts
  install(
@@ -44,5 +44,5 @@ index 53d42de..ab9366a 100644
  
  # localization
 -- 
-2.47.0
+2.49.0
 
